@@ -5,18 +5,20 @@ const payloadFormatter = (req, res, body) => {
         const isError = res.statusCode >= 400 && res.statusCode < 500
         if (isError) {
             response = {
-                error: 'ERROR',
                 code: body.code,
+                error: 'ERROR',
             }
         } else {
             response = {
-                error: 'INTERNAL_SERVER_ERROR',
                 code: body.code,
+                error: 'INTERNAL_SERVER_ERROR',
             }
         }
     }
 
     response = {
+        code: body.code,
+        message: 'OK',
         data: body
     }
 
