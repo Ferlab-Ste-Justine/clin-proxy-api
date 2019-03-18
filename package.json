@@ -1,0 +1,25 @@
+{
+  "name": "clin-proxy-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cp -p development.env .env && node index.js",
+    "service-auth": "node index.js --service auth"
+  },
+  "dependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/register": "^7.0.0",
+    "chalk": "^2.4.2",
+    "dotenv": "^7.0.0",
+    "eslint": "^5.15.3",
+    "eslint-config-airbnb": "^17.1.0",
+    "restify": "^8.1.1",
+    "restify-cors-middleware": "^1.1.1",
+    "restify-errors": "^7.0.0",
+    "restify-joi-middleware": "^5.0.1",
+    "restify-jwt-community": "^1.0.11",
+    "yargs": "^13.2.2"
+  }
+}
