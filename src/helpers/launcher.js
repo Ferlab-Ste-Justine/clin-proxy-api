@@ -62,9 +62,8 @@ try {
 
     for (let serviceIdx in serviceList) {
         const serviceName = serviceList[serviceIdx]
-        let config = null
         try {
-            config = generateConfig(serviceName)
+            const config = generateConfig(serviceName)
             const service = require(`./../services/${serviceName}`)
             const instance = service.start(config)
             let startDate = new Date().getTime()
@@ -88,7 +87,7 @@ try {
                 launcherLog.success(`${config.name} Service: Launched on port ${config.port}`)
             })
         } catch (e) {
-            launcherLog.error(`${config.name} Service: ${e.message}`)
+            launcherLog.error(e.message)
         }
     }
 
