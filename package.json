@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cp -p development.env .env && node index.js",
-    "service-auth": "node index.js --service auth"
+    "service-auth": "node index.js --service auth",
+    "service-query": "node index.js --service query"
   },
   "dependencies": {
     "@babel/core": "^7.3.4",
@@ -13,8 +14,13 @@
     "@babel/register": "^7.0.0",
     "chalk": "^2.4.2",
     "dotenv": "^7.0.0",
+    "elasticsearch": "^15.4.1",
     "eslint": "^5.15.3",
     "eslint-config-airbnb": "^17.1.0",
+    "graphql": "^14.1.1",
+    "graphql-compose": "^6.0.3",
+    "graphql-compose-elasticsearch": "^3.0.1",
+    "joi": "^14.3.1",
     "restify": "^8.1.1",
     "restify-cors-middleware": "^1.1.1",
     "restify-errors": "^7.0.0",
