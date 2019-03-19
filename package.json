@@ -20,6 +20,7 @@
     "restify-errors": "^7.0.0",
     "restify-joi-middleware": "^5.0.1",
     "restify-jwt-community": "^1.0.11",
+    "uniqid": "^5.0.3",
     "yargs": "^13.2.2"
   }
 }

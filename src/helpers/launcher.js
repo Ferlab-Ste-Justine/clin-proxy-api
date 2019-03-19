@@ -1,4 +1,5 @@
 const args = require('yargs').argv
+const uniqid = require('uniqid')
 
 const addCorsMiddleware = require('./../service/middleware/cors')
 const addGzipMiddleware = require('./../service/middleware/gzip')
@@ -11,6 +12,7 @@ const logger = require(`./../loggers/${process.env.LOGGER}`)
 
 const launcherVersion = process.env.npm_package_version
 const services = JSON.parse(process.env.SERVICES)
+const containerId = process.env.CONTAINER_ID || uniqid()
 const serviceCorsConfig = process.env.CORS_ORIGINS
 const serviceJwtSecret = process.env.JWT_SECRET
 const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
@@ -75,6 +77,7 @@ try {
             instance.get(`${config.prefix}/health`, (req, res) => {
                 requestsServed++
                 res.send({
+                    uid: containerId,
                     version: config.version,
                     uptime: (new Date().getTime() - startDate),
                     served: requestsServed,
