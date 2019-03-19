@@ -3,7 +3,8 @@ const args = require('yargs').argv
 const logger = require(`./../loggers/${process.env.LOGGER}`)
 const formatter = require('./payload')
 
-const serviceToLaunch = args.service
+const serviceToLaunch = args.service || null
+
 const launcherVersion = process.env.npm_package_version
 const services = JSON.parse(process.env.SERVICES)
 const serviceCorsConfig = process.env.CORS_ORIGINS
@@ -47,13 +48,14 @@ const generateConfig = (serviceName) => {
 }
 
 try {
-    const serviceList = (!serviceToLaunch) ? services : [serviceToLaunch]
-    if (serviceList.length === 1 && services.indexOf(serviceToLaunch) === -1) {
+    const serviceList = !serviceToLaunch ? services : [serviceToLaunch]
+    if (serviceToLaunch && services.indexOf(serviceToLaunch) === -1) {
         throw new Error(`Service '${serviceToLaunch}' not defined in SERVICES`)
     }
 
     for (let serviceIdx in serviceList) {
         const serviceName = serviceList[serviceIdx]
+
         try {
             const service = require(`./../service/${serviceName}`)
             const config = generateConfig(serviceName)
