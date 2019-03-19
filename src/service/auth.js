@@ -6,12 +6,12 @@ const validator = require('restify-joi-middleware')
 const corsMiddleware = require('restify-cors-middleware')
 
 let server = null
-let logger = null
+let log = null
+
 module.exports = {
-    name: 'Authentication',
     start: (config, callback = null) => {
+        log = config.serviceLog
         server = restify.createServer(config.options)
-        logger = config.log
         const cors = corsMiddleware(config.cors)
         server.pre(cors.preflight)
         server.use(cors.actual)
@@ -21,35 +21,35 @@ module.exports = {
         server.use(restifyPlugins.gzipResponse())
         server.use(validator())
 
-        /* Endpoints */
-        server.get('/api/auth/health', (req, res) => {
-            return res.send({
-                'status': 'OK',
-                'version': '1.0.0'
+        server.get(`${config.prefix}/health`, (req, res) => {
+            res.send({
+                'version': config.version
             })
         })
 
-        server.post('/api/auth', (req, res, next) => {
-            return next(new errors.UnauthorizedError())
+        server.post(`${config.prefix}`, (req, res, next) => {
+            next(new errors.UnauthorizedError())
         })
 
         server.use(rjwt(config.jwt).unless({
             path: [
-                { url: '/api/auth/health', methods: ['GET'] },
-                { url: '/api/auth', methods: ['POST'] }
+                { url: `${config.prefix}/health`, methods: ['GET'] },
+                { url: `${config.prefix}`, methods: ['POST'] },
             ]
         }))
 
         server.listen(config.port, () => {
-            logger.success(`Service listening on port ${config.port}`)
+            log.success(`Service listening on port ${config.port}`)
             if (callback) {
                 callback(server, config)
             }
         })
+
+        return server
     },
     stop: (callback = null) => {
         server.close(() => {
-            logger.warning('Service stopped')
+            log.warning('Service stopped')
             if (callback) {
                 callback()
             }

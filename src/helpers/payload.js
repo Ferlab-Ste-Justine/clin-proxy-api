@@ -1,32 +1,31 @@
+const statusCodeMapping = {
+    200: 'Ok',
+    201: 'Created',
+    204: 'NoContent',
+    400: 'BadRequest',
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'NotFound',
+}
+
 const payloadFormatter = (req, res, body) => {
-    let response
+    const response = {
+        timestamp: new Date().getTime(),
+    }
 
     if (body instanceof Error) {
-        const isError = res.statusCode >= 400 && res.statusCode < 500
-        if (isError) {
-            response = {
-                code: body.code,
-                error: 'ERROR',
-            }
-        } else {
-            response = {
-                code: body.code,
-                error: 'INTERNAL_SERVER_ERROR',
-            }
-        }
+        response.error = statusCodeMapping[res.statusCode] || 'Error'
+        response.data = { message: body.body.message }
+    } else {
+        response.message = statusCodeMapping[res.statusCode] || 'Ok'
+        response.data = body
     }
 
-    response = {
-        code: body.code,
-        message: 'OK',
-        data: body
-    }
-
-    response = JSON.stringify(response)
-    res.header('Content-Length', Buffer.byteLength(response))
+    const finalResponse = JSON.stringify(response)
+    res.header('Content-Length', Buffer.byteLength(finalResponse))
     res.header('Content-Type', 'application/json')
 
-    return response
+    return finalResponse
 }
 
 module.exports = payloadFormatter
