@@ -6,6 +6,7 @@ const statusCodeMapping = {
     401: 'Unauthorized',
     403: 'Forbidden',
     404: 'NotFound',
+    501: 'NotImplemented',
 }
 
 const payloadFormatter = (req, res, body) => {
@@ -15,7 +16,9 @@ const payloadFormatter = (req, res, body) => {
 
     if (body instanceof Error) {
         response.error = statusCodeMapping[res.statusCode] || 'Error'
-        response.data = { message: body.body.message }
+        const contents = body.body || body
+        const messages = contents.message.split(',')
+        response.data = { messages: messages[0] !== '' ? messages : [] }
     } else {
         response.message = statusCodeMapping[res.statusCode] || 'Ok'
         response.data = body

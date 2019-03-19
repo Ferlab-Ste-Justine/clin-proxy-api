@@ -1,3 +1,5 @@
+// https://github.com/graphql-compose/graphql-compose-elasticsearch
+
 const restify = require('restify')
 const errors = require('restify-errors')
 const rjwt = require('restify-jwt-community')
@@ -8,18 +10,11 @@ module.exports = {
 
         server.use(rjwt(config.jwt).unless({
             path: [
-                { url: `${config.prefix}/health`, methods: ['GET'] },
-                { url: `${config.prefix}`, methods: ['POST'] },
+                { url: `${config.prefix}/health`, methods: ['GET'] }
             ]
         }))
 
-        // Login
-        server.post(`${config.prefix}`, (req, res, next) => {
-            next(new errors.NotImplementedError())
-        })
-
-        // Logout
-        server.del(`${config.prefix}`, (req, res, next) => {
+        server.get(`${config.prefix}`, (req, res, next) => {
             next(new errors.NotImplementedError())
         })
 

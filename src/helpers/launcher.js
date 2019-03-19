@@ -1,12 +1,13 @@
 const args = require('yargs').argv
 const uniqid = require('uniqid')
 
-const addCorsMiddleware = require('./../service/middleware/cors')
-const addGzipMiddleware = require('./../service/middleware/gzip')
-const addAcceptMiddleware = require('./../service/middleware/accept')
-const addBodyParserMiddleware = require('./../service/middleware/bodyParser')
-const addQueryParserMiddleware = require('./../service/middleware/queryParser')
-const addJoiValidatorMiddleware = require('./../service/middleware/joi')
+const addCorsMiddleware = require('../services/middleware/cors')
+const addGzipMiddleware = require('../services/middleware/gzip')
+const addAcceptMiddleware = require('../services/middleware/accept')
+const addBodyParserMiddleware = require('../services/middleware/bodyParser')
+const addQueryParserMiddleware = require('../services/middleware/queryParser')
+const addJoiValidatorMiddleware = require('../services/middleware/joi')
+
 const formatter = require('./payload')
 const logger = require(`./../loggers/${process.env.LOGGER}`)
 
@@ -63,17 +64,17 @@ try {
         const serviceName = serviceList[serviceIdx]
         let config = null
         try {
-            const service = require(`./../service/${serviceName}`)
             config = generateConfig(serviceName)
+            const service = require(`./../services/${serviceName}`)
             const instance = service.start(config)
             let startDate = new Date().getTime()
             let requestsServed = 0
             addCorsMiddleware(instance, config)
             addQueryParserMiddleware(instance)
             addBodyParserMiddleware(instance)
-            addJoiValidatorMiddleware(instance)
             addGzipMiddleware(instance)
             addAcceptMiddleware(instance)
+            addJoiValidatorMiddleware(instance)
             instance.get(`${config.prefix}/health`, (req, res) => {
                 requestsServed++
                 res.send({
