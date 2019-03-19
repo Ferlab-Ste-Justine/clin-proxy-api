@@ -1,16 +1,20 @@
 const args = require('yargs').argv
 
-const logger = require(`./../loggers/${process.env.LOGGER}`)
+const addCorsMiddleware = require('./../service/middleware/cors')
+const addGzipMiddleware = require('./../service/middleware/gzip')
+const addAcceptMiddleware = require('./../service/middleware/accept')
+const addBodyParserMiddleware = require('./../service/middleware/bodyParser')
+const addQueryParserMiddleware = require('./../service/middleware/queryParser')
+const addJoiValidatorMiddleware = require('./../service/middleware/joi')
 const formatter = require('./payload')
-
-const serviceToLaunch = args.service || null
+const logger = require(`./../loggers/${process.env.LOGGER}`)
 
 const launcherVersion = process.env.npm_package_version
 const services = JSON.parse(process.env.SERVICES)
 const serviceCorsConfig = process.env.CORS_ORIGINS
 const serviceJwtSecret = process.env.JWT_SECRET
 const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
-
+const serviceToLaunch = args.service || null
 const launcherLog = new logger('LAUNCHER')
 
 const generateConfig = (serviceName) => {
@@ -55,14 +59,32 @@ try {
 
     for (let serviceIdx in serviceList) {
         const serviceName = serviceList[serviceIdx]
-
+        let config = null
         try {
             const service = require(`./../service/${serviceName}`)
-            const config = generateConfig(serviceName)
-            service.start(config)
-            launcherLog.info(`Initializing ${serviceName}...`)
+            config = generateConfig(serviceName)
+            const instance = service.start(config)
+            let startDate = new Date().getTime()
+            let requestsServed = 0
+            addCorsMiddleware(instance, config)
+            addQueryParserMiddleware(instance)
+            addBodyParserMiddleware(instance)
+            addJoiValidatorMiddleware(instance)
+            addGzipMiddleware(instance)
+            addAcceptMiddleware(instance)
+            instance.get(`${config.prefix}/health`, (req, res) => {
+                requestsServed++
+                res.send({
+                    version: config.version,
+                    uptime: (new Date().getTime() - startDate),
+                    served: requestsServed,
+                })
+            })
+            instance.listen(config.port, () => {
+                launcherLog.success(`${config.name} Service: Launched on port ${config.port}`)
+            })
         } catch (e) {
-            launcherLog.error(`Error starting ${serviceName} service: ${e.message}`)
+            launcherLog.error(`${config.name} Service: ${e.message}`)
         }
     }
 
