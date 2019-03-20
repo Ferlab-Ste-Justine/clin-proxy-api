@@ -1,46 +1,42 @@
-const util  = require('util')
-const chalk = require('chalk')
+const util = require( 'util' )
+const chalk = require( 'chalk' )
 
 class Logger {
 
-    constructor(namespace) {
-        if (namespace.length < 24) {
-            namespace += ' '.repeat(24 - namespace.length)
-        }
-
+    constructor( namespace, level = 'normal' ) {
         this.namespace = namespace
+        this.level = level
+        if ( this.namespace.length < 24 ) {
+            this.namespace += ' '.repeat( 24 - this.namespace.length )
+        }
     }
 
-    _log(color, message) {
+    _log( color, message ) {
         console.log(chalk[color](chalk.bold(this.namespace) + ' ' + message)) // eslint-disable-line
     }
 
-    error(message, error) {
-        this._log('red', message)
-        if (error) {
-            this._log('red', error)
+    success( message ) {
+        this._log( 'green', message )
+    }
+
+    warning( message ) {
+        this._log( 'yellow', message )
+    }
+
+    error( message ) {
+        this._log( 'red', message )
+    }
+
+    info( message ) {
+        if ( [ 'info', 'debug' ].indexOf( this.level ) !== -1 ) {
+            this._log( 'cyan', message )
         }
     }
 
-    info(message, object) {
-        this._log('cyan', message)
-        if (object && this.debug) {
-            this._log('grey', util.inspect(object))
+    debug( message ) {
+        if ( this.level === 'debug' ) {
+            this._log( 'grey', message )
         }
-    }
-
-    success(message) {
-        this._log('green', message)
-    }
-
-    verbose(message) {
-        if (this.debug) {
-            this._log('grey', message)
-        }
-    }
-
-    warning(message) {
-        this._log('yellow', message)
     }
 
 }
