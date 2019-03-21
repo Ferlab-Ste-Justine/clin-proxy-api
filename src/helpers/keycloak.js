@@ -9,6 +9,13 @@ class KeycloakClient {
         this.clientSecret = config.clientSecret
     }
 
+    ping() {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}`
+        } )
+    }
+
     authenticate( username, password ) {
         return rp( {
             method: 'POST',

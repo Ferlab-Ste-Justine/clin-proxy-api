@@ -1,4 +1,3 @@
-const util = require( 'util' )
 const chalk = require( 'chalk' )
 
 class Logger {
