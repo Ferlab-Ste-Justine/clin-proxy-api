@@ -85,7 +85,7 @@ const bootstrap = () => {
         try {
             const config = generateConfig( serviceName )
 
-            launcherLog.info( `Launching ${config.name} Service ...` )
+            launcherLog.info( `Requesting launch procedures from ${config.name} Service ...` )
             const service = require( `./../services/${serviceName}` ) // eslint-disable-line
             service.start( config )
                 .then( ( instance ) => {

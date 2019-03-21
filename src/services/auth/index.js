@@ -17,11 +17,11 @@ const authService = {
 
             const logger = config.serviceLog
             const cache = new CacheClient( config.cacheConfig )
-            logger.info('Cache Service Client Ready ... Testing.')
+            logger.debug( 'Cache Service Client appears functional ... Testing.' )
             const keycloak = new KeycloakClient( config.keycloakConfig )
-            logger.info('Keycloak Service Client Ready ... Testing.')
+            logger.debug( 'Keycloak Service Client appears functional ... Testing.' )
             const server = restify.createServer( config.options )
-            logger.info('API Service Ready ... Testing.')
+            logger.debug( 'API Service appears functional ... Testing.' )
             Promise.all([
                 cache.create('authService', new Date().getTime()),
                 keycloak.ping()

@@ -12,7 +12,7 @@ const queryService = {
                 const logger = config.serviceLog
                 const server = restify.createServer( config.options )
 
-                logger.info( 'API Service Ready ... Testing.' )
+                logger.debug( 'API Service appears functional ... Testing.' )
 
                 // JWT Endpoint Exceptions
                 server.use( rjwt( config.jwt ).unless( {
