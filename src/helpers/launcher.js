@@ -18,7 +18,7 @@ const Logger = require( `../loggers/${process.env.LOGGER}` )
 const launcherVersion = process.env.npm_package_version
 const services = JSON.parse( process.env.SERVICES )
 const containerId = process.env.CONTAINER_ID || uniqid()
-const serviceCorsConfig = process.env.CORS_ORIGINS
+const serviceCorsOrigins = JSON.parse( process.env.CORS_ORIGINS )
 const serviceJwtSecret = process.env.JWT_SECRET
 const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
 const cacheServiceConfig = JSON.parse( process.env.MEMCACHE_CONFIG )
@@ -41,12 +41,12 @@ const generateConfig = ( serviceName ) => {
         options: {
             formatters: { 'application/json': formatter },
             ignoreTrailingSlash: false
-        // @TODO key: fs.readFileSync(path.resolve(__dirname, './../server.key')),
-        // @TODO certificate: fs.readFileSync(path.resolve(__dirname, './../server.crt'))
+            // @TODO key: fs.readFileSync(path.resolve(__dirname, './../server.key')),
+            // @TODO certificate: fs.readFileSync(path.resolve(__dirname, './../server.crt'))
         },
         cors: {
             preflightMaxAge: 5,
-            origins: JSON.parse( serviceCorsConfig )
+            origins: serviceCorsOrigins
         },
         jwt: {
             secret: jwtSecret,
@@ -74,14 +74,17 @@ const generateConfig = ( serviceName ) => {
 const bootstrap = () => {
 
     const serviceList = !serviceToLaunch ? services : [ serviceToLaunch ]
+
     if ( serviceToLaunch && services.indexOf( serviceToLaunch ) === -1 ) {
-        return launcherLog.error(`Service '${serviceToLaunch}' not defined in SERVICES`)
+        return launcherLog.error( `Service '${serviceToLaunch}' not defined in SERVICES` )
     }
 
     for ( let serviceIdx in serviceList ) {
         const serviceName = serviceList[ serviceIdx ]
+
         try {
             const config = generateConfig( serviceName )
+
             launcherLog.info( `Launching ${config.name} Service ...` )
             const service = require( `./../services/${serviceName}` ) // eslint-disable-line
             const instance = service.start( config )

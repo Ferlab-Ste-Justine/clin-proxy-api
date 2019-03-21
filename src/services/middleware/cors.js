@@ -5,4 +5,8 @@ export default ( server, config ) => {
 
     server.pre( cors.preflight )
     server.use( cors.actual )
+    server.use( ( req, res, next ) => {
+        res.header( 'Access-Control-Allow-Credentials', true )
+        return next()
+    } )
 }
