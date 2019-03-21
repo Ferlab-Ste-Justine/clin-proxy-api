@@ -72,50 +72,43 @@ const generateConfig = ( serviceName ) => {
 }
 
 const bootstrap = () => {
-    try {
-        const serviceList = !serviceToLaunch ? services : [ serviceToLaunch ]
 
-        if ( serviceToLaunch && services.indexOf( serviceToLaunch ) === -1 ) {
-            throw new Error( `Service '${serviceToLaunch}' not defined in SERVICES` )
-        }
+    const serviceList = !serviceToLaunch ? services : [ serviceToLaunch ]
+    if ( serviceToLaunch && services.indexOf( serviceToLaunch ) === -1 ) {
+        return launcherLog.error(`Service '${serviceToLaunch}' not defined in SERVICES`)
+    }
 
-        for ( let serviceIdx in serviceList ) {
-            const serviceName = serviceList[ serviceIdx ]
+    for ( let serviceIdx in serviceList ) {
+        const serviceName = serviceList[ serviceIdx ]
+        try {
+            const config = generateConfig( serviceName )
+            launcherLog.info( `Launching ${config.name} Service ...` )
+            const service = require( `./../services/${serviceName}` ) // eslint-disable-line
+            const instance = service.start( config )
+            const startDate = new Date().getTime()
+            let requestsServed = 0
 
-            try {
-                const config = generateConfig( serviceName )
-
-                launcherLog.info( `Launching ${config.name} Service ...` )
-                const service = require( `./../services/${serviceName}` ) // eslint-disable-line
-                const instance = service.start( config )
-                const startDate = new Date().getTime()
-                let requestsServed = 0
-
-                addCorsMiddleware( instance, config )
-                addQueryParserMiddleware( instance )
-                addBodyParserMiddleware( instance )
-                addGzipMiddleware( instance )
-                addJoiValidatorMiddleware( instance )
-                addAcceptMiddleware( instance )
-                instance.get( `${config.prefix}/health`, ( req, res ) => {
-                    requestsServed++
-                    res.send( {
-                        uid: containerId,
-                        version: config.version,
-                        uptime: ( new Date().getTime() - startDate ),
-                        served: requestsServed
-                    } )
+            addCorsMiddleware( instance, config )
+            addQueryParserMiddleware( instance )
+            addBodyParserMiddleware( instance )
+            addGzipMiddleware( instance )
+            addJoiValidatorMiddleware( instance )
+            addAcceptMiddleware( instance )
+            instance.get( `${config.prefix}/health`, ( req, res ) => {
+                requestsServed++
+                res.send( {
+                    uid: containerId,
+                    version: config.version,
+                    uptime: ( new Date().getTime() - startDate ),
+                    served: requestsServed
                 } )
-                instance.listen( config.port, () => {
-                    launcherLog.success( `Launched ${config.name} Service on port ${config.port}` )
-                } )
-            } catch ( e ) {
-                launcherLog.error( e.message )
-            }
+            } )
+            instance.listen( config.port, () => {
+                launcherLog.success( `Launched ${config.name} Service on port ${config.port}` )
+            } )
+        } catch ( e ) {
+            launcherLog.error( e.message )
         }
-
-    } catch ( e ) {
-        launcherLog.error( e.message )
     }
 }
 
