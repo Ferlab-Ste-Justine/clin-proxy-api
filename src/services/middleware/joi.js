@@ -1,21 +1,18 @@
-const validator = require('restify-joi-middleware')
+const validator = require( 'restify-joi-middleware' )
 
-module.exports = (server) => {
-    server.use(validator({
-        joiOptions: {
-            abortEarly: false
-        },
-        keysToValidate: ['params', 'body', 'query', 'user', 'headers', 'trailers', 'files'],
-        errorTransformer: (input, errors) => {
+module.exports = ( server ) => {
+    server.use( validator( {
+        keysToValidate: [ 'params', 'body', 'query', 'user', 'headers', 'trailers', 'files' ],
+        errorTransformer: ( input, errors ) => {
             let messages = []
-            for (let eidx in errors.details) {
-                messages.push(errors.details[eidx].message)
+
+            for ( let eidx in errors.details ) {
+                messages.push( errors.details[ eidx ].message )
             }
-            return new Error(messages)
+            return new Error( messages )
         },
-        errorResponder: (transformedErr, req, res, next) => {
-            res.send(400, transformedErr)
-            return next()
+        errorResponder: ( transformedErr, req, res ) => {
+            return res.send( 400, transformedErr )
         }
-    }))
+    } ) )
 }

@@ -1,14 +1,12 @@
-const Joi = require('joi')
+import Joi from 'joi'
 
-const validators = {
+export default {
     login: {
         schema: {
-            body: {
+            body: Joi.object( {
                 username: Joi.string().email().required(),
-                password: Joi.string().min(5).max(32).required()
-            }
+                password: Joi.string().min( 5 ).max( 32 ).required()
+            } ).required()
         }
     }
 }
-
-module.exports = validators

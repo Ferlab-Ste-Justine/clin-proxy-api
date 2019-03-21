@@ -1,7 +1,7 @@
-const restifyPlugins = require('restify').plugins
+const restifyPlugins = require( 'restify' ).plugins
 
-module.exports = (server) => {
-    server.use(restifyPlugins.acceptParser([
+export default ( server ) => {
+    server.use( restifyPlugins.acceptParser( [
         'application/json'
-    ]))
+    ] ) )
 }

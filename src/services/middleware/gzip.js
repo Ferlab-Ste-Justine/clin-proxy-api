@@ -1,5 +1,5 @@
-const restifyPlugins = require('restify').plugins
+const restifyPlugins = require( 'restify' ).plugins
 
-module.exports = (server) => {
-    server.use(restifyPlugins.gzipResponse())
+export default ( server ) => {
+    server.use( restifyPlugins.gzipResponse() )
 }

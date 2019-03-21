@@ -1,7 +1,12 @@
-const corsMiddleware = require('restify-cors-middleware')
+const corsMiddleware = require( 'restify-cors-middleware' )
 
-module.exports = (server, config) => {
-    const cors = corsMiddleware(config.cors)
-    server.pre(cors.preflight)
-    server.use(cors.actual)
+export default ( server, config ) => {
+    const cors = corsMiddleware( config.cors )
+
+    server.pre( cors.preflight )
+    server.use( cors.actual )
+    server.use( ( req, res, next ) => {
+        res.header( 'Access-Control-Allow-Credentials', true )
+        return next()
+    } )
 }

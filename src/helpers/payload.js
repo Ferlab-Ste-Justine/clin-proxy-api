@@ -6,29 +6,32 @@ const statusCodeMapping = {
     401: 'Unauthorized',
     403: 'Forbidden',
     404: 'NotFound',
-    501: 'NotImplemented',
+    500: 'InternalError',
+    501: 'NotImplemented'
 }
 
-const payloadFormatter = (req, res, body) => {
+const payloadFormatter = ( req, res, body ) => {
     const response = {
-        timestamp: new Date().getTime(),
+        timestamp: new Date().getTime()
     }
 
-    if (body instanceof Error) {
-        response.error = statusCodeMapping[res.statusCode] || 'Error'
-        const contents = body.body || body
-        const messages = contents.message.split(',')
-        response.data = { messages: messages[0] !== '' ? messages : [] }
+    if ( body instanceof Error ) {
+        response.error = statusCodeMapping[ res.statusCode ] || 'Error'
+        const contents = body.body || body,
+            messages = contents.message.split( ',' )
+
+        response.data = { messages: messages[ 0 ] !== '' ? messages : [] }
     } else {
-        response.message = statusCodeMapping[res.statusCode] || 'Ok'
+        response.message = statusCodeMapping[ res.statusCode ] || 'Ok'
         response.data = body
     }
 
-    const finalResponse = JSON.stringify(response)
-    res.header('Content-Length', Buffer.byteLength(finalResponse))
-    res.header('Content-Type', 'application/json')
+    const finalResponse = JSON.stringify( response )
+
+    res.header( 'Content-Length', Buffer.byteLength( finalResponse ) )
+    res.header( 'Content-Type', 'application/json' )
 
     return finalResponse
 }
 
-module.exports = payloadFormatter
+export default payloadFormatter
