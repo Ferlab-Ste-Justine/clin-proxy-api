@@ -3,8 +3,11 @@ import Cache from 'memcached-promisify'
 
 class CacheClient {
 
-    constructor( config, options = {}, expirationInSeconds = 1800 ) {
-        this.instance = new Cache( config, options )
+    constructor( config, expirationInSeconds = 1800 ) {
+        this.instance = new Cache( config, {
+            retries: 2,
+            timeout: 2500
+        } )
         this.expiry = expirationInSeconds
     }
 

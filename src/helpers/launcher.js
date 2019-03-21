@@ -25,7 +25,7 @@ const cacheServiceConfig = JSON.parse( process.env.MEMCACHE_CONFIG )
 const keycloakServiceConfig = JSON.parse( process.env.KEYCLOAK_CONFIG )
 const serviceToLaunch = args.service || null
 const logLevel = process.env.LOG_LEVEL
-const launcherLog = new Logger( 'Launcher', logLevel )
+const launcherLog = new Logger( 'Kennedy Space Center', logLevel )
 
 const generateConfig = ( serviceName ) => {
     const serviceConfig = JSON.parse( process.env[ `${serviceName.toUpperCase()}_SERVICE` ] )
@@ -87,28 +87,33 @@ const bootstrap = () => {
 
             launcherLog.info( `Launching ${config.name} Service ...` )
             const service = require( `./../services/${serviceName}` ) // eslint-disable-line
-            const instance = service.start( config )
-            const startDate = new Date().getTime()
-            let requestsServed = 0
+            service.start( config )
+                .then( ( instance ) => {
+                    const startDate = new Date().getTime()
+                    let requestsServed = 0
 
-            addCorsMiddleware( instance, config )
-            addQueryParserMiddleware( instance )
-            addBodyParserMiddleware( instance )
-            addGzipMiddleware( instance )
-            addJoiValidatorMiddleware( instance )
-            addAcceptMiddleware( instance )
-            instance.get( `${config.prefix}/health`, ( req, res ) => {
-                requestsServed++
-                res.send( {
-                    uid: containerId,
-                    version: config.version,
-                    uptime: ( new Date().getTime() - startDate ),
-                    served: requestsServed
+                    addCorsMiddleware( instance, config )
+                    addQueryParserMiddleware( instance )
+                    addBodyParserMiddleware( instance )
+                    addGzipMiddleware( instance )
+                    addJoiValidatorMiddleware( instance )
+                    addAcceptMiddleware( instance )
+                    instance.get( `${config.prefix}/health`, ( req, res ) => {
+                        requestsServed++
+                        res.send( {
+                            uid: containerId,
+                            version: config.version,
+                            uptime: ( new Date().getTime() - startDate ),
+                            served: requestsServed
+                        } )
+                    } )
+                    instance.listen( config.port, () => {
+                        launcherLog.success( `It's a Go for ${config.name} Service on port ${config.port}!` )
+                    } )
                 } )
-            } )
-            instance.listen( config.port, () => {
-                launcherLog.success( `Launched ${config.name} Service on port ${config.port}` )
-            } )
+                .catch( ( e ) => {
+                    launcherLog.error( `Houston, we have a problem! ${config.name} Service ${e}` )
+                } )
         } catch ( e ) {
             launcherLog.error( e.message )
         }
