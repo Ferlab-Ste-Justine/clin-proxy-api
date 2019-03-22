@@ -1,5 +1,8 @@
 const restifyPlugins = require( 'restify' ).plugins
 
+
 export default ( server ) => {
-    server.use( restifyPlugins.gzipResponse() )
+    server.use( restifyPlugins.acceptParser( [
+        'application/json'
+    ] ) )
 }

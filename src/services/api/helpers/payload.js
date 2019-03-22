@@ -10,7 +10,7 @@ const statusCodeMapping = {
     501: 'NotImplemented'
 }
 
-const payloadFormatter = ( req, res, body ) => {
+export default ( req, res, body ) => {
     const response = {
         timestamp: new Date().getTime()
     }
@@ -33,5 +33,3 @@ const payloadFormatter = ( req, res, body ) => {
 
     return finalResponse
 }
-
-export default payloadFormatter
