@@ -23,11 +23,11 @@ export default class AuthService extends ApiService {
         super.init()
 
         this.cacheService = new CacheClient( this.config.cache )
-        this.logService.debug( 'Cache Service Client appears functional ... Testing.' )
+        await this.logService.debug( 'Cache Service Client appears functional ... Testing.' )
         await this.cacheService.create( 'authService', new Date().getTime() )
 
         this.keycloakService = new KeycloakClient( this.config.keykloak )
-        this.logService.debug( 'Keycloak Service Client appears functional ... Testing.' )
+        await this.logService.debug( 'Keycloak Service Client appears functional ... Testing.' )
         await this.keycloakService.ping()
     }
 
@@ -78,7 +78,7 @@ export default class AuthService extends ApiService {
                 }
 
                 await this.cacheService.create( cacheKey, cacheData, expiresIn )
-                this.logService.debug( `Login for ${username} using ${cacheKey}` )
+                await this.logService.debug( `Login for ${username} using ${cacheKey}` )
                 res.setHeader( 'Set-Cookie', cookie.serialize( this.config.jwt.requestProperty, token, {
                     httpOnly: true,
                     maxAge: expiresIn
@@ -86,7 +86,7 @@ export default class AuthService extends ApiService {
                 res.send( { user } )
                 return next()
             } catch ( e ) {
-                this.logService.warning( `Login for ${username} ${e.toString()}` )
+                await this.logService.warning( `Login for ${username} ${e.toString()}` )
                 return next( new errors.UnauthorizedError() )
             }
         } ) )
@@ -97,7 +97,7 @@ export default class AuthService extends ApiService {
 
             try {
                 await this.cacheService.delete( cacheKey )
-                this.logService.debug( `Logout using ${cacheKey}` )
+                await this.logService.debug( `Logout using ${cacheKey}` )
                 res.setHeader( 'Set-Cookie', cookie.serialize( this.config.jwt.requestProperty, null, {
                     httpOnly: true,
                     maxAge: 0
@@ -105,7 +105,7 @@ export default class AuthService extends ApiService {
                 res.send( {} )
                 return next()
             } catch ( e ) {
-                this.logService.warning( `Logout using ${cacheKey} ${e.toString()}` )
+                await this.logService.warning( `Logout using ${cacheKey} ${e.toString()}` )
                 return next( new errors.InternalServerError() )
             }
         } ) )

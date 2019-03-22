@@ -1,6 +1,6 @@
-const restifyPlugins = require( 'restify' ).plugins
+import { plugins } from 'restify'
 
 
 export default ( server ) => {
-    server.use( restifyPlugins.gzipResponse() )
+    server.use( plugins.gzipResponse() )
 }

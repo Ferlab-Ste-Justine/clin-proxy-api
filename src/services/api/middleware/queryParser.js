@@ -1,6 +1,6 @@
-const restifyPlugins = require( 'restify' ).plugins
+import { plugins } from 'restify'
 
 
 export default ( server ) => {
-    server.use( restifyPlugins.queryParser() )
+    server.use( plugins.queryParser() )
 }

@@ -1,9 +1,10 @@
 require( 'dotenv' ).config()
 
 const args = require( 'yargs' ).argv
-const uniqid = require( 'uniqid' )
-const cookie = require( 'cookie' )
-const jwt = require( 'jsonwebtoken' )
+
+import uniqid from 'uniqid'
+import cookie from 'cookie'
+import jwt from 'jsonwebtoken'
 
 import payloadFormatter from './src/services/api/helpers/payload'
 

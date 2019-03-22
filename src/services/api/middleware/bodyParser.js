@@ -1,8 +1,8 @@
-const restifyPlugins = require( 'restify' ).plugins
+import { plugins } from 'restify'
 
 
 export default ( server ) => {
-    server.use( restifyPlugins.bodyParser( {
+    server.use( plugins.bodyParser( {
         mapParams: false
     } ) )
 }

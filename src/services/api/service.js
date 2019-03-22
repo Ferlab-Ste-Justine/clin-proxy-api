@@ -32,7 +32,7 @@ export default class ApiService {
     async init() {
         this.initTimestamp = new Date().getTime()
         this.instance = restify.createServer( this.config.options )
-        this.logService.debug( 'API Service appears functional ... Testing.' )
+        await this.logService.debug( 'API Service appears functional ... Testing.' )
     }
 
     async start( ) {
@@ -62,13 +62,13 @@ export default class ApiService {
         } )
 
         await this.instance.listen( this.config.port )
-        this.logService.debug( `${this.config.name} API Service launched.` )
+        await this.logService.debug( `${this.config.name} API Service launched.` )
     }
 
     async stop() {
-        this.logService.debug( `${this.config.name} API Service attempting to land ...` )
+        await this.logService.debug( `${this.config.name} API Service attempting to land ...` )
         await this.instance.close()
-        this.parentLogService.success( `${this.config.name} API Service has landed.` )
+        await this.parentLogService.success( `${this.config.name} API Service has landed.` )
     }
 
 }
