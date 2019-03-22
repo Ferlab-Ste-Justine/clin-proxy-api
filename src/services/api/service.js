@@ -26,7 +26,6 @@ export default class ApiService {
         this.instance = null
         this.initTimestamp = null
         this.startTimestamp = null
-        this.requestsServed = 0
     }
 
     async init() {
