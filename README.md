@@ -17,3 +17,12 @@
 
 #### API Service Creation
 Please refer to `src/services/api/boilerplate`
+
+###Docker
+
+Update docker.env for keycloack,
+
+then run:
+```
+docker-compose up
+```
