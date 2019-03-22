@@ -135,20 +135,27 @@ const launchApiServices = async() => {
 
     for ( let serviceIdx in serviceList ) {
         const serviceName = serviceList[ serviceIdx ]
-        const config = generateApiConfig( serviceName )
 
-        try {
+        if ( process.env[ `${serviceName.toUpperCase()}_API_SERVICE` ] ) {
 
-            launcherLog.info( `Requesting launch procedures from ${config.name} Service ...` )
-            const ServiceClass = require( `./src/services/api/${serviceName}` ) // eslint-disable-line global-require
-            const service = new ServiceClass.default( config ) // eslint-disable-line new-cap
+            const config = generateApiConfig( serviceName )
 
-            await service.init()
-            await service.start()
+            try {
 
-            launcherLog.success( `It's a Go for ${config.name} API Service on port ${config.port}!` )
-        } catch ( e ) {
-            launcherLog.error( `Houston, we have a problem! ${config.name} API Service ${e}` )
+                launcherLog.info( `Requesting launch procedures from ${config.name} Service ...` )
+                const ServiceClass = require( `./src/services/api/${serviceName}` ) // eslint-disable-line global-require
+                const service = new ServiceClass.default( config ) // eslint-disable-line new-cap
+
+                await service.init()
+                await service.start()
+
+                launcherLog.success( `It's a Go for ${config.name} API Service on port ${config.port}!` )
+            } catch ( e ) {
+                launcherLog.error( `Houston, we have a problem! ${config.name} API Service ${e}` )
+            }
+
+        } else {
+            launcherLog.error( `No ${serviceName.toUpperCase()}_API_SERVICE exists in environment. Skipping ...` )
         }
     }
 }
