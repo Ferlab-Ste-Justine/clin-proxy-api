@@ -1,7 +1,7 @@
-// https://github.com/request/request-promise
 import rp from 'request-promise-native'
 
-class KeycloakClient {
+
+export default class KeycloakClient {
 
     constructor( config ) {
         this.host = config.host
@@ -9,7 +9,14 @@ class KeycloakClient {
         this.clientSecret = config.clientSecret
     }
 
-    authenticate( username, password ) {
+    async ping() {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}`
+        } )
+    }
+
+    async authenticate( username, password ) {
         return rp( {
             method: 'POST',
             uri: `${this.host}/token`,
@@ -24,5 +31,3 @@ class KeycloakClient {
     }
 
 }
-
-export default KeycloakClient

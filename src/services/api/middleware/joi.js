@@ -1,8 +1,9 @@
-const validator = require( 'restify-joi-middleware' )
+import validator from 'restify-joi-middleware'
+
 
 module.exports = ( server ) => {
     server.use( validator( {
-        keysToValidate: [ 'params', 'body', 'query', 'user', 'headers', 'trailers', 'files' ],
+        keysToValidate: [ 'params', 'body', 'query', 'headers', 'files' ],
         errorTransformer: ( input, errors ) => {
             let messages = []
 

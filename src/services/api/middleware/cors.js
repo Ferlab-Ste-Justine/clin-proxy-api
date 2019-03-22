@@ -1,4 +1,5 @@
-const corsMiddleware = require( 'restify-cors-middleware' )
+import corsMiddleware from 'restify-cors-middleware'
+
 
 export default ( server, config ) => {
     const cors = corsMiddleware( config.cors )

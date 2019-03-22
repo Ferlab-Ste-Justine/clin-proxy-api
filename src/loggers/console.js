@@ -1,4 +1,3 @@
-const util = require( 'util' )
 const chalk = require( 'chalk' )
 
 class Logger {
@@ -11,31 +10,31 @@ class Logger {
         }
     }
 
-    _log( color, message ) {
+    async _log( color, message ) {
         console.log(chalk[color](chalk.bold(this.namespace) + ' ' + message)) // eslint-disable-line
     }
 
-    success( message ) {
-        this._log( 'green', message )
+    async success( message ) {
+        await this._log( 'green', message )
     }
 
-    warning( message ) {
-        this._log( 'yellow', message )
+    async warning( message ) {
+        await this._log( 'yellow', message )
     }
 
-    error( message ) {
-        this._log( 'red', message )
+    async error( message ) {
+        await this._log( 'red', message )
     }
 
-    info( message ) {
+    async info( message ) {
         if ( [ 'info', 'debug' ].indexOf( this.level ) !== -1 ) {
-            this._log( 'cyan', message )
+            await this._log( 'cyan', message )
         }
     }
 
-    debug( message ) {
+    async debug( message ) {
         if ( this.level === 'debug' ) {
-            this._log( 'grey', message )
+            await this._log( 'grey', message )
         }
     }
 

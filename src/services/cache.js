@@ -1,28 +1,30 @@
 import Cache from 'memcached-promisify'
 
-class CacheClient {
+
+export default class CacheClient {
 
     constructor( config, expirationInSeconds = 1800 ) {
-        this.instance = new Cache( config )
+        this.instance = new Cache( config, {
+            retries: 2,
+            timeout: 2500
+        } )
         this.expiry = expirationInSeconds
     }
 
-    create( key, value, expiration = this.expiry ) {
+    async create( key, value, expiration = this.expiry ) {
         return this.instance.set( key, value, expiration )
     }
 
-    read( key, value ) {
+    async read( key, value ) {
         return this.instance.get( key, value )
     }
 
-    update( key, value, expiration = this.expiry ) {
+    async update( key, value, expiration = this.expiry ) {
         return this.instance.get( key, value, expiration )
     }
 
-    delete( key, value, expiration = this.expiry ) {
+    async delete( key, value, expiration = this.expiry ) {
         return this.instance.get( key, value, expiration )
     }
 
 }
-
-export default CacheClient
