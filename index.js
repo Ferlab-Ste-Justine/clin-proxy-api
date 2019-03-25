@@ -92,7 +92,9 @@ const generateApiConfig = ( serviceName ) => {
         version: launcherVersion,
         endpointPrefix: serviceConfig.endpointPrefix,
         options: {
-            formatters: { 'application/json': payloadFormatter },
+            formatters: {
+                'application/json': payloadFormatter
+            },
             ignoreTrailingSlash: false
         },
         cors: {
@@ -121,7 +123,8 @@ const generateApiConfig = ( serviceName ) => {
         logService,
         parentLogService: launcherLog,
         cacheConfig: cacheServiceConfig,
-        keycloakConfig: keycloakServiceConfig
+        keycloakConfig: keycloakServiceConfig,
+        docsBranch: process.env.NODE_ENV === 'production' ? 'master' : 'dev'
     }
 }
 

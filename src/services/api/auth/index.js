@@ -38,6 +38,10 @@ export default class AuthService extends ApiService {
             path: [
                 {
                     methods: [ 'GET' ],
+                    url: `${this.config.prefix}/docs`
+                },
+                {
+                    methods: [ 'GET' ],
                     url: `${this.config.prefix}/health`
                 },
                 {
