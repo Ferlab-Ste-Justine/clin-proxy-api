@@ -20,6 +20,10 @@ export default class QueryService extends ApiService {
             path: [
                 {
                     methods: [ 'GET' ],
+                    url: `${this.config.prefix}/docs`
+                },
+                {
+                    methods: [ 'GET' ],
                     url: `${this.config.prefix}/health`
                 }
             ]

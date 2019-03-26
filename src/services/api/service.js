@@ -16,6 +16,8 @@ export default class ApiService {
             uid: config.serviceId,
             cuid: config.containerId,
             version: config.version,
+            docsBranch: config.docsBranch,
+            id: config.id,
             name: config.name,
             port: config.port,
             cors: config.cors,
@@ -34,7 +36,7 @@ export default class ApiService {
         await this.logService.debug( 'API Service appears functional ... Testing.' )
     }
 
-    async start( ) {
+    async start() {
         let requestsServed = 0
         const startDate = new Date().getTime()
         const uid = this.config.uid
@@ -58,6 +60,21 @@ export default class ApiService {
                 uptime: ( new Date().getTime() - startDate ),
                 served: requestsServed
             } )
+        } )
+
+        this.instance.get( `${this.config.prefix}/docs`, ( req, res ) => {
+            res.end( `
+                <html>
+                  <body>
+                    <div id='root'></div>
+                    <script src='https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js'></script>
+                    <script>
+                      Redoc.init('https://raw.githubusercontent.com/cr-ste-justine/clin-proxy-api/${this.config.docsBranch}/src/services/api/${this.config.id}/docs.yaml', {
+                        hideDownloadButton: true
+                      }, document.getElementById('root'))
+                    </script>
+                  </body>
+                </html>` )
         } )
 
         await this.instance.listen( this.config.port )
