@@ -5,8 +5,8 @@ export default class CacheClient {
 
     constructor( config, expirationInSeconds = 1800 ) {
         this.instance = new Cache( config, {
-            retries: 2,
-            timeout: 2500
+            retries: 3,
+            timeout: 10000
         } )
         this.expiry = expirationInSeconds
     }
