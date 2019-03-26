@@ -6,7 +6,7 @@ services:
       - "11211:11211"
 
   web:
-    image: crsj/clin-api
+    image: chusj/clin-api
     build: .
     ports:
       - "3000:3000"

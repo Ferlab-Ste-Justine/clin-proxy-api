@@ -32,7 +32,9 @@ docker swarm init (on master node)
 (on another node)
 docker swarm join --token SWMTKN-1-05mkbqs1dcxl3r6umbx0dqygz0ius3wxnw9ko9mddyy3vycz0s-2vqxt00dvmeztut58d08k2xh5 10.10.0.15:2377
 docker run -it -d -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock dockersamples/visualizer
-
+docker build . -t chusj/clin-api
+docker images
+docker tag 
 docker stack deploy -c docker-compose.yml clin
 
 

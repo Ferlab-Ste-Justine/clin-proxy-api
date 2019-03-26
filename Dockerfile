@@ -1,4 +1,4 @@
-FROM node:10.15-alpine
+FROM node:10.14-alpine
 ADD . /code
 WORKDIR /code
 RUN cp -p docker.env .env
