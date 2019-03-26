@@ -1,3 +1,4 @@
+require( 'babel-polyfill' )
 require( 'dotenv' ).config()
 
 const args = require( 'yargs' ).argv
@@ -6,14 +7,14 @@ import uniqid from 'uniqid'
 import cookie from 'cookie'
 import jwt from 'jsonwebtoken'
 
-import payloadFormatter from './src/services/api/helpers/payload'
+import payloadFormatter from './services/api/helpers/payload'
 
 
 if ( !process.env.LOGGER ) {
     console.log( 'No LOGGER defined in environment, using default: console.' )
     process.env.LOGGER = 'console'
 }
-const LogService = require( `./src/loggers/${process.env.LOGGER}` )
+const LogService = require( `./loggers/${process.env.LOGGER}` )
 const logLevel = process.env.LOG_LEVEL || 'debug'
 const launcherLog = new LogService( 'Kennedy Space Center', logLevel )
 
@@ -146,7 +147,7 @@ const launchApiServices = async() => {
             try {
 
                 launcherLog.info( `Requesting launch procedures from ${config.name} Service ...` )
-                const ServiceClass = require( `./src/services/api/${serviceName}` ) // eslint-disable-line global-require
+                const ServiceClass = require( `./services/api/${serviceName}` ) // eslint-disable-line global-require
                 const service = new ServiceClass.default( config ) // eslint-disable-line new-cap
 
                 await service.init()

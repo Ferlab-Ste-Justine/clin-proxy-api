@@ -11,7 +11,8 @@ dependencies:
   joi: 14.3.1
   jsonwebtoken: 8.5.1
   memcached-promisify: 2.0.0
-  newman: 4.4.0
+  newman: 4.4.1
+  pnpm: 3.0.1
   request: 2.88.0
   request-promise: 4.2.4
   request-promise-native: 1.0.7
@@ -27,6 +28,7 @@ devDependencies:
   '@babel/core': 7.4.0
   '@babel/node': 7.2.2
   '@babel/preset-env': 7.4.2
+  babel-polyfill: 6.26.0
   nodemon: 1.18.10
 lockfileVersion: 5
 packages:
@@ -44,7 +46,7 @@ packages:
     dev: true
     hasBin: true
     optionalDependencies:
-      chokidar: 2.1.4
+      chokidar: 2.1.5
     peerDependencies:
       '@babel/core': ^7.0.0-0
     resolution:
@@ -871,6 +873,21 @@ packages:
     dev: false
     resolution:
       integrity: sha512-ReZxvNHIOv88FlT7rxcXIIC0fPt4KZqZbOlivyWtXLt8ESx84zd3kMC6iK5jVeS2qt+g7ftS7ye4fi06X5rtRQ==
+  /babel-polyfill/6.26.0:
+    dependencies:
+      babel-runtime: 6.26.0
+      core-js: 2.6.5
+      regenerator-runtime: 0.10.5
+    dev: true
+    resolution:
+      integrity: sha1-N5k3q8Z9eJWXCtxiHyhM2WbPIVM=
+  /babel-runtime/6.26.0:
+    dependencies:
+      core-js: 2.6.5
+      regenerator-runtime: 0.11.1
+    dev: true
+    resolution:
+      integrity: sha1-llxwWGaOgrVde/4E/yM3vItWR/4=
   /balanced-match/1.0.0:
     resolution:
       integrity: sha1-ibTRmasr7kneFk6gK4nORi1xt2c=
@@ -947,7 +964,7 @@ packages:
       integrity: sha512-aNdbnj9P8PjdXU4ybaWLK2IF3jc/EoDYbC7AazW6to3TRsfXxscC9UXOB5iDiEQrkyIbWp2SLQda4+QAa7nc3w==
   /browserslist/4.5.2:
     dependencies:
-      caniuse-lite: 1.0.30000951
+      caniuse-lite: 1.0.30000953
       electron-to-chromium: 1.3.119
       node-releases: 1.1.11
     dev: true
@@ -1015,10 +1032,10 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-IXFsBS2pC+X0j0N/GE7Dm7j3bsEBp+oTpb7F50dwEVX7rf3IgwO9XatnegTsDtniKCUtEJH4fSU6Asw7uoVLfQ==
-  /caniuse-lite/1.0.30000951:
+  /caniuse-lite/1.0.30000953:
     dev: true
     resolution:
-      integrity: sha512-eRhP+nQ6YUkIcNQ6hnvdhMkdc7n3zadog0KXNRxAZTT2kHjUb1yGn71OrPhSn8MOvlX97g5CR97kGVj8fMsXWg==
+      integrity: sha512-2stdF/q5MZTDhQ6uC65HWbSgI9UMKbc7+HKvlwH5JBIslKoD/J9dvabP4J4Uiifu3NljbHj3iMpfYflLSNt09A==
   /capture-stack-trace/1.0.1:
     dev: true
     engines:
@@ -1060,7 +1077,7 @@ packages:
       node: '>=4.0.0'
     resolution:
       integrity: sha512-6dVyOOYjpfFcL1Y4qChrAoQLRHvj2ziyhcm0QJlhOcAhykL/k1kTUPbeo+87MNRTRdk2OIIsIXbuF3x2wi5EXg==
-  /chokidar/2.1.4:
+  /chokidar/2.1.5:
     dependencies:
       anymatch: 2.0.0
       async-each: 1.0.2
@@ -1077,16 +1094,11 @@ packages:
     optionalDependencies:
       fsevents: 1.2.7
     resolution:
-      integrity: sha512-ZVuFiB9IGOHqu+Jh7B7fSTmzsfDmUtC6yqd/V72UPQeXbNHONbMV0chOXtLXjsP3NvdUsHTNMg02NtXPDaSmNQ==
+      integrity: sha512-i0TprVWp+Kj4WRPtInjexJ8Q+BqTE909VpH8xVhXrJkoc5QC8VO9TryGOqTr+2hljzc1sC62t22h5tZePodM/A==
   /ci-info/1.6.0:
     dev: true
     resolution:
       integrity: sha512-vsGdkwSCDpWmP80ncATX7iea5DWQemg1UgCW5J8tqjU3lYw4FBYuj89J0CTVomA7BEfvSZd84GmHko+MxFQU2A==
-  /circular-json/0.5.5:
-    deprecated: 'CircularJSON is in maintenance only, flatted is its successor.'
-    dev: false
-    resolution:
-      integrity: sha512-13YaR6kiz0kBNmIVM87Io8Hp7bWOo4r61vkEANy8iH9R9bc6avud/1FT0SBpqR1RpIQADOh/Q+yHZDA1iL6ysA==
   /class-utils/0.3.6:
     dependencies:
       arr-union: 3.1.0
@@ -1489,7 +1501,7 @@ packages:
       integrity: sha1-vpewhcufSgt+gINdVH53uGh9Cgw=
   /dtrace-provider/0.8.7:
     dependencies:
-      nan: 2.13.1
+      nan: 2.13.2
     dev: false
     engines:
       node: '>=0.10'
@@ -1994,7 +2006,7 @@ packages:
     bundledDependencies:
       - node-pre-gyp
     dependencies:
-      nan: 2.13.1
+      nan: 2.13.2
     dev: true
     engines:
       node: '>=4.0'
@@ -3006,13 +3018,13 @@ packages:
     hasBin: true
     resolution:
       integrity: sha1-8S2LiKk+ZCVDSN/Rg71wv2BWekI=
-  /marked/0.6.0:
+  /marked/0.6.1:
     dev: false
     engines:
       node: '>=0.10.0'
     hasBin: true
     resolution:
-      integrity: sha512-HduzIW2xApSXKXJSpCipSxKyvMbwRRa/TwMbepmlZziKdH8548WSoDP4SxzulEKjlo8BE39l+2fwJZuRKOln6g==
+      integrity: sha512-+H0L3ibcWhAZE02SKMqmvYsErLo4EAVJxu5h3bHBBDvvjeWXtl92rGUSBYHL2++5Y+RSNgl8dYOAXcYe7lp1fA==
   /mdurl/1.0.1:
     dev: false
     resolution:
@@ -3164,10 +3176,10 @@ packages:
     optional: true
     resolution:
       integrity: sha1-rmzg1vbV4KT32JN5jQPB6pVZtqI=
-  /nan/2.13.1:
+  /nan/2.13.2:
     optional: true
     resolution:
-      integrity: sha512-I6YB/YEuDeUZMmhscXKxGgZlFnhsn5y0hgOZBadkzfTRrZBtJDZeg6eQf7PYMIEclwmorTKK8GztsyOUSVBREA==
+      integrity: sha512-TghvYc72wlMGMVMluVo9WRJc0mB8KxxF/gZ4YYFy7V2ZQX9l7rgbPg7vjS9mt6U5HXODVFVI2bOduCzwOMv/lw==
   /nanomatch/1.2.13:
     dependencies:
       arr-diff: 4.0.0
@@ -3202,7 +3214,7 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-KzJxhOiZIQEXeyhWP7XnECrNDKk=
-  /newman/4.4.0:
+  /newman/4.4.1:
     dependencies:
       async: 2.6.1
       chardet: 0.7.0
@@ -3215,21 +3227,21 @@ packages:
       filesize: 4.1.2
       lodash: 4.17.11
       mkdirp: 0.5.1
-      postman-collection: 3.4.4
+      postman-collection: 3.4.6
       postman-collection-transformer: 3.0.0
-      postman-request: 2.88.1-postman.6
-      postman-runtime: 7.9.1
+      postman-request: 2.88.1-postman.8
+      postman-runtime: 7.11.0
       pretty-ms: 4.0.0
       semver: 5.6.0
       serialised-error: 1.1.3
       word-wrap: 1.2.3
-      xmlbuilder: 11.0.0
+      xmlbuilder: 11.0.1
     dev: false
     engines:
       node: '>=6'
     hasBin: true
     resolution:
-      integrity: sha512-IdTiWJByea2h6xStkxjJlROVCQ5nINRHB3htS4FQ0Pq2zMNmj9jI3EjDopSssR9dj3nd9vTLEQi6BWRWNUnmvA==
+      integrity: sha512-HMYCBlFNlST/XnpVg8ri6hZ9PaDiqsgIpzUyy26Ra1WpNQorrezN8qD0FM35yeCv5R//QrsUiJMH8Wy6AkE3nw==
   /nice-try/1.0.5:
     dev: false
     resolution:
@@ -3254,7 +3266,7 @@ packages:
       integrity: sha512-8v1j5KfP+s5WOTa1spNUAOfreajQPN12JXbRR0oDE+YrJBQCXBnNqUDj27EKpPLOoSiU3tKi3xGPB+JaOdUEQQ==
   /nodemon/1.18.10:
     dependencies:
-      chokidar: 2.1.4
+      chokidar: 2.1.5
       debug: 3.2.6
       ignore-by-default: 1.0.1
       minimatch: 3.0.4
@@ -3582,6 +3594,13 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-/E57AYkoeQ25qkxMj5PBOVgF8Kiu/h7cYS30Z5+R7WaiCCBfLq58ZI/dSeaEKb9WVJV5n/03QwrN3IeWIFllvw==
+  /pnpm/3.0.1:
+    dev: false
+    engines:
+      node: '>=8'
+    hasBin: true
+    resolution:
+      integrity: sha512-hYWjRN7U96zHDvgQxGyYaMF469Uzx0iZo2ej1VMUSaOULUFI9ue7dDku29AOf/E0+5Zd9zFs0qE0Tuq5Zsrk0A==
   /posix-character-classes/0.1.1:
     dev: true
     engines:
@@ -3612,7 +3631,7 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-XPNCtaekoOFGBQnjOfGs/fD7Qk8L8Nmp9NPO77Pivv8MRdMvNZM8QqbZ/Uh4zybyLedIIBKX1vsov4VIOBhU6Q==
-  /postman-collection/3.4.4:
+  /postman-collection/3.4.6:
     dependencies:
       escape-html: 1.0.3
       file-type: 3.9.0
@@ -3620,7 +3639,7 @@ packages:
       iconv-lite: 0.4.24
       liquid-json: 0.3.1
       lodash: 4.17.11
-      marked: 0.6.0
+      marked: 0.6.1
       mime-format: 2.0.0
       mime-types: 2.1.22
       postman-url-encoder: 1.0.1
@@ -3629,8 +3648,8 @@ packages:
       uuid: 3.3.2
     dev: false
     resolution:
-      integrity: sha512-9nf4Wx7qEfcqIgYvl8rURPLuOoAvoDrEdG/wiQznCHMmp82Nl/wSQi29K7UpNTwq3a4P2orXuhg1Wsbjx/td2w==
-  /postman-request/2.88.1-postman.6:
+      integrity: sha512-8MWLE84JolniNR4mmBiZlkTgqICtlEt7wppsK1xzUfdNQWNvId0dZuwqLF6e6pyXNhCtDYl0CqjdY7l82X7+gg==
+  /postman-request/2.88.1-postman.8:
     dependencies:
       aws-sign2: 0.7.0
       aws4: 1.8.0
@@ -3658,8 +3677,8 @@ packages:
     engines:
       node: '>= 6'
     resolution:
-      integrity: sha512-vM9QU/IdSk7UpOpNoUirDYS4CxQLijKaxb6b1eFJ9Ih1hAaek1Fuhl7Pw1jTQc4iF+/J13VC+SPLrlxtBL7ojg==
-  /postman-runtime/7.9.1:
+      integrity: sha512-lXxc4R6+g4oiLPA937Thl5MGdFBV7FSBN4WnUhKNq2UWEt+YJrOEYv0UOP6pH7kPF5cg8IXG1lHls7IWf8if4A==
+  /postman-runtime/7.11.0:
     dependencies:
       async: 2.6.1
       aws4: 1.8.0
@@ -3671,9 +3690,10 @@ packages:
       inherits: 2.0.3
       lodash: 4.17.11
       node-oauth1: 1.2.2
-      postman-collection: 3.4.4
-      postman-request: 2.88.1-postman.6
-      postman-sandbox: 3.2.4
+      performance-now: 2.1.0
+      postman-collection: 3.4.6
+      postman-request: 2.88.1-postman.8
+      postman-sandbox: 3.2.6
       resolve-from: 4.0.0
       serialised-error: 1.1.3
       uuid: 3.3.2
@@ -3681,16 +3701,16 @@ packages:
     engines:
       node: '>=4'
     resolution:
-      integrity: sha512-rNEtZ5wXnuK8atj4Fx9Y/ZtOVnuvUgq9m3q1p2GUaakaSa1sfvZElT+/Dkew5jldAmoweRmd+Fn6li6d8QUSSw==
-  /postman-sandbox/3.2.4:
+      integrity: sha512-IgBo6CZneFIhpOXNMDllOd8sQwm0wNHM3mjYynFPdLUx29UVP+4P92QdWDpUwsxDa55hKBg8sZhqGU7JeH9teg==
+  /postman-sandbox/3.2.6:
     dependencies:
       inherits: 2.0.3
       lodash: 4.17.11
       uuid: 3.3.2
-      uvm: 1.7.4
+      uvm: 1.7.5
     dev: false
     resolution:
-      integrity: sha512-+xIufVjIiIANSJDTjECcWCDotMeGMOzl9bRjofpektZGgzhKSx//Bi+MW3StKRVOLXAJR4ru7BA2+lfBXSsIgA==
+      integrity: sha512-mf7x9yuFJf4XYDtZ5T5jPRFH116wvs5k9WRyiMSmA8fYpqX+LZPZaP4M8DVTkJ6T4DbgErRzc+VMfVtJ4wSjkg==
   /postman-url-encoder/1.0.1:
     dev: false
     resolution:
@@ -3765,12 +3785,12 @@ packages:
       node: '>=0.6'
     resolution:
       integrity: sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
-  /qs/6.6.0:
+  /qs/6.7.0:
     dev: false
     engines:
       node: '>=0.6'
     resolution:
-      integrity: sha512-KIJqT9jQJDQx5h5uAVPimw6yVg2SekOKu959OCtktD3FjzbpvaPr8i4zzg07DOMz+igA4W/aNM7OV8H37pFYfA==
+      integrity: sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==
   /range-parser/1.2.0:
     dev: false
     engines:
@@ -3830,6 +3850,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-1G6jJVDWrt0rK99kBjvEtziZNCICAuvIPkSiUFIQxVP06RCVpq3dmDo2oi6ABpYaDYaTRr67BEhL8r1wgEZZKg==
+  /regenerator-runtime/0.10.5:
+    dev: true
+    resolution:
+      integrity: sha1-M2w+/BIgrc7dosn6tntaeVWjNlg=
+  /regenerator-runtime/0.11.1:
+    dev: true
+    resolution:
+      integrity: sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
   /regenerator-runtime/0.13.2:
     dev: true
     resolution:
@@ -4069,7 +4097,7 @@ packages:
       negotiator: 0.6.1
       once: 1.4.0
       pidusage: 2.0.17
-      qs: 6.6.0
+      qs: 6.7.0
       restify-errors: 7.0.0
       semver: 5.6.0
       send: 0.16.2
@@ -4840,15 +4868,15 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
-  /uvm/1.7.4:
+  /uvm/1.7.5:
     dependencies:
-      circular-json: 0.5.5
+      flatted: 2.0.0
       inherits: 2.0.3
       lodash: 4.17.11
       uuid: 3.3.2
     dev: false
     resolution:
-      integrity: sha512-kELQDSqBfIwLxKG16aTdX3NxfmWsQkQkywrsxq6/Jqts35qLP+33fwwB2Dv4ELIaNZCCC3pctLeyIaq7kfo40A==
+      integrity: sha512-QteSdkvRFbrSozInbNwRy5c8RUlxyyZU32EFCVHBDDPprCJ/gAAbWwTTAvyqC8+7uhxGihocAtcn28YBrpObZg==
   /v8flags/3.1.2:
     dependencies:
       homedir-polyfill: 1.0.3
@@ -4943,12 +4971,12 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-SWsswQnsqNus/i3HK2A8F8WHCtQ=
-  /xmlbuilder/11.0.0:
+  /xmlbuilder/11.0.1:
     dev: false
     engines:
       node: '>=4.0'
     resolution:
-      integrity: sha512-LzeAc96zUlknAk0F+xOXC8hO1D4ISG1ivov9UBjFkPcbSk6jVGhm9J8pTQp1ksZp9YbOws8pae8tVs+hwQl12w==
+      integrity: sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==
   /xtend/4.0.1:
     dev: false
     engines:
@@ -4995,6 +5023,7 @@ specifiers:
   '@babel/core': ^7.4.0
   '@babel/node': ^7.2.2
   '@babel/preset-env': ^7.4.1
+  babel-polyfill: ^6.26.0
   chalk: ^2.4.2
   cookie: ^0.3.1
   dotenv: ^7.0.0
@@ -5009,6 +5038,7 @@ specifiers:
   memcached-promisify: ^2.0.0
   newman: ^4.4.0
   nodemon: ^1.18.10
+  pnpm: ^3.0.1
   request: ^2.88.0
   request-promise: ^4.2.4
   request-promise-native: ^1.0.7
