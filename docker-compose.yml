@@ -5,8 +5,8 @@ services:
     ports:
       - "11211:11211"
 
-  web:
-    image: chusj/clin-api
+  auth:
+    image: chusj/clin-proxy-api-auth-service
     build: .
     ports:
       - "3000:3000"

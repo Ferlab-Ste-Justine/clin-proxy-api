@@ -18,6 +18,11 @@
 #### API Service Creation
 Please refer to `src/services/api/boilerplate`
 
+### Production Set-up
+* `pnpm install`
+* `pnpm run build`
+* `pnpm run service-auth`
+
 ###Docker
 
 Update docker.env for keycloack,
@@ -33,7 +38,7 @@ docker swarm init (on master node)
 docker swarm join --token SWMTKN-1-05mkbqs1dcxl3r6umbx0dqygz0ius3wxnw9ko9mddyy3vycz0s-2vqxt00dvmeztut58d08k2xh5 10.10.0.15:2377
 docker run -it -d -p 108080:8080 -v /var/run/docker.sock:/var/run/docker.sock dockersamples/visualizer
 or
-docker service create --name=viz --publish=108080:8080/tcp --constraint=node.role==manager \
+docker service create --name=viz --publish=18080:8080/tcp --constraint=node.role==manager \
   --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock dockersamples/visualizer
   
 docker build . -t chusj/clin-api
