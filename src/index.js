@@ -1,4 +1,6 @@
-require( 'babel-polyfill' )
+try {
+    require( 'babel-polyfill' )
+} catch ( e ) {}
 require( 'dotenv' ).config()
 
 const args = require( 'yargs' ).argv
