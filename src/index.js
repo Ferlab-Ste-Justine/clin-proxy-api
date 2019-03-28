@@ -93,7 +93,7 @@ const generateApiConfig = ( serviceName ) => {
         name: serviceConfig.name,
         port: serviceConfig.port,
         version: launcherVersion,
-        endpointPrefix: serviceConfig.endpointPrefix,
+        endpoint: serviceConfig.endpoint,
         options: {
             formatters: {
                 'application/json': payloadFormatter
@@ -108,6 +108,7 @@ const generateApiConfig = ( serviceName ) => {
             secret: jwtSecret,
             credentialsRequired: true,
             requestProperty: serviceJwtPropertyName,
+            // @TODO Validation on expiry on cache instance + refresh token
             getToken: ( req ) => {
                 if ( req.headers && req.headers.cookie ) {
                     const cookieJar = cookie.parse( req.headers.cookie )

@@ -1,0 +1,8 @@
+FROM node:10.14-alpine
+ADD . /code
+WORKDIR /code
+RUN cp -p docker.env .env
+RUN npm install -g pnpm
+RUN pnpm install
+RUN pnpm run build
+CMD ["pnpm", "run", "service-auth"]

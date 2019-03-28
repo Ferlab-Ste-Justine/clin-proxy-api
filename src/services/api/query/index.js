@@ -20,17 +20,17 @@ export default class QueryService extends ApiService {
             path: [
                 {
                     methods: [ 'GET' ],
-                    url: `${this.config.prefix}/docs`
+                    url: `${this.config.endpoint}/docs`
                 },
                 {
                     methods: [ 'GET' ],
-                    url: `${this.config.prefix}/health`
+                    url: `${this.config.endpoint}/health`
                 }
             ]
         } ) )
 
         // Register Query Route
-        this.instance.get( `${this.config.prefix}`, restifyAsyncWrap( async( req, res, next ) => {
+        this.instance.get( `${this.config.endpoint}`, restifyAsyncWrap( async( req, res, next ) => {
             next( new errors.NotImplementedError() )
         } ) )
 
