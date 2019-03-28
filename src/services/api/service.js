@@ -22,7 +22,7 @@ export default class ApiService {
             port: config.port,
             cors: config.cors,
             jwt: config.jwt,
-            prefix: config.endpointPrefix,
+            endpoint: config.endpoint,
             options: config.options
         }
         this.instance = null
@@ -51,7 +51,7 @@ export default class ApiService {
         addJoiValidatorMiddleware( this.instance )
         addAcceptMiddleware( this.instance )
 
-        this.instance.get( `${this.config.prefix}/health`, ( req, res ) => {
+        this.instance.get( `${this.config.endpoint}/health`, ( req, res ) => {
             requestsServed++
             res.send( {
                 uid,
@@ -62,7 +62,7 @@ export default class ApiService {
             } )
         } )
 
-        this.instance.get( `${this.config.prefix}/docs`, ( req, res ) => {
+        this.instance.get( `${this.config.endpoint}/docs`, ( req, res ) => {
             res.end( `
                 <html>
                   <body>

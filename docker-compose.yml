@@ -3,12 +3,19 @@ services:
   memcached:
     image: "memcached"
     ports:
-      - "11211:11211"
-
+    - "11211:11211"
+    networks:
+    - webnet
   auth:
     image: chusj/clin-proxy-api-auth-service
-    build: .
+    depends_on:
+    - memcached
     ports:
-      - "3000:3000"
+    - "3000:3000"
     deploy:
       replicas: 2
+    networks:
+    - webnet
+
+networks:
+  webnet:

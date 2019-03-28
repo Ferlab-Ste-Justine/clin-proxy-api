@@ -38,22 +38,22 @@ export default class AuthService extends ApiService {
             path: [
                 {
                     methods: [ 'GET' ],
-                    url: `${this.config.prefix}/docs`
+                    url: `${this.config.endpoint}/docs`
                 },
                 {
                     methods: [ 'GET' ],
-                    url: `${this.config.prefix}/health`
+                    url: `${this.config.endpoint}/health`
                 },
                 {
                     methods: [ 'POST' ],
-                    url: `${this.config.prefix}`
+                    url: `${this.config.endpoint}`
                 }
             ]
         } ) )
 
         // Register Login Route
         this.instance.post( {
-            path: `${this.config.prefix}`,
+            path: `${this.config.endpoint}`,
             validation: validators.login
         }, restifyAsyncWrap( async( req, res, next ) => {
             const username = req.body.username
@@ -96,7 +96,7 @@ export default class AuthService extends ApiService {
         } ) )
 
         // Register Logout Route
-        this.instance.del( `${this.config.prefix}`, restifyAsyncWrap( async( req, res, next ) => {
+        this.instance.del( `${this.config.endpoint}`, restifyAsyncWrap( async( req, res, next ) => {
             const cacheKey = req.jwt.uid
 
             try {
