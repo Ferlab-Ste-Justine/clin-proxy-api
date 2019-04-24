@@ -1,0 +1,313 @@
+{
+  "info": {
+    "_postman_id": "7ec4d8e5-e5ff-4a02-b7e6-12e0656963ac",
+    "name": "CLIN-PROXY-API Common",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "API Version should be present when not using version in URL",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "0482e748-9c48-4c8e-a269-c45341c66084",
+            "exec": [
+              "pm.test(\"Returned API Version should fallback to default version\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.currentApiVersion).to.eql(jsonData.data.defaultApiVersion);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{serviceUrl}}:{{boilerplateServicePort}}/{{boilerplateServiceEndpointPrefix}}",
+          "host": [
+            "{{serviceUrl}}"
+          ],
+          "port": "{{boilerplateServicePort}}",
+          "path": [
+            "{{boilerplateServiceEndpointPrefix}}"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "API Version",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{serviceUrl}}:2999/boilerplate/health",
+              "host": [
+                "{{serviceUrl}}"
+              ],
+              "port": "2999",
+              "path": [
+                "boilerplate",
+                "health"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Server",
+              "value": "restify"
+            },
+            {
+              "key": "API-Version",
+              "value": "1"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "API Version should be present when using version in URL",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "332a2df5-13c9-4882-9f4b-7defd3c16056",
+            "exec": [
+              "pm.test(\"API Version should equal requested version\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.data.currentApiVersion).to.eql(1);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{serviceUrl}}:2999/v1/boilerplate/health",
+          "host": [
+            "{{serviceUrl}}"
+          ],
+          "port": "2999",
+          "path": [
+            "v1",
+            "boilerplate",
+            "health"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "API Version",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{serviceUrl}}:2999/boilerplate/health",
+              "host": [
+                "{{serviceUrl}}"
+              ],
+              "port": "2999",
+              "path": [
+                "boilerplate",
+                "health"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Server",
+              "value": "restify"
+            },
+            {
+              "key": "API-Version",
+              "value": "1"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "API Version should not be present when using inexistent version in URL",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "1dac6fdf-6773-4f4d-ba13-909d0858455c",
+            "exec": [
+              "pm.test(\"Inexistent API Version should fail with a message\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.error).to.eql(\"BadRequest\");",
+              "    pm.expect(jsonData.data.messages[0]).to.eql(\"The API version you requested does not exist.\");",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{serviceUrl}}:{{boilerplateServicePort}}/v0{{boilerplateServiceEndpointPrefix}}/health",
+          "host": [
+            "{{serviceUrl}}"
+          ],
+          "port": "{{boilerplateServicePort}}",
+          "path": [
+            "v0{{boilerplateServiceEndpointPrefix}}",
+            "health"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "API Version",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{serviceUrl}}:2999/boilerplate/health",
+              "host": [
+                "{{serviceUrl}}"
+              ],
+              "port": "2999",
+              "path": [
+                "boilerplate",
+                "health"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Server",
+              "value": "restify"
+            },
+            {
+              "key": "API-Version",
+              "value": "1"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+        }
+      ]
+    }
+  ]
+}
