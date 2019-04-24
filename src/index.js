@@ -92,8 +92,10 @@ const generateApiConfig = ( serviceName ) => {
         id: serviceName,
         name: serviceConfig.name,
         port: serviceConfig.port,
-        version: launcherVersion,
-        endpoint: serviceConfig.endpoint,
+        packageVersion: launcherVersion,
+        defaultApiVersion: serviceConfig.defaultVersion,
+        availableApiVersions: serviceConfig.availableVersions,
+        endpoint: serviceConfig.endpointPrefix,
         options: {
             formatters: {
                 'application/json': payloadFormatter

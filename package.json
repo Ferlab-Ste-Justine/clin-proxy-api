@@ -10,12 +10,11 @@
     "service-query": "node dist/index.js --service query"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.4.0",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.4.1",
-    "nodemon": "^1.18.10",
+    "babel-polyfill": "^6.26.0",
     "chalk": "^2.4.2",
     "cookie": "^0.3.1",
     "dotenv": "^7.0.0",
@@ -29,6 +28,7 @@
     "jsonwebtoken": "^8.5.1",
     "memcached-promisify": "^2.0.0",
     "newman": "^4.4.0",
+    "nodemon": "^1.18.10",
     "pnpm": "^3.0.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
