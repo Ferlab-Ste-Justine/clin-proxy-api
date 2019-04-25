@@ -6,6 +6,7 @@ import addCorsMiddleware from './middleware/cors'
 import addGzipMiddleware from './middleware/gzip'
 import addJoiValidatorMiddleware from './middleware/joi'
 import addQueryParserMiddleware from './middleware/queryParser'
+import addVersionMiddleware from './middleware/version'
 
 
 export default class ApiService {
@@ -15,7 +16,9 @@ export default class ApiService {
         this.config = {
             uid: config.serviceId,
             cuid: config.containerId,
-            version: config.version,
+            packageVersion: config.packageVersion,
+            defaultApiVersion: config.defaultApiVersion,
+            availableApiVersions: config.availableApiVersions,
             docsBranch: config.docsBranch,
             id: config.id,
             name: config.name,
@@ -25,6 +28,7 @@ export default class ApiService {
             endpoint: config.endpoint,
             options: config.options
         }
+
         this.instance = null
         this.initTimestamp = null
         this.startTimestamp = null
@@ -33,6 +37,7 @@ export default class ApiService {
     async init() {
         this.initTimestamp = new Date().getTime()
         this.instance = restify.createServer( this.config.options )
+
         await this.logService.debug( 'API Service appears functional ... Testing.' )
     }
 
@@ -41,9 +46,12 @@ export default class ApiService {
         const startDate = new Date().getTime()
         const uid = this.config.uid
         const cuid = this.config.cuid
-        const version = this.config.version
+        const packageVersion = this.config.packageVersion
+        const defaultApiVersion = this.config.defaultApiVersion
+        const apiVersions = this.config.availableApiVersions
 
         this.startTimestamp = startDate
+        addVersionMiddleware( this.instance, apiVersions, defaultApiVersion )
         addCorsMiddleware( this.instance, this.config )
         addQueryParserMiddleware( this.instance )
         addBodyParserMiddleware( this.instance )
@@ -56,7 +64,10 @@ export default class ApiService {
             res.send( {
                 uid,
                 cuid,
-                version,
+                packageVersion,
+                defaultApiVersion,
+                currentApiVersion: req.version,
+                apiVersions,
                 uptime: ( new Date().getTime() - startDate ),
                 served: requestsServed
             } )

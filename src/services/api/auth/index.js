@@ -36,18 +36,9 @@ export default class AuthService extends ApiService {
         // JWT Endpoint Exceptions
         this.instance.use( rjwt( this.config.jwt ).unless( {
             path: [
-                {
-                    methods: [ 'GET' ],
-                    url: `${this.config.endpoint}/docs`
-                },
-                {
-                    methods: [ 'GET' ],
-                    url: `${this.config.endpoint}/health`
-                },
-                {
-                    methods: [ 'POST' ],
-                    url: `${this.config.endpoint}`
-                }
+                { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
+                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` },
+                { methods: [ 'POST' ], url: `${this.config.endpoint}` }
             ]
         } ) )
 

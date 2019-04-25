@@ -11,3 +11,6 @@ dist
 
 # logs
 pnpm-debug.log
+
+# tests
+newman
