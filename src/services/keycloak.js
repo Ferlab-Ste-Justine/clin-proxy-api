@@ -30,4 +30,17 @@ export default class KeycloakClient {
         } )
     }
 
+    async refresh( token ) {
+        return rp( {
+            method: 'POST',
+            uri: `${this.host}/token`,
+            form: {
+                grant_type: 'refresh_token',
+                refresh_token: token,
+                client_id: this.clientId,
+                client_secret: this.clientSecret
+            }
+        } )
+    }
+
 }

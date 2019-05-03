@@ -24,6 +24,7 @@
     "graphql": "^14.1.1",
     "graphql-compose": "^6.0.3",
     "graphql-compose-elasticsearch": "^3.0.1",
+    "http": "^0.0.0",
     "joi": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
     "liquid-json": "^0.3.1",

@@ -1,3 +1,6 @@
+import errors from 'restify-errors'
+
+
 try {
     require( 'babel-polyfill' )
 } catch ( e ) {}
@@ -10,6 +13,7 @@ import cookie from 'cookie'
 import jwt from 'jsonwebtoken'
 
 import payloadFormatter from './services/api/helpers/payload'
+import { refreshTokenMiddlewareGenerator } from './services/api/auth'
 
 
 if ( !process.env.LOGGER ) {
@@ -83,6 +87,18 @@ const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
 const serviceToLaunch = args.service || null
 
 
+let refreshTokenMiddleware = ( request, payload, callback ) => {
+    callback( null, true )
+}
+
+try {
+    const authServiceConfig = JSON.parse( process.env.AUTH_API_SERVICE )
+
+    refreshTokenMiddleware = refreshTokenMiddlewareGenerator( authServiceConfig )
+} catch ( e ) {
+    launcherLog.warning( 'No Token Refresh Middleware will be available for API Services launched.' )
+}
+
 const generateApiConfig = ( serviceName ) => {
     const serviceConfig = JSON.parse( process.env[ `${serviceName.toUpperCase()}_API_SERVICE` ] )
     const logService = new LogService( `${serviceConfig.name} Service`, logLevel )
@@ -95,7 +111,7 @@ const generateApiConfig = ( serviceName ) => {
         packageVersion: launcherVersion,
         defaultApiVersion: serviceConfig.defaultVersion,
         availableApiVersions: serviceConfig.availableVersions,
-        endpoint: serviceConfig.endpointPrefix,
+        endpoint: serviceConfig.endpoint,
         options: {
             formatters: {
                 'application/json': payloadFormatter
@@ -110,7 +126,6 @@ const generateApiConfig = ( serviceName ) => {
             secret: jwtSecret,
             credentialsRequired: true,
             requestProperty: serviceJwtPropertyName,
-            // @TODO Validation on expiry on cache instance + refresh token
             getToken: ( req ) => {
                 if ( req.headers && req.headers.cookie ) {
                     const cookieJar = cookie.parse( req.headers.cookie )
@@ -118,10 +133,19 @@ const generateApiConfig = ( serviceName ) => {
 
                     if ( token ) {
                         req.jwt = jwt.decode( token, jwtSecret )
+                        // Signed JWT Token Version Should Match Package Version
+                        if ( req.jwt.version !== launcherVersion ) {
+                            return new errors.InvalidCredentialsError( 'The token version is outdated' )
+                        }
+
                         return token
                     }
                 }
                 return null
+            },
+            isRevoked: ( req, payload, done ) => {
+                // Refresh Expired JWT Token, if possible.
+                refreshTokenMiddleware( req, payload, done )
             }
         },
         serviceId: uniqid(),
