@@ -1,4 +1,5 @@
 import restify from 'restify'
+import errors from 'restify-errors'
 
 import addAcceptMiddleware from './middleware/accept'
 import addBodyParserMiddleware from './middleware/bodyParser'
@@ -106,6 +107,6 @@ export const generateGetFunctionForApiVersion = ( apiVersions ) => {
             return apiVersions[ version ][ functionName ]
         }
 
-        return apiVersions[ 1 ][ functionName ]
+        throw new Error( `API v${version} does not implement ${functionName}` )
     }
 }
