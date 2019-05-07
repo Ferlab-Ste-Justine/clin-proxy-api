@@ -1,4 +1,5 @@
 import restify from 'restify'
+import errors from 'restify-errors'
 
 import addAcceptMiddleware from './middleware/accept'
 import addBodyParserMiddleware from './middleware/bodyParser'
@@ -98,4 +99,14 @@ export default class ApiService {
         await this.parentLogService.success( `${this.config.name} API Service has landed.` )
     }
 
+}
+
+export const generateGetFunctionForApiVersion = ( apiVersions ) => {
+    return ( version, functionName ) => {
+        if ( apiVersions[ version ] && apiVersions[ version ][ functionName ] ) {
+            return apiVersions[ version ][ functionName ]
+        }
+
+        throw new Error( `API v${version} does not implement ${functionName}` )
+    }
 }
