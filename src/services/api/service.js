@@ -99,3 +99,13 @@ export default class ApiService {
     }
 
 }
+
+export const generateGetFunctionForApiVersion = ( apiVersions ) => {
+    return ( version, functionName ) => {
+        if ( apiVersions[ version ] && apiVersions[ version ][ functionName ] ) {
+            return apiVersions[ version ][ functionName ]
+        }
+
+        return apiVersions[ 1 ][ functionName ]
+    }
+}
