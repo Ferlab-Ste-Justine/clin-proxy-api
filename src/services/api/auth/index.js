@@ -17,20 +17,21 @@ const generateSignedToken = ( jwtSecret, cacheKey, packageVersion, refreshTokenE
 
     return jwt.sign( {
         uid: cacheKey,
-        version: packageVersion,
-        expiry: currentTimeInSeconds + refreshTokenExpiresInSeconds
+        expiry: currentTimeInSeconds + refreshTokenExpiresInSeconds,
+        version: packageVersion
     }, jwtSecret, { expiresIn: `${accessTokenExpiresInSeconds}s` } )
 }
 
-const generateCacheData = ( accessToken, accessTokenExpiresInSeconds, refreshToken, refreshTokenExpiresInSeconds ) => {
+const generateCacheData = ( accessToken, accessTokenExpiresInSeconds, refreshToken, refreshTokenExpiresInSeconds, user ) => {
     return {
+        acl: {},
         auth: {
             access_token: accessToken,
             expires_in: accessTokenExpiresInSeconds,
             refresh_token: refreshToken,
             refresh_expires_in: refreshTokenExpiresInSeconds
         },
-        acl: {}
+        user
     }
 }
 
@@ -38,7 +39,6 @@ const generateCacheKey = () => {
     return uniqid()
 }
 
-// @TODO
 export const refreshTokenMiddlewareGenerator = ( config ) => {
     return ( req, payload, callback ) => {
         const refreshTokenIsExpired = payload.expiry <= Math.round( new Date().getTime() / 1000 )
@@ -50,7 +50,7 @@ export const refreshTokenMiddlewareGenerator = ( config ) => {
         const options = {
             host: `${( req.isSecure() ) ? 'https' : 'http' }://${req.headers.host}`,
             port: config.port,
-            path: config.endpoint,
+            path: `${config.endpoint}/token`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -68,10 +68,11 @@ export const refreshTokenMiddlewareGenerator = ( config ) => {
         refreshRequest.write( JSON.stringify( {} ) )
         refreshRequest.end()
 
-        // @TODO Check is refreshWasSuccessful
+        const jsonResponse = JSON.parse( response )
 
-        console.log( 'REFRESH RESPONSE' )
-        console.log( response )
+        if ( jsonResponse.data ) {
+            refreshWasSuccessful = true
+        }
 
         callback( null, !refreshWasSuccessful )
     }
@@ -105,7 +106,7 @@ export default class AuthService extends ApiService {
             path: [
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/health` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/refresh` },
+                { methods: [ 'POST' ], url: `${this.config.endpoint}/token` },
                 { methods: [ 'POST' ], url: `${this.config.endpoint}` }
             ]
         } ) )
@@ -133,15 +134,16 @@ export default class AuthService extends ApiService {
                     refreshTokenExpiresInSeconds,
                     accessTokenExpiresInSeconds
                 )
+                const user = {
+                    username
+                }
                 const cacheData = generateCacheData(
                     accessToken,
                     accessTokenExpiresInSeconds,
                     refreshToken,
-                    refreshTokenExpiresInSeconds
+                    refreshTokenExpiresInSeconds,
+                    user,
                 )
-                const user = {
-                    username
-                }
 
                 await this.cacheService.create( cacheKey, cacheData, refreshTokenExpiresInSeconds )
                 await this.logService.debug( `Login for ${username} using ${cacheKey}` )
@@ -182,22 +184,31 @@ export default class AuthService extends ApiService {
             const cacheKey = req.jwt.uid
 
             try {
-                const currentCachedData = await this.cacheService.get( cacheKey )
+                const currentCachedData = await this.cacheService.read( cacheKey )
                 const refreshToken = currentCachedData.auth.refresh_token
                 const keycloakResponse = await this.keycloakService.refresh( refreshToken )
+                const jsonReponse = JSON.parse( keycloakResponse )
+                const newAccessToken = jsonReponse.access_token
+                const newAccessTokenExpiresInSeconds = jsonReponse.expires_in
+                const newRefreshToken = jsonReponse.refresh_token
+                const newRefreshTokenExpiresInSeconds = jsonReponse.refresh_expires_in
+                const newCacheData = generateCacheData( newAccessToken, newAccessTokenExpiresInSeconds, newRefreshToken, newRefreshTokenExpiresInSeconds, currentCachedData.user )
+                const newToken = generateSignedToken(
+                    this.config.jwt.secret,
+                    cacheKey,
+                    this.config.version,
+                    newRefreshTokenExpiresInSeconds,
+                    newAccessTokenExpiresInSeconds
+                )
 
-                // @TODO Validate Keycloak Response Format
-                // const jsonReponse = JSON.parse( keycloakResponse )
-                // const refreshCacheData = generateCacheData( accessToken, accessTokenExpiresInSeconds, refreshToken, refreshTokenExpiresInSeconds )
-                // await this.cacheService.update( cacheKey, refreshCacheData )
+                await this.cacheService.update( cacheKey, newCacheData )
 
-                await this.logService.debug( `Token Refresh using ${cacheKey}` )
-                // @TODO Set Cookie
-                // res.setHeader( 'Set-Cookie', cookie.serialize( this.config.jwt.requestProperty, token, {
-                //    httpOnly: true,
-                //    maxAge: refreshTokenExpiresInSeconds
-                // } ) )
-                res.send( {} )
+                await this.logService.debug( `Refreshed token for ${currentCachedData.user.username} using ${cacheKey}` )
+                res.setHeader( 'Set-Cookie', cookie.serialize( this.config.jwt.requestProperty, newToken, {
+                    httpOnly: true,
+                    maxAge: newRefreshTokenExpiresInSeconds
+                } ) )
+                res.send( { user: currentCachedData.user } )
                 return next()
             } catch ( e ) {
                 await this.logService.warning( `Token Refresh ${cacheKey} ${e.toString()}` )
