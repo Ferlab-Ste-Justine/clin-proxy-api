@@ -20,7 +20,7 @@ newman.run( {
             {
                 enabled: true,
                 key: 'boilerplateServiceEndpointPrefix',
-                value: boilerplateServiceConfig.endpointPrefix,
+                value: boilerplateServiceConfig.endpoint,
                 type: 'text'
             },
             {
