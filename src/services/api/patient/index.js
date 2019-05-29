@@ -1,4 +1,4 @@
-// https://github.com/graphql-compose/graphql-compose-elasticsearch
+// https://github.com/elastic/elasticsearch-js
 
 import errors from 'restify-errors'
 import rjwt from 'restify-jwt-community'
@@ -6,7 +6,7 @@ import rjwt from 'restify-jwt-community'
 import ApiService from '../service'
 import restifyAsyncWrap from '../helpers/async'
 
-export default class QueryService extends ApiService {
+export default class PatientService extends ApiService {
     constructor( config ) {
         config.logService.info( 'Roger that.' )
         super( config )

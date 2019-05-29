@@ -23,7 +23,7 @@
 
 Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/master/README.md) and run
 ```
-cp -p local.env .env
+cp -p development.env .env
 npm install -g pnpm
 pnpm install
 pnpm start
