@@ -33,7 +33,17 @@ pnpm start
 
 - Install Docker
 - Use `docker-compose` as described in this [repository](https://github.com/cr-ste-justine/devops/tree/dev/Keycloak)
-- Log into Keycloak
+- Log into Keycloak as `admin`
+- Add a Realm named `clin`
+  - Enable `Login with email`
+- Create a client called `clin-proxy-api`
+  - Enable `Direct Access Grants`
+  - Enable `Service Accounts`
+  - Enable `Authorization`
+- Find your `secret` under Client > Credentials and update the `.env` file
+- Create an Identity Provider
+  - Set the Client ID to `clin-proxy-api`
+- Create a User
 
 ### Production Set-up
 
