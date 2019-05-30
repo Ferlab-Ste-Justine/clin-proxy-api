@@ -29,6 +29,12 @@ pnpm install
 pnpm start
 ```
 
+##### Keycloak Set-up
+
+- Install Docker
+- Use `docker-compose` as described in this [repository](https://github.com/cr-ste-justine/devops/tree/dev/Keycloak)
+- Log into Keycloak
+
 ### Production Set-up
 
 ##### Manual Mode

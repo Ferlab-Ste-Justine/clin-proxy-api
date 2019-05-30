@@ -1,5 +1,3 @@
-import errors from 'restify-errors'
-
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
 import restifyAsyncWrap from '../helpers/async'
@@ -27,7 +25,7 @@ export default class BoilerplateService extends ApiService {
                 return next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( new errors.InternalServerError() )
+                return next( e )
             }
 
         } ) )

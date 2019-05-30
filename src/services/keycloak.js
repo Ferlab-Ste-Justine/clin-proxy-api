@@ -19,7 +19,7 @@ export default class KeycloakClient {
     async authenticate( username, password ) {
         return rp( {
             method: 'POST',
-            uri: `${this.host}/token`,
+            uri: `${this.host}/protocol/openid-connect/token`,
             form: {
                 username: username,
                 password: password,
@@ -33,7 +33,7 @@ export default class KeycloakClient {
     async refresh( token ) {
         return rp( {
             method: 'POST',
-            uri: `${this.host}/token`,
+            uri: `${this.host}/protocol/openid-connect/token`,
             form: {
                 grant_type: 'refresh_token',
                 refresh_token: token,

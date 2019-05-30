@@ -86,9 +86,8 @@ const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
 
 const serviceToLaunch = args.service || null
 
-
-let refreshTokenMiddleware = ( request, payload, callback ) => {
-    callback( null, true )
+let refreshTokenMiddleware = () => {
+    return true
 }
 
 try {
@@ -133,20 +132,29 @@ const generateApiConfig = ( serviceName ) => {
 
                     if ( token ) {
                         req.jwt = jwt.decode( token, jwtSecret )
+
                         // Signed JWT Token Version Should Match Package Version
                         if ( req.jwt.version !== launcherVersion ) {
                             return new errors.InvalidCredentialsError( 'The token version is outdated' )
+                        }
+
+                        // Signed JWT Token Is Expired
+                        const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
+
+                        if ( req.jwt.expiry <= currentTimeInSeconds ) {
+                            const tokenCannotBeRefreshed = refreshTokenMiddleware( req )
+
+                            if ( tokenCannotBeRefreshed ) {
+                                return new errors.InvalidCredentialsError( 'The token has expired' )
+                            }
                         }
 
                         return token
                     }
                 }
                 return null
-            },
-            isRevoked: ( req, payload, done ) => {
-                // Refresh Expired JWT Token, if possible.
-                refreshTokenMiddleware( req, payload, done )
             }
+            // isRevoked: ( req, payload, done ) => {}
         },
         serviceId: uniqid(),
         containerId,
