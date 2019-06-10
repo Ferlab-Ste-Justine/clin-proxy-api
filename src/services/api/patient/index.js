@@ -1,5 +1,3 @@
-// http://localhost:8888/static/console.html#/entities/Operation?
-
 import rjwt from 'restify-jwt-community'
 
 import ApiService from '../service'
