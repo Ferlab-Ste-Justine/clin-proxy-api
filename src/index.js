@@ -72,6 +72,15 @@ try {
     process.exit( 1 )
 }
 
+let aidboxServiceConfig = null
+
+try {
+    aidboxServiceConfig = JSON.parse( process.env.AIDBOX_SERVICE )
+} catch ( e ) {
+    launcherLog.error( 'Invalid JSON value or missing AIDBOX_SERVICE in environment.' )
+    process.exit( 1 )
+}
+
 if ( !process.env.CONTAINER_ID ) {
     process.env.CONTAINER_ID = uniqid()
     launcherLog.warning( 'No CONTAINER_ID specified in environment, auto-generated.' )
@@ -131,6 +140,7 @@ const generateApiConfig = ( serviceName ) => {
                     const token = cookieJar[ serviceJwtPropertyName ] || null
 
                     if ( token ) {
+                        req.token = token
                         req.jwt = jwt.decode( token, jwtSecret )
 
                         // Signed JWT Token Version Should Match Package Version
@@ -162,6 +172,7 @@ const generateApiConfig = ( serviceName ) => {
         parentLogService: launcherLog,
         cacheConfig: cacheServiceConfig,
         keycloakConfig: keycloakServiceConfig,
+        aidboxConfig: aidboxServiceConfig,
         docsBranch: process.env.NODE_ENV === 'production' ? 'master' : 'dev'
     }
 }

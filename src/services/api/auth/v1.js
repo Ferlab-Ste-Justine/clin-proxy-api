@@ -94,9 +94,7 @@ const logout = async ( req, res, cacheService, logService, config ) => {
 
 const token = async ( req, res, keycloakService, cacheService, logService, config ) => {
     try {
-        const cookieJar = cookie.parse( req.headers.cookie )
-        const encodedJwt = cookieJar[ config.jwt.requestProperty ] || null
-        const decodedJwt = jwt.decode( encodedJwt, config.jwt.secret )
+        const decodedJwt = jwt.decode( req.token, config.jwt.secret )
         const cacheKey = decodedJwt.uid
         const currentCachedData = await cacheService.read( cacheKey )
         const refreshToken = currentCachedData.auth.refresh_token

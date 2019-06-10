@@ -1,20 +1,15 @@
 import errors from 'restify-errors'
 
 
-const getPatient = ( req, res ) => {
-
-    throw new errors.NotImplementedError( 'getPatient is not implemented' )
-
+const getPatientById = async ( req, res, aidboxService ) => {
+    return await aidboxService.getPatientById( req.params.query, req.token )
 }
 
-const searchPatients = ( req, res ) => {
-
-    throw new errors.NotImplementedError( 'searchPatients is not implemented' )
-
+const fulltextPatientSearch = async ( req, res, aidboxService ) => {
+    return await aidboxService.fulltextPatientSearch( req.params.query, req.token )
 }
-
 
 export default {
-    getPatient,
-    searchPatients
+    getPatientById,
+    fulltextPatientSearch
 }

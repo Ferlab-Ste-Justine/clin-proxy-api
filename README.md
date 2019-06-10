@@ -37,13 +37,22 @@ pnpm start
 - Add a Realm named `clin`
   - Enable `Login with email`
 - Create a client called `clin-proxy-api`
-  - Enable `Direct Access Grants`
-  - Enable `Service Accounts`
-  - Enable `Authorization`
+  - Disable `Standard Flow Enabled` in Settings
+  - Enable `Authorization Enabled` in Settings
+  - Enable `Direct Access Grants` in Settings
+  - Enable `Service Accounts` in Settings
+  - Enable `Exclude Session State From Authentication Response` in Settings under OpenID Connect Compatibility Modes
+  - Set `Access Token Lifespan` to X minutes in Settings > Advanced Settings
+  - Enable `OAuth 2.0 Mutual TLS Certificate Bound Access Tokens Enabled` in Settings > Advanced Settings
 - Find your `secret` under Client > Credentials and update the `.env` file
 - Create an Identity Provider
-  - Set the Client ID to `clin-proxy-api`
+  - Enable `Trust Email` in Settings
+  - Set the Client ID to `clin-proxy-api` in Settings under OpenID Connect Config
+  - Set the Client Secret to found `secret` under Client > Credentials
+  - Set Prompt to `none` in Settings under OpenID Connect Config
 - Create a User
+  - Set an email
+  - Set a non-temporary password under Credentials > Manage Password
 
 ### Production Set-up
 
