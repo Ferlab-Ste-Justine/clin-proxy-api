@@ -15,24 +15,24 @@ export default class AidboxClient {
         } )
     }
 
-    async getPatientById( id, jwt ) {
+    async getPatientById( id, jwtIdToken ) {
         return rp( {
             method: 'GET',
             uri: `${this.host}/Patient/${id}`,
             json: true,
             headers: {
-                Authorization: `Bearer ${jwt}`
+                Authorization: `Bearer ${jwtIdToken}`
             }
         } )
     }
 
-    async fulltextPatientSearch( param, jwt ) {
+    async fulltextPatientSearch( param, jwtIdToken ) {
         return rp( {
             method: 'GET',
             uri: `${this.host}/Patient?_content=${param}`,
             json: true,
             headers: {
-                Authorization: `Bearer ${jwt}`
+                Authorization: `Bearer ${jwtIdToken}`
             }
         } )
     }

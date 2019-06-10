@@ -8,6 +8,7 @@ import restifyAsyncWrap from '../helpers/async'
 import AidboxClient from '../../aidbox'
 
 import Apiv1 from './v1'
+import CacheClient from '../../cache'
 
 
 const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
@@ -18,12 +19,17 @@ export default class PatientService extends ApiService {
     constructor( config ) {
         config.logService.info( 'Roger that.' )
         super( config )
+        this.config.cache = config.cacheConfig
         this.config.aidbox = config.aidboxConfig
     }
 
 
     async init() {
         super.init()
+
+        await this.logService.debug( 'Cache Service Client appears functional ... checking connectivity.' )
+        this.cacheService = new CacheClient( this.config.cache )
+        await this.cacheService.create( 'patientService', new Date().getTime() )
 
         await this.logService.debug( 'Aidbox Service Client appears functional ... checking connectivity.' )
         this.aidboxService = new AidboxClient( this.config.aidbox )
@@ -46,8 +52,7 @@ export default class PatientService extends ApiService {
 
         this.instance.get( `${this.config.endpoint}/query/:query`, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                console.log('*** fulltextPatientSearch')
-                const response = await getFunctionForApiVersion( req.version, 'fulltextPatientSearch' )( req, res, this.aidboxService )
+                const response = await getFunctionForApiVersion( req.version, 'fulltextPatientSearch' )( req, res, this.cacheService, this.aidboxService )
 
                 res.send( response )
                 return next()
@@ -60,8 +65,7 @@ export default class PatientService extends ApiService {
 
         this.instance.get( `${this.config.endpoint}/:uid`, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                console.log('*** getPatientById')
-                const response = await getFunctionForApiVersion( req.version, 'getPatientById' )( req, res, this.aidboxService )
+                const response = await getFunctionForApiVersion( req.version, 'getPatientById' )( req, res, this.cacheService, this.aidboxService )
 
                 res.send( response )
                 return next()

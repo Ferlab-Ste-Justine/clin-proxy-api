@@ -8,24 +8,25 @@ const generateCacheKey = () => {
     return uniqid()
 }
 
-const generateSignedToken = ( jwtSecret, cacheKey, packageVersion, refreshTokenExpiresInSeconds, accessTokenExpiresInSeconds ) => {
+const generateSignedToken = ( jwtSecret, cacheKey, packageVersion, refreshTokenExpiresInSeconds, accessTokenExpiresInSeconds, scope ) => {
     const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
 
     return jwt.sign( {
         uid: cacheKey,
         expiry: currentTimeInSeconds + refreshTokenExpiresInSeconds,
-        version: packageVersion
+        version: packageVersion,
+        scope
     }, jwtSecret, { expiresIn: `${accessTokenExpiresInSeconds}s` } )
 }
 
-const generateCacheData = ( accessToken, accessTokenExpiresInSeconds, refreshToken, refreshTokenExpiresInSeconds, user ) => {
+const generateCacheData = ( accessToken, accessTokenExpiresInSeconds, refreshToken, refreshTokenExpiresInSeconds, idToken, user ) => {
     return {
-        acl: {},
         auth: {
             access_token: accessToken,
             expires_in: accessTokenExpiresInSeconds,
             refresh_token: refreshToken,
-            refresh_expires_in: refreshTokenExpiresInSeconds
+            refresh_expires_in: refreshTokenExpiresInSeconds,
+            id_token: idToken
         },
         user
     }
@@ -42,13 +43,15 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
         const accessTokenExpiresInSeconds = jsonReponse.expires_in
         const refreshToken = jsonReponse.refresh_token
         const refreshTokenExpiresInSeconds = jsonReponse.refresh_expires_in
+        const idToken = jsonReponse.id_token
         const cacheKey = generateCacheKey()
         const token = generateSignedToken(
             config.jwt.secret,
             cacheKey,
             config.packageVersion,
             refreshTokenExpiresInSeconds,
-            accessTokenExpiresInSeconds
+            accessTokenExpiresInSeconds,
+            jsonReponse.scope,
         )
 
         const user = {
@@ -59,6 +62,7 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
             accessTokenExpiresInSeconds,
             refreshToken,
             refreshTokenExpiresInSeconds,
+            idToken,
             user,
         )
 
@@ -104,13 +108,15 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
         const newAccessTokenExpiresInSeconds = jsonReponse.expires_in
         const newRefreshToken = jsonReponse.refresh_token
         const newRefreshTokenExpiresInSeconds = jsonReponse.refresh_expires_in
-        const newCacheData = generateCacheData( newAccessToken, newAccessTokenExpiresInSeconds, newRefreshToken, newRefreshTokenExpiresInSeconds, currentCachedData.user )
+        const newIdToken = jsonReponse.id_token
+        const newCacheData = generateCacheData( newAccessToken, newAccessTokenExpiresInSeconds, newRefreshToken, newRefreshTokenExpiresInSeconds, newIdToken, currentCachedData.user )
         const newToken = generateSignedToken(
             config.jwt.secret,
             cacheKey,
             config.packageVersion,
             newRefreshTokenExpiresInSeconds,
-            newAccessTokenExpiresInSeconds
+            newAccessTokenExpiresInSeconds,
+            jsonReponse.scope,
         )
 
         await cacheService.update( cacheKey, newCacheData, newRefreshTokenExpiresInSeconds )

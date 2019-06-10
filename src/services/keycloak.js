@@ -24,6 +24,7 @@ export default class KeycloakClient {
                 username: username,
                 password: password,
                 grant_type: 'password',
+                scope: 'openid',
                 client_id: this.clientId,
                 client_secret: this.clientSecret
             }

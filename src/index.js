@@ -140,7 +140,6 @@ const generateApiConfig = ( serviceName ) => {
                     const token = cookieJar[ serviceJwtPropertyName ] || null
 
                     if ( token ) {
-                        req.token = token
                         req.jwt = jwt.decode( token, jwtSecret )
 
                         // Signed JWT Token Version Should Match Package Version
