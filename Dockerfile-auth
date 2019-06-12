@@ -1,8 +1,9 @@
 FROM node:10.14-alpine
 ADD . /code
 WORKDIR /code
-RUN npm install
-RUN npm run build
-CMD ["npm", "run", "service-auth"]
+RUN npm install -g pnpm
+RUN pnpm install
+RUN pnpm run build
+CMD ["pnpm", "run", "service-auth"]
 
 HEALTHCHECK --interval=20s CMD wget -qO- localhost:3000/auth/health
