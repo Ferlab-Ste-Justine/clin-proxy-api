@@ -3,10 +3,11 @@ import rjwt from 'restify-jwt-community'
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
 import restifyAsyncWrap from '../helpers/async'
+import CacheClient from '../../cache'
 import AidboxClient from '../../aidbox'
+import validators from '../helpers/validators'
 
 import Apiv1 from './v1'
-import CacheClient from '../../cache'
 
 
 const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
@@ -48,7 +49,11 @@ export default class PatientService extends ApiService {
             ]
         } ) )
 
-        this.instance.get( `${this.config.endpoint}/:uid`, restifyAsyncWrap( async( req, res, next ) => {
+        // Register getPatientById Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getPatientById' )(
                     req,
@@ -59,15 +64,19 @@ export default class PatientService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
+                next( e )
             }
 
         } ) )
 
-        this.instance.get( `${this.config.endpoint}/:uid/clinicalImpressions`, restifyAsyncWrap( async( req, res, next ) => {
+        // Register getClinicalImpressionsByPatientId Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/clinicalImpressions`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getClinicalImpressionsByPatientId' )(
                     req,
@@ -78,15 +87,19 @@ export default class PatientService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
+                next( e )
             }
 
         } ) )
 
-        this.instance.get( `${this.config.endpoint}/:uid/observations/:type`, restifyAsyncWrap( async( req, res, next ) => {
+        // Register getObservationsByPatientId Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/observations/:type`,
+            validation: validators.byPatientIdAndObservationType
+        }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getObservationsByPatientId' )(
                     req,
@@ -97,15 +110,19 @@ export default class PatientService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
+                next( e )
             }
 
         } ) )
 
-        this.instance.get( `${this.config.endpoint}/:uid/serviceRequests`, restifyAsyncWrap( async( req, res, next ) => {
+        // Register getServiceRequestByPatientId Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/serviceRequests`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getServiceRequestByPatientId' )(
                     req,
@@ -116,15 +133,19 @@ export default class PatientService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
+                next( e )
             }
 
         } ) )
 
-        this.instance.get( `${this.config.endpoint}/:uid/specimens`, restifyAsyncWrap( async( req, res, next ) => {
+        // Register getSpecimensByPatientId Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/specimens`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getSpecimensByPatientId' )(
                     req,
@@ -135,15 +156,19 @@ export default class PatientService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
+                next( e )
             }
 
         } ) )
 
-        this.instance.get( `${this.config.endpoint}/:uid/familyMemberHistory`, restifyAsyncWrap( async( req, res, next ) => {
+        // Register getFamilyMemberHistoryByPatientId Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/familyMemberHistory`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getFamilyMemberHistoryByPatientId' )(
                     req,
@@ -154,10 +179,10 @@ export default class PatientService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
+                next( e )
             }
 
         } ) )
@@ -174,10 +199,10 @@ export default class PatientService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
+                next( e )
             }
 
         } ) )

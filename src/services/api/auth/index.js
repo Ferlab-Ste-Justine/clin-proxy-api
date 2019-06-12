@@ -1,6 +1,7 @@
 import rjwt from 'restify-jwt-community'
 import http from 'http'
 import https from 'https'
+import axios from 'axios'
 
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
@@ -17,39 +18,26 @@ const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
 } )
 
 export const refreshTokenMiddlewareGenerator = ( config ) => {
-    return ( req ) => {
-        const adapter = req.isSecure() ? https : http
-        const host = req.headers.host.split( ':' )[ 0 ].replace( '//', '' )
-        const options = {
-            host: host,
-            path: `${config.endpoint}/token`,
-            port: config.port,
-            method: 'POST',
-            headers: {
-                Cookie: req.headers.cookie,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+    return async ( req ) => {
+        try {
+            const protocol = req.isSecure() ? 'https' : 'http'
+            const host = req.headers.host.split( ':' )[ 0 ].replace( '//', '' )
+            const port = config.port ? `:${config.port}` : ''
+            const endpoint = `${protocol}://${host}${port}${config.endpoint}/token`
+            const result = await axios( {
+                method: 'post',
+                url: endpoint,
+                headers: {
+                    Cookie: req.headers.cookie
+                },
+                json: true
+            } )
+
+            req.refreshToken = result.headers[ 'set-cookie' ]
+            return result.data
+        } catch ( e ) {
+            return null
         }
-
-        adapter.request( options, ( refreshResponse ) => {
-            let responseString = ''
-
-            refreshResponse.setEncoding( 'utf8' )
-            refreshResponse.on( 'data', ( chunk ) => {
-                responseString += chunk
-            } )
-
-            refreshResponse.on( 'end', () => {
-                const jsonResponse = JSON.parse( responseString )
-
-                if ( jsonResponse.error ) {
-                    return true
-                }
-
-                return false
-            } )
-        } ).end()
-
     }
 }
 
@@ -99,9 +87,9 @@ export default class AuthService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
-                return next( e )
+                next( e )
             }
 
         } ) )
@@ -116,9 +104,9 @@ export default class AuthService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
-                return next( e )
+                next( e )
             }
 
         } ) )
@@ -135,9 +123,9 @@ export default class AuthService extends ApiService {
                 )
 
                 res.send( response )
-                return next()
+                next()
             } catch ( e ) {
-                return next( e )
+                next( e )
             }
 
         } ) )

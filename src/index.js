@@ -95,7 +95,7 @@ const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
 
 const serviceToLaunch = args.service || null
 
-let refreshTokenMiddleware = () => {
+let refreshTokenMiddleware = async () => {
     return true
 }
 
@@ -134,10 +134,10 @@ const generateApiConfig = ( serviceName ) => {
             secret: jwtSecret,
             credentialsRequired: true,
             requestProperty: serviceJwtPropertyName,
-            getToken: ( req ) => {
+            getToken: async ( req ) => {
                 if ( req.headers && req.headers.cookie ) {
                     const cookieJar = cookie.parse( req.headers.cookie )
-                    const token = cookieJar[ serviceJwtPropertyName ] || null
+                    let token = cookieJar[ serviceJwtPropertyName ] || null
 
                     if ( token ) {
                         req.jwt = jwt.decode( token, jwtSecret )
@@ -151,11 +151,10 @@ const generateApiConfig = ( serviceName ) => {
                         const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
 
                         if ( req.jwt.expiry <= currentTimeInSeconds ) {
-                            const tokenCannotBeRefreshed = refreshTokenMiddleware( req )
+                            const refreshPayload = await refreshTokenMiddleware( req )
 
-                            if ( tokenCannotBeRefreshed ) {
-                                return new errors.InvalidCredentialsError( 'The token has expired' )
-                            }
+                            token = refreshPayload.data.token.value
+                            req.jwt = jwt.decode( token, jwtSecret )
                         }
 
                         return token

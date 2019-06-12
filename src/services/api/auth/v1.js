@@ -83,8 +83,7 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
         await cacheService.create( cacheKey, cacheData, refreshTokenExpiresInSeconds )
         await logService.debug( `Login for ${username} using ${cacheKey}` )
         res.setHeader( 'Set-Cookie', cookie.serialize( config.jwt.requestProperty, token, {
-            httpOnly: true,
-            maxAge: refreshTokenExpiresInSeconds
+            httpOnly: true
         } ) )
         return { user }
     } catch ( e ) {
@@ -112,7 +111,9 @@ const logout = async ( req, res, cacheService, logService, config ) => {
 
 const token = async ( req, res, keycloakService, cacheService, logService, config ) => {
     try {
-        const decodedJwt = jwt.decode( req.token, config.jwt.secret )
+        const cookieJar = cookie.parse( req.headers.cookie )
+        const jwtCookie = cookieJar[ config.jwt.requestProperty ] || null
+        const decodedJwt = jwt.decode( jwtCookie, config.jwt.secret )
         const cacheKey = decodedJwt.uid
         const currentCachedData = await cacheService.read( cacheKey )
         const refreshToken = currentCachedData.auth.refresh_token
@@ -131,6 +132,7 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
             newIdToken,
             currentCachedData.user
         )
+
         const newToken = generateSignedToken(
             config.jwt.secret,
             cacheKey,
@@ -144,10 +146,15 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
 
         await logService.debug( `Refreshed token for ${currentCachedData.user.username} using ${cacheKey}` )
         res.setHeader( 'Set-Cookie', cookie.serialize( config.jwt.requestProperty, newToken, {
-            httpOnly: true,
-            maxAge: newRefreshTokenExpiresInSeconds
+            httpOnly: true
         } ) )
-        return { user: currentCachedData.user }
+        return {
+            user: currentCachedData.user,
+            token: {
+                value: newToken,
+                expiry: newRefreshTokenExpiresInSeconds
+            }
+        }
     } catch ( e ) {
         await logService.warning( `Token Refresh ${e.toString()}` )
         return new errors.InternalServerError()

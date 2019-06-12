@@ -43,6 +43,7 @@ pnpm start
   - Enable `Service Accounts` in Settings
   - Enable `Exclude Session State From Authentication Response` in Settings under OpenID Connect Compatibility Modes
   - Set `Access Token Lifespan` to X minutes in Settings > Advanced Settings
+  - Disable `OAuth 2.0 Mutual TLS Certificate ...` in Settings > Advanced Settings
   - Enable `OAuth 2.0 Mutual TLS Certificate Bound Access Tokens Enabled` in Settings > Advanced Settings
 - Find your `secret` under Client > Credentials and update the `.env` file
 - Create an Identity Provider
