@@ -31,7 +31,7 @@ pnpm start
 
 ### Production Set-up
 
-##### Manual Mode
+#### Manual Mode
 
 Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/master/README.md) and run
 ```
@@ -42,20 +42,31 @@ pnpm run build
 pnpm run service-auth
 ```
 
-##### Docker Mode
+#### Docker Mode
 
+
+`docker network create -d overlay --attachable proxy`
 `cp -p docker.env .env`
 
 ###### Local Environment
 
+`docker-compose up --build` to rebuild images
+
+or
+
 `docker-compose up`
 
-###### Pushing Changes to DockerHub
+###### Pushing Changes to QA/Prod Private Docker Registry 
 
 ```
-docker login
-docker build . --tag=chusj/clin-proxy-api-{endpoint}-service
-docker images [TAKE THE LATEST ID)
-docker tag [LATEST ID] chusj/clin-proxy-api-{endpoint}-service:latest
-docker push
+ssh -L 5000:localhost:5000 ubuntu@...
+```
+Build and Push
+
+```
+docker-compose build 
+docker tag clin-proxy-api-auth-service localhost:5000/clin-proxy-api-auth-service:1.1
+docker push localhost:5000/clin-proxy-api-auth-service:1.1
+
+
 ```
