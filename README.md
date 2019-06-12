@@ -57,7 +57,7 @@ pnpm start
 
 ### Production Set-up
 
-##### Manual Mode
+#### Manual Mode
 
 Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/master/README.md) and run
 ```
@@ -68,20 +68,56 @@ pnpm run build
 pnpm run service-auth
 ```
 
-##### Docker Mode
+#### Docker Mode
 
+
+`docker network create -d overlay --attachable proxy`
 `cp -p docker.env .env`
 
 ###### Local Environment
 
+`docker-compose up --build` to rebuild images
+
+or
+
 `docker-compose up`
 
-###### Pushing Changes to DockerHub
+```
+docker stack deploy -c docker-compiose.yml qa-proxi-api
 
 ```
-docker login
-docker build . --tag=chusj/clin-proxy-api-{endpoint}-service
-docker images [TAKE THE LATEST ID)
-docker tag [LATEST ID] chusj/clin-proxy-api-{endpoint}-service:latest
-docker push
+###### Pushing Changes to QA/Prod Private Docker Registry 
+To change to prod...
+```
+ssh -L 5000:localhost:5000 ubuntu@...
+```
+######Build and Push and deploy the first time
+
+```
+copy docker.env .env
+nano .env
+docker-compose build 
+docker push localhost:5000/clin-proxy-api-auth-service:latest
+docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.0
+docker push localhost:5000/clin-proxy-api-auth-service:1.0
+docker stack deploy -c docker-compose.yml qa-proxy-api
+docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.0
+
+
+```
+
+#### Update a service to another version i.e. (1.1)
+
+```
+copy docker.env .env
+nano .env
+docker-compose build
+docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.1
+docker push localhost:5000/clin-proxy-api-auth-service:1.1
+docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.1
+```
+To scale the service up or down...
+```
+docker service scale qa-proxi-api_auth=3
+
 ```
