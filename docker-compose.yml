@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.3'
 
 services:
   memcached:
@@ -11,7 +11,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-auth
-    image: clin-proxy-api-auth-service
+    image: localhost:5000/clin-proxy-api-auth-service
     depends_on:
       - memcached
     ports:

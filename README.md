@@ -56,17 +56,42 @@ or
 
 `docker-compose up`
 
-###### Pushing Changes to QA/Prod Private Docker Registry 
+```
+docker stack deploy -c docker-compiose.yml qa-proxi-api
 
+```
+###### Pushing Changes to QA/Prod Private Docker Registry 
+To change to prod...
 ```
 ssh -L 5000:localhost:5000 ubuntu@...
 ```
-Build and Push
+######Build and Push and deploy the first time
 
 ```
+copy docker.env .env
+nano .env
 docker-compose build 
-docker tag clin-proxy-api-auth-service localhost:5000/clin-proxy-api-auth-service:1.1
-docker push localhost:5000/clin-proxy-api-auth-service:1.1
+docker push localhost:5000/clin-proxy-api-auth-service:latest
+docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.0
+docker push localhost:5000/clin-proxy-api-auth-service:1.0
+docker stack deploy -c docker-compose.yml qa-proxy-api
+docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.0
 
+
+```
+
+#### Update a service to another version i.e. (1.1)
+
+```
+copy docker.env .env
+nano .env
+docker-compose build
+docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.1
+docker push localhost:5000/clin-proxy-api-auth-service:1.1
+docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.1
+```
+To scale the service up or down...
+```
+docker service scale qa-proxi-api_auth=3
 
 ```
