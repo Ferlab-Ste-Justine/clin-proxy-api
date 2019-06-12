@@ -72,6 +72,15 @@ try {
     process.exit( 1 )
 }
 
+let aidboxServiceConfig = null
+
+try {
+    aidboxServiceConfig = JSON.parse( process.env.AIDBOX_SERVICE )
+} catch ( e ) {
+    launcherLog.error( 'Invalid JSON value or missing AIDBOX_SERVICE in environment.' )
+    process.exit( 1 )
+}
+
 if ( !process.env.CONTAINER_ID ) {
     process.env.CONTAINER_ID = uniqid()
     launcherLog.warning( 'No CONTAINER_ID specified in environment, auto-generated.' )
@@ -86,9 +95,8 @@ const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
 
 const serviceToLaunch = args.service || null
 
-
-let refreshTokenMiddleware = ( request, payload, callback ) => {
-    callback( null, true )
+let refreshTokenMiddleware = async () => {
+    return true
 }
 
 try {
@@ -126,27 +134,35 @@ const generateApiConfig = ( serviceName ) => {
             secret: jwtSecret,
             credentialsRequired: true,
             requestProperty: serviceJwtPropertyName,
-            getToken: ( req ) => {
+            getToken: async ( req ) => {
                 if ( req.headers && req.headers.cookie ) {
                     const cookieJar = cookie.parse( req.headers.cookie )
-                    const token = cookieJar[ serviceJwtPropertyName ] || null
+                    let token = cookieJar[ serviceJwtPropertyName ] || null
 
                     if ( token ) {
                         req.jwt = jwt.decode( token, jwtSecret )
+
                         // Signed JWT Token Version Should Match Package Version
                         if ( req.jwt.version !== launcherVersion ) {
                             return new errors.InvalidCredentialsError( 'The token version is outdated' )
+                        }
+
+                        // Signed JWT Token Is Expired
+                        const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
+
+                        if ( req.jwt.expiry <= currentTimeInSeconds ) {
+                            const refreshPayload = await refreshTokenMiddleware( req )
+
+                            token = refreshPayload.data.token.value
+                            req.jwt = jwt.decode( token, jwtSecret )
                         }
 
                         return token
                     }
                 }
                 return null
-            },
-            isRevoked: ( req, payload, done ) => {
-                // Refresh Expired JWT Token, if possible.
-                refreshTokenMiddleware( req, payload, done )
             }
+            // isRevoked: ( req, payload, done ) => {}
         },
         serviceId: uniqid(),
         containerId,
@@ -154,6 +170,7 @@ const generateApiConfig = ( serviceName ) => {
         parentLogService: launcherLog,
         cacheConfig: cacheServiceConfig,
         keycloakConfig: keycloakServiceConfig,
+        aidboxConfig: aidboxServiceConfig,
         docsBranch: process.env.NODE_ENV === 'production' ? 'master' : 'dev'
     }
 }

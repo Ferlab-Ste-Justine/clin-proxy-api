@@ -1,5 +1,4 @@
 import restify from 'restify'
-import errors from 'restify-errors'
 
 import addAcceptMiddleware from './middleware/accept'
 import addBodyParserMiddleware from './middleware/bodyParser'
@@ -37,9 +36,9 @@ export default class ApiService {
 
     async init() {
         this.initTimestamp = new Date().getTime()
-        this.instance = restify.createServer( this.config.options )
 
-        await this.logService.debug( 'API Service appears functional ... Testing.' )
+        await this.logService.debug( 'API Service appears functional ... starting instance.' )
+        this.instance = restify.createServer( this.config.options )
     }
 
     async start() {
@@ -90,7 +89,7 @@ export default class ApiService {
         } )
 
         await this.instance.listen( this.config.port )
-        await this.logService.debug( `${this.config.name} API Service launched.` )
+        await this.logService.debug( `${this.config.name} API Service is ready.` )
     }
 
     async stop() {

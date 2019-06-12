@@ -1,7 +1,7 @@
 import validator from 'restify-joi-middleware'
 
 
-module.exports = ( server ) => {
+export default ( server ) => {
     server.use( validator( {
         keysToValidate: [ 'params', 'body', 'query', 'headers', 'files' ],
         errorTransformer: ( input, errors ) => {

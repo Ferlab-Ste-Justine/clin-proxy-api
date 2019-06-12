@@ -3,10 +3,10 @@ import newman from 'newman'
 
 
 const boilerplateServiceConfig = JSON.parse( process.env.BOILERPLATE_API_SERVICE )
+const collection = require( `${__dirname}/collections/common.json` )
 
 newman.run( {
-    collection: require( `${__dirname}/collections/common.json` ),
-
+    collection,
     globals: {},
     environment: {
         name: 'Local',
