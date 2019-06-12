@@ -1,21 +1,30 @@
-version: '3'
+version: '3.3'
+
 services:
   memcached:
     image: "memcached"
     ports:
-    - "11211:11211"
+      - "11211:11211"
     networks:
-    - webnet
+      - clinnet
   auth:
-    image: chusj/clin-proxy-api-auth-service
+    build:
+      context: .
+      dockerfile: Dockerfile-auth
+    image: localhost:5000/clin-proxy-api-auth-service
     depends_on:
-    - memcached
+      - memcached
     ports:
-    - "3000:3000"
+      - "3000:3000"
     deploy:
       replicas: 2
     networks:
-    - webnet
+      - clinnet
+      - proxy
+    env_file:
+      - .env
 
 networks:
-  webnet:
+  clinnet:
+  proxy:
+    external: true
