@@ -15,10 +15,10 @@ export default class AidboxClient {
         } )
     }
 
-    async getPatientById( id, jwtIdToken ) {
+    async getPatientById( uid, jwtIdToken ) {
         return rp( {
             method: 'GET',
-            uri: `${this.host}/Patient/${id}`,
+            uri: `${this.host}/Patient?id=${uid}`,
             json: true,
             headers: {
                 Authorization: `Bearer ${jwtIdToken}`
@@ -26,6 +26,64 @@ export default class AidboxClient {
         } )
     }
 
+    async getClinicalImpressionsByPatientId( uid, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/ClinicalImpression?subject:Patient._id=${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getObservationsByPatientId( uid, type, jwtIdToken ) {
+        const typeCode = ( type === 'phenotype' ) ? 'phenotype observation' : 'Medicale note'
+
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Observation?patient:Patient._id=${uid}&.code.text=${typeCode}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getServiceRequestByPatientId( uid, type, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/ServiceRequest?subject:Patient._id=${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getSpecimensByPatientId( uid, type, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Specimen?subject:Patient._id=${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getFamilyMemberHistoryByPatientId( uid, type, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/FamilyMemberHistory?patient:Patient._id=${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    // @TODO
     async fulltextPatientSearch( param, jwtIdToken ) {
         return rp( {
             method: 'GET',

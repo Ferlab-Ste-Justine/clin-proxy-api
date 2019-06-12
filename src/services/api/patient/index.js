@@ -48,22 +48,15 @@ export default class PatientService extends ApiService {
             ]
         } ) )
 
-        this.instance.get( `${this.config.endpoint}/query/:query`, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'fulltextPatientSearch' )( req, res, this.cacheService, this.aidboxService )
-
-                res.send( response )
-                return next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                return next( e )
-            }
-
-        } ) )
-
         this.instance.get( `${this.config.endpoint}/:uid`, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getPatientById' )( req, res, this.cacheService, this.aidboxService )
+                const response = await getFunctionForApiVersion( req.version, 'getPatientById' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
 
                 res.send( response )
                 return next()
@@ -74,6 +67,120 @@ export default class PatientService extends ApiService {
 
         } ) )
 
+        this.instance.get( `${this.config.endpoint}/:uid/clinicalImpressions`, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getClinicalImpressionsByPatientId' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                return next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                return next( e )
+            }
+
+        } ) )
+
+        this.instance.get( `${this.config.endpoint}/:uid/observations/:type`, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getObservationsByPatientId' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                return next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                return next( e )
+            }
+
+        } ) )
+
+        this.instance.get( `${this.config.endpoint}/:uid/serviceRequests`, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getServiceRequestByPatientId' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                return next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                return next( e )
+            }
+
+        } ) )
+
+        this.instance.get( `${this.config.endpoint}/:uid/specimens`, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getSpecimensByPatientId' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                return next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                return next( e )
+            }
+
+        } ) )
+
+        this.instance.get( `${this.config.endpoint}/:uid/familyMemberHistory`, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getFamilyMemberHistoryByPatientId' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                return next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                return next( e )
+            }
+
+        } ) )
+
+        // @TODO
+        this.instance.get( `${this.config.endpoint}/query/:query`, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'fulltextPatientSearch' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                return next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                return next( e )
+            }
+
+        } ) )
 
         super.start()
     }
