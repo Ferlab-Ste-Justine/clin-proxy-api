@@ -22,7 +22,23 @@ services:
       - clinnet
       - proxy
     env_file:
-      - .env
+      - auth.env
+  patient:
+    build:
+      context: .
+      dockerfile: Dockerfile-patient
+    image: localhost:5000/clin-proxy-api-patient-service
+    depends_on:
+      - memcached
+    ports:
+      - "4000:4000"
+    deploy:
+      replicas: 2
+    networks:
+      - clinnet
+      - proxy
+    env_file:
+      - patient.env
 
 networks:
   clinnet:

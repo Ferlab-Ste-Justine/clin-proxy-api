@@ -93,14 +93,20 @@ ssh -L 5000:localhost:5000 ubuntu@...
 ######Build and Push and deploy the first time
 
 ```
-copy docker.env .env
-nano .env
+copy docker.env patient.env
+copy docker.env auth.env
+nano patient.env  -- fix environment
+nano auth.env -- fix environment
 docker-compose build 
 docker push localhost:5000/clin-proxy-api-auth-service:latest
+docker push localhost:5000/clin-proxy-api-patient-service:latest
 docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.0
+docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:1.0
 docker push localhost:5000/clin-proxy-api-auth-service:1.0
+docker push localhost:5000/clin-proxy-api-patient-service:1.0
 docker stack deploy -c docker-compose.yml qa-proxy-api
 docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.0
+docker service update qa-proxi-api_patient --image localhost:5000/clin-proxy-api-patient-service:1.0
 
 
 ```
@@ -108,15 +114,22 @@ docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-au
 #### Update a service to another version i.e. (1.1)
 
 ```
-copy docker.env .env
-nano .env
+copy docker.env patient.env
+copy docker.env auth.env
+nano patient.env  -- fix environment
+nano auth.env -- fix environment
 docker-compose build
 docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.1
+docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:1.1
 docker push localhost:5000/clin-proxy-api-auth-service:1.1
+docker push localhost:5000/clin-proxy-api-patient-service:1.1
 docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.1
+docker service update qa-proxi-api_patient --image localhost:5000/clin-proxy-api-patient-service:1.1
 ```
 To scale the service up or down...
 ```
 docker service scale qa-proxi-api_auth=3
-
+docker service scale qa-proxi-api_patient=3
+or
+use portainer (port 9000)
 ```
