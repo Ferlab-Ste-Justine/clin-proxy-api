@@ -10,10 +10,31 @@ const getPatientById = async ( req, res, cacheService, aidboxService, logService
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const response = await aidboxService.getPatientById( req.params.uid, sessionData.auth.id_token )
 
+        if ( response.total === 0 ) {
+            return new errors.NotFound()
+        }
+
         await logService.debug( `Aidbox getPatientById for ${req.params.uid}` )
-        return response
+        return response.entry[ 0 ].resource
     } catch ( e ) {
         await logService.warning( `Aidbox getPatientById ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+const getAllResourcesByPatientId = async ( req, res, cacheService, aidboxService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const response = await aidboxService.getAllResourcesByPatientId( req.params.uid, sessionData.auth.id_token )
+
+        if ( response.total === 0 ) {
+            return new errors.NotFound()
+        }
+
+        await logService.debug( `Aidbox getAllResourcesByPatientId for ${req.params.uid}` )
+        return response.entry
+    } catch ( e ) {
+        await logService.warning( `Aidbox getAllResourcesByPatientId ${e.toString()}` )
         return new errors.InternalServerError()
     }
 }
@@ -100,6 +121,7 @@ const fulltextPatientSearch = async ( req, res, cacheService, aidboxService, log
 
 export default {
     getPatientById,
+    getAllResourcesByPatientId,
     getClinicalImpressionsByPatientId,
     getObservationsByPatientId,
     getServiceRequestByPatientId,

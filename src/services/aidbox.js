@@ -18,7 +18,18 @@ export default class AidboxClient {
     async getPatientById( uid, jwtIdToken ) {
         return rp( {
             method: 'GET',
-            uri: `${this.host}/Patient?id=${uid}`,
+            uri: `${this.host}/Patient/${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getAllResourcesByPatientId( uid, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Patient/${uid}/$everything`,
             json: true,
             headers: {
                 Authorization: `Bearer ${jwtIdToken}`

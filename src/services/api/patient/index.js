@@ -22,7 +22,6 @@ export default class PatientService extends ApiService {
         this.config.aidbox = config.aidboxConfig
     }
 
-
     async init() {
         super.init()
 
@@ -38,7 +37,6 @@ export default class PatientService extends ApiService {
             throw new Error( 'Aidbox Service Client health check failed' )
         }
     }
-
 
     async start() {
         // JWT Endpoint Exceptions
@@ -56,6 +54,52 @@ export default class PatientService extends ApiService {
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getPatientById' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register getPatientById Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getPatientById' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register getAllResourcesByPatientId Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/resources`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getAllResourcesByPatientId' )(
                     req,
                     res,
                     this.cacheService,
