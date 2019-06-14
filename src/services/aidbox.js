@@ -50,7 +50,7 @@ export default class AidboxClient {
         } )
     }
 
-    async getServiceRequestByPatientId( uid, type, jwtIdToken ) {
+    async getServiceRequestByPatientId( uid, jwtIdToken ) {
         return rp( {
             method: 'GET',
             uri: `${this.host}/ServiceRequest?subject:Patient._id=${uid}`,
@@ -61,7 +61,7 @@ export default class AidboxClient {
         } )
     }
 
-    async getSpecimensByPatientId( uid, type, jwtIdToken ) {
+    async getSpecimensByPatientId( uid, jwtIdToken ) {
         return rp( {
             method: 'GET',
             uri: `${this.host}/Specimen?subject:Patient._id=${uid}`,
@@ -72,7 +72,7 @@ export default class AidboxClient {
         } )
     }
 
-    async getFamilyMemberHistoryByPatientId( uid, type, jwtIdToken ) {
+    async getFamilyMemberHistoryByPatientId( uid, jwtIdToken ) {
         return rp( {
             method: 'GET',
             uri: `${this.host}/FamilyMemberHistory?patient:Patient._id=${uid}`,

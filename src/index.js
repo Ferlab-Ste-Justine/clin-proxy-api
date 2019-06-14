@@ -1,5 +1,5 @@
 import errors from 'restify-errors'
-
+import deasync from 'deasync'
 
 try {
     require( 'babel-polyfill' )
@@ -106,6 +106,8 @@ try {
 } catch ( e ) {
     launcherLog.warning( 'No Token Refresh Middleware will be available for API Services launched.' )
 }
+const _refreshTokenMiddleware = deasync( refreshTokenMiddleware )
+
 
 const generateApiConfig = ( serviceName ) => {
     const serviceConfig = JSON.parse( process.env[ `${serviceName.toUpperCase()}_API_SERVICE` ] )
@@ -134,7 +136,8 @@ const generateApiConfig = ( serviceName ) => {
             secret: jwtSecret,
             credentialsRequired: true,
             requestProperty: serviceJwtPropertyName,
-            getToken: async ( req ) => {
+
+            getToken: ( req ) => {
                 if ( req.headers && req.headers.cookie ) {
                     const cookieJar = cookie.parse( req.headers.cookie )
                     let token = cookieJar[ serviceJwtPropertyName ] || null
@@ -151,7 +154,7 @@ const generateApiConfig = ( serviceName ) => {
                         const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
 
                         if ( req.jwt.expiry <= currentTimeInSeconds ) {
-                            const refreshPayload = await refreshTokenMiddleware( req )
+                            const refreshPayload = _refreshTokenMiddleware( req )
 
                             token = refreshPayload.data.token.value
                             req.jwt = jwt.decode( token, jwtSecret )
