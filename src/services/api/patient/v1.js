@@ -104,6 +104,40 @@ const getFamilyMemberHistoryByPatientId = async ( req, res, cacheService, aidbox
     }
 }
 
+const getPractitionerById = async ( req, res, cacheService, aidboxService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const response = await aidboxService.getPractitionerById( req.params.puid, sessionData.auth.id_token )
+
+        if ( !response.id ) {
+            return new errors.NotFound()
+        }
+
+        await logService.debug( `Aidbox getPractitionerById for ${req.params.uid}` )
+        return response
+    } catch ( e ) {
+        await logService.warning( `Aidbox getPractitionerById ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+const getOrganizationById = async ( req, res, cacheService, aidboxService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const response = await aidboxService.getOrganizationById( req.params.ouid, sessionData.auth.id_token )
+
+        if ( !response.id ) {
+            return new errors.NotFound()
+        }
+
+        await logService.debug( `Aidbox getOrganizationById for ${req.params.uid}` )
+        return response
+    } catch ( e ) {
+        await logService.warning( `Aidbox getOrganizationById ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
 // @TODO
 const fulltextPatientSearch = async ( req, res, cacheService, aidboxService, logService ) => {
     try {
@@ -127,5 +161,7 @@ export default {
     getServiceRequestByPatientId,
     getSpecimensByPatientId,
     getFamilyMemberHistoryByPatientId,
+    getPractitionerById,
+    getOrganizationById,
     fulltextPatientSearch
 }

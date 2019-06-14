@@ -208,6 +208,52 @@ export default class PatientService extends ApiService {
 
         } ) )
 
+        // Register getPractitionerById Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/practitioner/:puid`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getPractitionerById' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register getOrganizationById Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:uid/organization/:ouid`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getOrganizationById' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.aidboxService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
         // @TODO
         this.instance.get( `${this.config.endpoint}/query/:query`, restifyAsyncWrap( async( req, res, next ) => {
             try {

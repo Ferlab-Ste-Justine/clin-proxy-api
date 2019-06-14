@@ -94,6 +94,28 @@ export default class AidboxClient {
         } )
     }
 
+    async getPractitionerById( uid, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Practitioner/${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getOrganizationById( uid, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Organization/${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
     // @TODO
     async fulltextPatientSearch( param, jwtIdToken ) {
         return rp( {
