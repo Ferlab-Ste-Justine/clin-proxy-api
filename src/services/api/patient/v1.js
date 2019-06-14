@@ -10,12 +10,12 @@ const getPatientById = async ( req, res, cacheService, aidboxService, logService
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const response = await aidboxService.getPatientById( req.params.uid, sessionData.auth.id_token )
 
-        if ( response.total === 0 ) {
+        if ( !response.id ) {
             return new errors.NotFound()
         }
 
         await logService.debug( `Aidbox getPatientById for ${req.params.uid}` )
-        return response.entry[ 0 ].resource
+        return response
     } catch ( e ) {
         await logService.warning( `Aidbox getPatientById ${e.toString()}` )
         return new errors.InternalServerError()
