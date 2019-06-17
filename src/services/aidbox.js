@@ -18,7 +18,18 @@ export default class AidboxClient {
     async getPatientById( uid, jwtIdToken ) {
         return rp( {
             method: 'GET',
-            uri: `${this.host}/Patient?id=${uid}`,
+            uri: `${this.host}/Patient/${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getAllResourcesByPatientId( uid, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Patient/${uid}/$everything`,
             json: true,
             headers: {
                 Authorization: `Bearer ${jwtIdToken}`
@@ -76,6 +87,28 @@ export default class AidboxClient {
         return rp( {
             method: 'GET',
             uri: `${this.host}/FamilyMemberHistory?patient:Patient._id=${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getPractitionerById( uid, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Practitioner/${uid}`,
+            json: true,
+            headers: {
+                Authorization: `Bearer ${jwtIdToken}`
+            }
+        } )
+    }
+
+    async getOrganizationById( uid, jwtIdToken ) {
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/Organization/${uid}`,
             json: true,
             headers: {
                 Authorization: `Bearer ${jwtIdToken}`
