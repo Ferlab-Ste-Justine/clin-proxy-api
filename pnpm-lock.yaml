@@ -11,6 +11,7 @@ dependencies:
   babel-polyfill: 6.26.0
   chalk: 2.4.2
   cookie: 0.3.1
+  deasync: 0.1.15
   dotenv: 7.0.0
   eslint: 5.16.0
   eslint-config-airbnb: 17.1.0
@@ -1013,6 +1014,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-Un7MIEDdUC5gNpcGDV97op1Ywk748MpHcFTHoYs6qnj1Z3j7I53VG3nwZhKzoBZmbdRNnb6WRdFlwl7tSDuZGw==
+  /bindings/1.2.1:
+    dev: false
+    resolution:
+      integrity: sha1-FK1hE4EtLTfXLme0ystLtyZQXxE=
   /bluebird/2.11.0:
     dev: false
     resolution:
@@ -1440,6 +1445,16 @@ packages:
     dev: false
     resolution:
       integrity: sha1-MrSzEF6IYQQ6b5rHVdgOVC02WzE=
+  /deasync/0.1.15:
+    dependencies:
+      bindings: 1.2.1
+      node-addon-api: 1.6.3
+    dev: false
+    engines:
+      node: '>=0.11.0'
+    requiresBuild: true
+    resolution:
+      integrity: sha512-pxMaCYu8cQIbGkA4Y1R0PLSooPIpH1WgFBLeJ+zLxQgHfkZG86ViJSmZmONSjZJ/R3NjwkMcIWZAzpLB2G9/CA==
   /debug/2.6.9:
     dependencies:
       ms: 2.0.0
@@ -3314,6 +3329,10 @@ packages:
     dev: false
     resolution:
       integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
+  /node-addon-api/1.6.3:
+    dev: false
+    resolution:
+      integrity: sha512-FXWH6mqjWgU8ewuahp4spec8LkroFZK2NicOv6bNwZC3kcwZUI8LeZdG80UzTSLLhK4T7MsgNwlYDVRlDdfTDg==
   /node-environment-flags/1.0.5:
     dependencies:
       object.getownpropertydescriptors: 2.0.3
@@ -5178,6 +5197,7 @@ specifiers:
   babel-polyfill: ^6.26.0
   chalk: ^2.4.2
   cookie: ^0.3.1
+  deasync: ^0.1.15
   dotenv: ^7.0.0
   eslint: ^5.15.3
   eslint-config-airbnb: ^17.1.0
@@ -5193,6 +5213,6 @@ specifiers:
   restify-cors-middleware: ^1.1.1
   restify-errors: ^7.0.0
   restify-joi-middleware: ^5.0.1
-  restify-jwt-community: ^1.0.11
+  restify-jwt-community: 1.0.13
   uniqid: ^5.0.3
   yargs: ^13.2.2
