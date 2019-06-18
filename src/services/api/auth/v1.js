@@ -32,6 +32,7 @@ const generateCacheData = (
     refreshToken,
     refreshTokenExpiresInSeconds,
     idToken,
+    acl,
     user
 ) => {
     return {
@@ -42,6 +43,7 @@ const generateCacheData = (
             refresh_expires_in: refreshTokenExpiresInSeconds,
             id_token: idToken
         },
+        acl,
         user
     }
 }
@@ -71,15 +73,15 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
         const user = {
             username,
             groups: decodedAccessToken.groups,
-            roles: decodedAccessToken.realm_access.roles,
-            acl: {
-                fhir: {
-                    role: decodedAccessToken.realm_access.roles.find( ( role ) => {
-                        return role.startsWith( 'clin_' )
-                    } ),
-                    organization_id: decodedAccessToken.fhir_organization_id || null,
-                    practitioner_id: decodedAccessToken.fhir_practitioner_id || null
-                }
+            roles: decodedAccessToken.realm_access.roles
+        }
+        const acl = {
+            fhir: {
+                role: decodedAccessToken.realm_access.roles.find( ( role ) => {
+                    return role.startsWith( 'clin_' )
+                } ).replace( 'clin_', '' ),
+                organization_id: decodedAccessToken.fhir_organization_id || null,
+                practitioner_id: decodedAccessToken.fhir_practitioner_id || null
             }
         }
         const cacheData = generateCacheData(
@@ -88,6 +90,7 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
             refreshToken,
             refreshTokenExpiresInSeconds,
             idToken,
+            acl,
             user,
         )
 
@@ -141,7 +144,8 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
             newRefreshToken,
             newRefreshTokenExpiresInSeconds,
             newIdToken,
-            currentCachedData.user
+            currentCachedData.acl,
+            currentCachedData.user,
         )
 
         const newToken = generateSignedToken(

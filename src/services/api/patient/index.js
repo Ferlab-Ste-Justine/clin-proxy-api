@@ -5,6 +5,7 @@ import { generateGetFunctionForApiVersion } from '../service'
 import restifyAsyncWrap from '../helpers/async'
 import CacheClient from '../../cache'
 import AidboxClient from '../../aidbox'
+import ElasticClient from '../../elastic'
 import validators from '../helpers/validators'
 
 import Apiv1 from './v1'
@@ -20,6 +21,7 @@ export default class PatientService extends ApiService {
         super( config )
         this.config.cache = config.cacheConfig
         this.config.aidbox = config.aidboxConfig
+        this.config.elastic = config.elasticConfig
     }
 
     async init() {
@@ -29,11 +31,19 @@ export default class PatientService extends ApiService {
         this.cacheService = new CacheClient( this.config.cache )
         await this.cacheService.create( 'patientService', new Date().getTime() )
 
+        await this.logService.debug( 'Elastic Search Client appears functional ... checking connectivity.' )
+        this.elasticService = new ElasticClient( this.config.elastic )
+        const elasticPingResult = await this.elasticService.ping()
+
+        if ( !elasticPingResult.name ) {
+            throw new Error( 'Elastic Search Client health check failed' )
+        }
+
         await this.logService.debug( 'Aidbox Service Client appears functional ... checking connectivity.' )
         this.aidboxService = new AidboxClient( this.config.aidbox )
-        const pingResult = await this.aidboxService.ping()
+        const aidboxPingResult = await this.aidboxService.ping()
 
-        if ( pingResult.status !== 'pass' ) {
+        if ( aidboxPingResult.status !== 'pass' ) {
             throw new Error( 'Aidbox Service Client health check failed' )
         }
     }
@@ -47,6 +57,28 @@ export default class PatientService extends ApiService {
             ]
         } ) )
 
+        // Register getAllPatients Route
+        this.instance.get( {
+            path: `${this.config.endpoint}`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getAllPatients' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
         // Register getPatientById Route
         this.instance.get( {
             path: `${this.config.endpoint}/:uid`,
@@ -57,7 +89,7 @@ export default class PatientService extends ApiService {
                     req,
                     res,
                     this.cacheService,
-                    this.aidboxService,
+                    this.elasticService,
                     this.logService
                 )
 
@@ -70,17 +102,17 @@ export default class PatientService extends ApiService {
 
         } ) )
 
-        // Register getAllResourcesByPatientId Route
+        // Register searchPatients Route
+        /*
         this.instance.get( {
-            path: `${this.config.endpoint}/:uid/resources`,
-            validation: validators.byPatientId
+            path: `${this.config.endpoint}/search/:query`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getAllResourcesByPatientId' )(
+                const response = await getFunctionForApiVersion( req.version, 'searchPatients' )(
                     req,
                     res,
                     this.cacheService,
-                    this.aidboxService,
+                    this.elasticService,
                     this.logService
                 )
 
@@ -92,187 +124,7 @@ export default class PatientService extends ApiService {
             }
 
         } ) )
-
-        // Register getClinicalImpressionsByPatientId Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid/clinicalImpressions`,
-            validation: validators.byPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getClinicalImpressionsByPatientId' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getObservationsByPatientId Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid/observations/:type`,
-            validation: validators.byPatientIdAndObservationType
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getObservationsByPatientId' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getServiceRequestByPatientId Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid/serviceRequests`,
-            validation: validators.byPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getServiceRequestByPatientId' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getSpecimensByPatientId Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid/specimens`,
-            validation: validators.byPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getSpecimensByPatientId' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getFamilyMemberHistoryByPatientId Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid/familyMemberHistory`,
-            validation: validators.byPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getFamilyMemberHistoryByPatientId' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getPractitionerById Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid/practitioner/:puid`,
-            validation: validators.byPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getPractitionerById' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getOrganizationById Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid/organization/:ouid`,
-            validation: validators.byPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getOrganizationById' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // @TODO
-        this.instance.get( `${this.config.endpoint}/query/:query`, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'fulltextPatientSearch' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.aidboxService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
+        */
 
         super.start()
     }
