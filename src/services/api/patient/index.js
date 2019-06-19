@@ -59,7 +59,7 @@ export default class PatientService extends ApiService {
 
         // Register getAllPatients Route
         this.instance.get( {
-            path: `${this.config.endpoint}`
+            path: `${this.config.endpoint}/search`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getAllPatients' )(

@@ -10,13 +10,12 @@ const getPatientById = async ( req, res, cacheService, elasticService, logServic
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const response = await elasticService.getPatientById( req.params.uid, sessionData.acl.fhir )
 
-        console.log( response )
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
         }
 
         await logService.debug( `Elastic getPatientById for ${req.params.uid}` )
-        return response.hits.hits[ 0 ]
+        return response.hits.hits[ 0 ]._source
     } catch ( e ) {
         await logService.warning( `Elastic getPatientById ${e.toString()}` )
         return new errors.InternalServerError()
@@ -28,15 +27,14 @@ const getAllPatients = async ( req, res, cacheService, elasticService, logServic
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const response = await elasticService.getAllPatients( sessionData.acl.fhir )
 
-        if ( !response.hits.total < 1 ) {
+        if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
         }
 
-        await logService.debug( `Elastic getAllPatients for ${req.params.uid}` )
-        delete response.hits.max_score
+        await logService.debug( `Elastic getAllPatients returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
-            items: response.hits.hits
+            hits: response.hits.hits
         }
     } catch ( e ) {
         await logService.warning( `Elastic getAllPatients ${e.toString()}` )
