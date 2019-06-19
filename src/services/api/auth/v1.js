@@ -32,6 +32,7 @@ const generateCacheData = (
     refreshToken,
     refreshTokenExpiresInSeconds,
     idToken,
+    acl,
     user
 ) => {
     return {
@@ -42,6 +43,7 @@ const generateCacheData = (
             refresh_expires_in: refreshTokenExpiresInSeconds,
             id_token: idToken
         },
+        acl,
         user
     }
 }
@@ -54,6 +56,7 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
         const keycloakResponse = await keycloakService.authenticate( username, password )
         const jsonReponse = JSON.parse( keycloakResponse )
         const accessToken = jsonReponse.access_token
+        const decodedAccessToken = jwt.decode( accessToken, config.jwt.secret )
         const accessTokenExpiresInSeconds = jsonReponse.expires_in
         const refreshToken = jsonReponse.refresh_token
         const refreshTokenExpiresInSeconds = jsonReponse.refresh_expires_in
@@ -67,9 +70,19 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
             accessTokenExpiresInSeconds,
             jsonReponse.scope,
         )
-
         const user = {
-            username
+            username,
+            groups: decodedAccessToken.groups,
+            roles: decodedAccessToken.realm_access.roles
+        }
+        const acl = {
+            fhir: {
+                role: decodedAccessToken.realm_access.roles.find( ( role ) => {
+                    return role.startsWith( 'clin_' )
+                } ).replace( 'clin_', '' ),
+                organization_id: decodedAccessToken.fhir_organization_id || null,
+                practitioner_id: decodedAccessToken.fhir_practitioner_id || null
+            }
         }
         const cacheData = generateCacheData(
             accessToken,
@@ -77,6 +90,7 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
             refreshToken,
             refreshTokenExpiresInSeconds,
             idToken,
+            acl,
             user,
         )
 
@@ -130,7 +144,8 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
             newRefreshToken,
             newRefreshTokenExpiresInSeconds,
             newIdToken,
-            currentCachedData.user
+            currentCachedData.acl,
+            currentCachedData.user,
         )
 
         const newToken = generateSignedToken(
