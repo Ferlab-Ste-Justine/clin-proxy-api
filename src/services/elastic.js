@@ -16,7 +16,7 @@ export default class ElasticClient {
     }
 
     generateAcl( acl ) {
-        let filters = []
+        const filters = []
 
         if ( acl.role === 'practitioner' ) {
             filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
@@ -29,7 +29,7 @@ export default class ElasticClient {
 
 
     async getPatientById( uid, acl ) {
-        let filters = this.generateAcl( acl )
+        const filters = this.generateAcl( acl )
 
         filters.push( { match: { id: uid } } )
         return rp( {
@@ -38,7 +38,6 @@ export default class ElasticClient {
             json: true,
             body: {
                 query: {
-                    size: 1,
                     bool: {
                         must: filters
                     }
