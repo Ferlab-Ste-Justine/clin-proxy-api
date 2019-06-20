@@ -25,7 +25,9 @@ const getPatientById = async ( req, res, cacheService, elasticService, logServic
 const getAllPatients = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const response = await elasticService.getAllPatients( sessionData.acl.fhir )
+        const index = req.index || 0
+        const limit = req.limit || 1000
+        const response = await elasticService.getAllPatients( sessionData.acl.fhir, index, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()

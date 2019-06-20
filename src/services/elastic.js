@@ -38,6 +38,7 @@ export default class ElasticClient {
             json: true,
             body: {
                 query: {
+                    size: 1,
                     bool: {
                         must: filters
                     }
@@ -46,16 +47,20 @@ export default class ElasticClient {
         } )
     }
 
-    async getAllPatients( acl ) {
+    async getAllPatients( acl, index, limit ) {
         const filters = this.generateAcl( acl )
 
         return rp( {
             method: 'GET',
             uri: `${this.host}/patient/_search`,
             json: true,
-            query: {
-                bool: {
-                    must: filters
+            body: {
+                from: index,
+                size: limit,
+                query: {
+                    bool: {
+                        must: filters
+                    }
                 }
             }
         } )
