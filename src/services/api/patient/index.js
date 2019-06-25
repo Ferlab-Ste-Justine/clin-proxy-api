@@ -79,6 +79,50 @@ export default class PatientService extends ApiService {
 
         } ) )
 
+        // Register searchPatientsByFilters Route
+        this.instance.post( {
+            path: `${this.config.endpoint}/search`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'searchPatientsByFilters' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register getPatientsByAutoComplete Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/autocomplete/:type/:query`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getPatientsByAutoComplete' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
         // Register getPatientById Route
         this.instance.get( {
             path: `${this.config.endpoint}/:uid`,
@@ -101,30 +145,6 @@ export default class PatientService extends ApiService {
             }
 
         } ) )
-
-        // Register searchPatients Route
-        /*
-        this.instance.get( {
-            path: `${this.config.endpoint}/search/:query`
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'searchPatients' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.elasticService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-        */
 
         super.start()
     }

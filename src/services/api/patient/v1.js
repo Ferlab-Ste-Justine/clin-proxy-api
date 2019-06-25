@@ -22,6 +22,46 @@ const getPatientById = async ( req, res, cacheService, elasticService, logServic
     }
 }
 
+const getPatientsByAutoComplete = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const response = await elasticService.getPatientsByAutoComplete( req.params.type, req.params.query, sessionData.acl.fhir, 25 )
+
+        if ( response.hits.total < 1 ) {
+            return new errors.NotFoundError()
+        }
+
+        await logService.debug( `Elastic getPatientsByAutoComplete using ${req.params.query} returns ${response.hits.total} matches` )
+        return {
+            total: response.hits.total,
+            hits: response.hits.hits
+        }
+    } catch ( e ) {
+        await logService.warning( `Elastic getPatientsByAutoComplete ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+const searchPatientsByFilters = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const response = await elasticService.searchPatientsByFilters( req.body.filters, sessionData.acl.fhir )
+
+        if ( response.hits.total < 1 ) {
+            return new errors.NotFoundError()
+        }
+
+        await logService.debug( `Elastic searchPatients using ${req.params.query} returns ${response.hits.total} matches` )
+        return {
+            total: response.hits.total,
+            hits: response.hits.hits
+        }
+    } catch ( e ) {
+        await logService.warning( `Elastic searchPatients ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
 const getAllPatients = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
@@ -46,5 +86,7 @@ const getAllPatients = async ( req, res, cacheService, elasticService, logServic
 
 export default {
     getPatientById,
-    getAllPatients
+    getPatientsByAutoComplete,
+    getAllPatients,
+    searchPatientsByFilters
 }
