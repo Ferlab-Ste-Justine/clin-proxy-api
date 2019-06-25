@@ -1,4 +1,4 @@
-FROM node:10.14-alpine
+FROM node:10.14.1-alpine
 ADD . /code
 WORKDIR /code
 RUN npm install -g pnpm
