@@ -119,12 +119,12 @@ copy docker.env auth.env
 nano patient.env  -- fix environment
 nano auth.env -- fix environment
 docker-compose build
-docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.1
-docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:1.1
-docker push localhost:5000/clin-proxy-api-auth-service:1.1
-docker push localhost:5000/clin-proxy-api-patient-service:1.1
-docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.1
-docker service update qa-proxi-api_patient --image localhost:5000/clin-proxy-api-patient-service:1.1
+docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.2.0
+docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:1.2.0
+docker push localhost:5000/clin-proxy-api-auth-service:1.2.0
+docker push localhost:5000/clin-proxy-api-patient-service:1.2.0
+docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.2.0
+docker service update qa-proxi-api_patient --image localhost:5000/clin-proxy-api-patient-service:1.2.0
 ```
 To scale the service up or down...
 ```
