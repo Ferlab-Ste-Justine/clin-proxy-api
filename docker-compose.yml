@@ -12,6 +12,9 @@ services:
       context: .
       dockerfile: Dockerfile-auth
     image: localhost:5000/clin-proxy-api-auth-service
+    volumes:
+#      - ./data/certbot/conf:/etc/letsencrypt  -- for local
+      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
     depends_on:
       - memcached
     ports:
@@ -28,6 +31,9 @@ services:
       context: .
       dockerfile: Dockerfile-patient
     image: localhost:5000/clin-proxy-api-patient-service
+    volumes:
+#      - ./data/certbot/conf:/etc/letsencrypt  --for local usage
+      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
     depends_on:
       - memcached
     ports:
