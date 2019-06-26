@@ -1,3 +1,4 @@
+import fs from 'fs'
 import errors from 'restify-errors'
 import deasync from 'deasync'
 
@@ -102,6 +103,21 @@ if ( !process.env.JWT_PROPERTY_NAME ) {
 }
 const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
 
+let sslCertificate = null
+let sslCertificateKey = null
+
+if ( !process.env.SSL_CERTIFICATE_PATH || !process.env.SSL_CERTIFICATE_KEY_PATH ) {
+    launcherLog.warning( 'No SSL_CERTIFICATE_PATH or SSL_CERTIFICATE_KEY_PATH defined in environment.' )
+} else {
+    try {
+        sslCertificate = fs.readFileSync( process.env.SSL_CERTIFICATE_PATH )
+        sslCertificateKey = fs.readFileSync( process.env.SSL_CERTIFICATE_KEY_PATH )
+    } catch ( e ) {
+        launcherLog.error( 'SSL_CERTIFICATE_PATH or SSL_CERTIFICATE_KEY_PATH could not be read.' )
+        process.exit( 1 )
+    }
+}
+
 const serviceToLaunch = args.service || null
 
 let refreshTokenMiddleware = async () => {
@@ -135,7 +151,9 @@ const generateApiConfig = ( serviceName ) => {
             formatters: {
                 'application/json': payloadFormatter
             },
-            ignoreTrailingSlash: false
+            ignoreTrailingSlash: false,
+            certificate: sslCertificate,
+            key: sslCertificateKey
         },
         cors: {
             preflightMaxAge: 5,
@@ -212,7 +230,7 @@ const launchApiServices = async() => {
                 await service.init()
                 await service.start()
 
-                launcherLog.success( `It's a Go for ${config.name} API Service on port ${config.port}!` )
+                launcherLog.success( `It's a Go for ${config.name} API Service using HTTP${service.instance.secure ? 'S' : ''} on port ${config.port}!` )
             } catch ( e ) {
                 launcherLog.error( `Houston, we have a problem! ${config.name} API Service ${e}` )
             }
