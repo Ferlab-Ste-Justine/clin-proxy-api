@@ -18,13 +18,11 @@ export default class ElasticClient {
     generateAcl( acl ) {
         const filters = []
 
-        /*
         if ( acl.role === 'practitioner' ) {
             filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
         } else if ( acl.role === 'genetician' ) {
             filters.push( { match: { 'organization.id': acl.organization_id } } )
         }
-        */
 
         return filters
     }

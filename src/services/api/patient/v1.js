@@ -25,7 +25,8 @@ const getPatientById = async ( req, res, cacheService, elasticService, logServic
 const getPatientsByAutoComplete = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const response = await elasticService.getPatientsByAutoComplete( req.params.type, req.params.query, sessionData.acl.fhir, 25 )
+        const limit = req.size || 25
+        const response = await elasticService.getPatientsByAutoComplete( req.params.type, req.params.query, sessionData.acl.fhir, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
@@ -45,7 +46,9 @@ const getPatientsByAutoComplete = async ( req, res, cacheService, elasticService
 const searchPatientsByFilters = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const response = await elasticService.searchPatientsByFilters( req.body.filters, sessionData.acl.fhir )
+        const limit = req.size || 25
+        const index = ( req.page ? ( req.page - 1 ) : 0 ) * limit
+        const response = await elasticService.searchPatientsByFilters( req.body.filters, sessionData.acl.fhir, index, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
@@ -65,8 +68,8 @@ const searchPatientsByFilters = async ( req, res, cacheService, elasticService, 
 const getAllPatients = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const index = req.index || 0
-        const limit = req.limit || 1000
+        const limit = req.size || 25
+        const index = ( req.page ? ( req.page - 1 ) : 0 ) * limit
         const response = await elasticService.getAllPatients( sessionData.acl.fhir, index, limit )
 
         if ( response.hits.total < 1 ) {
