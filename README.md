@@ -69,11 +69,23 @@ pnpm run service-auth
 
 #### Docker Mode
 
-
-`docker network create -d overlay --attachable proxy`
-`cp -p docker.env .env`
+```
+# Create the proxy network to connect all necessary services together
+docker network create -d overlay --attachable proxy
+# Install on all box sshfs docker volume pluggin
+docker plugin install vieux/sshfs DEBUG=1 sshkey.source=/home/ubuntu/.ssh/
+# Create the volumen sshvolume on all box
+docker volume create -d vieux/sshfs -o sshcmd=ubuntu@10.10.0.19:/home/ubuntu/sshvolume sshvolume
+# To Test (does not work on docker for macosx)
+docker run -it -v sshvolume:/sshvolume busybox ls /sshvolume
+```
 
 ###### Local Environment
+
+```
+cp -p docker.env auth.env
+cp -p docker.env patient.env
+```
 
 `docker-compose up --build` to rebuild images
 
@@ -85,12 +97,8 @@ or
 docker stack deploy -c docker-compiose.yml qa-proxi-api
 
 ```
-###### Pushing Changes to QA/Prod Private Docker Registry 
-To change to prod...
-```
-ssh -L 5000:localhost:5000 ubuntu@...
-```
-######Build and Push and deploy the first time
+
+###### Build and Push and deploy the first time  Qa/Prod
 
 ```
 copy docker.env patient.env
