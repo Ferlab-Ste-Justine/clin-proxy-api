@@ -57,12 +57,12 @@ export default class PatientService extends ApiService {
             ]
         } ) )
 
-        // Register getAllPatients Route
+        // Register ALL searchPatients Route
         this.instance.get( {
             path: `${this.config.endpoint}/search`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getAllPatients' )(
+                const response = await getFunctionForApiVersion( req.version, 'searchPatients' )(
                     req,
                     res,
                     this.cacheService,
@@ -79,12 +79,12 @@ export default class PatientService extends ApiService {
 
         } ) )
 
-        // Register searchPatientsByFilters Route
+        // Register SOME searchPatients Route
         this.instance.post( {
             path: `${this.config.endpoint}/search`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'searchPatientsByFilters' )(
+                const response = await getFunctionForApiVersion( req.version, 'searchPatients' )(
                     req,
                     res,
                     this.cacheService,

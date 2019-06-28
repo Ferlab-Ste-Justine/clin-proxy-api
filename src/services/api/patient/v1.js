@@ -26,13 +26,14 @@ const getPatientsByAutoComplete = async ( req, res, cacheService, elasticService
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const limit = req.size || 25
-        const response = await elasticService.getPatientsByAutoComplete( req.params.type, req.params.query, sessionData.acl.fhir, limit )
+        const index = ( req.page ? ( req.page - 1 ) : 0 ) * limit
+        const response = await elasticService.getPatientsByAutoComplete( req.params.type, req.params.query, sessionData.acl.fhir, index, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
         }
 
-        await logService.debug( `Elastic getPatientsByAutoComplete using ${req.params.query} returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic getPatientsByAutoComplete using ${req.params.query} [${index},${limit}] returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
             hits: response.hits.hits
@@ -43,18 +44,18 @@ const getPatientsByAutoComplete = async ( req, res, cacheService, elasticService
     }
 }
 
-const searchPatientsByFilters = async ( req, res, cacheService, elasticService, logService ) => {
+const searchPatients = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const limit = req.size || 25
         const index = ( req.page ? ( req.page - 1 ) : 0 ) * limit
-        const response = await elasticService.searchPatientsByFilters( req.body.filters, sessionData.acl.fhir, index, limit )
+        const response = await elasticService.searchPatients( sessionData.acl.fhir, index, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
         }
 
-        await logService.debug( `Elastic searchPatients using ${req.params.query} returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
             hits: response.hits.hits
@@ -65,31 +66,8 @@ const searchPatientsByFilters = async ( req, res, cacheService, elasticService, 
     }
 }
 
-const getAllPatients = async ( req, res, cacheService, elasticService, logService ) => {
-    try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const limit = req.size || 25
-        const index = ( req.page ? ( req.page - 1 ) : 0 ) * limit
-        const response = await elasticService.getAllPatients( sessionData.acl.fhir, index, limit )
-
-        if ( response.hits.total < 1 ) {
-            return new errors.NotFoundError()
-        }
-
-        await logService.debug( `Elastic getAllPatients returns ${response.hits.total} matches` )
-        return {
-            total: response.hits.total,
-            hits: response.hits.hits
-        }
-    } catch ( e ) {
-        await logService.warning( `Elastic getAllPatients ${e.toString()}` )
-        return new errors.InternalServerError()
-    }
-}
-
 export default {
     getPatientById,
     getPatientsByAutoComplete,
-    getAllPatients,
-    searchPatientsByFilters
+    searchPatients,
 }

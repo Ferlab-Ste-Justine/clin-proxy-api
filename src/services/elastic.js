@@ -46,7 +46,7 @@ export default class ElasticClient {
         } )
     }
 
-    async getPatientsByAutoComplete( type, query, acl, limit ) {
+    async getPatientsByAutoComplete( type, query, acl, index, limit ) {
         const filters = this.generateAcl( acl )
         const includes = []
 
@@ -68,7 +68,7 @@ export default class ElasticClient {
             uri: `${this.host}/patient/_search`,
             json: true,
             body: {
-                from: 0,
+                from: index,
                 size: limit,
                 _source: { includes },
                 query: {
@@ -91,29 +91,9 @@ export default class ElasticClient {
         } )
     }
 
-    async getAllPatients( acl, index, limit ) {
+    async searchPatients( acl, index, limit ) {
         const filters = this.generateAcl( acl )
 
-        return rp( {
-            method: 'GET',
-            uri: `${this.host}/patient/_search`,
-            json: true,
-            body: {
-                from: index,
-                size: limit,
-                query: {
-                    bool: {
-                        must: filters
-                    }
-                }
-            }
-        } )
-    }
-
-    async searchPatients( query, acl, index, limit ) {
-        const filters = this.generateAcl( acl )
-
-        filters.push( { match: { full_text: query } } )
         return rp( {
             method: 'GET',
             uri: `${this.host}/patient/_search`,
