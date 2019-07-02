@@ -74,8 +74,9 @@ pnpm run service-auth
 docker network create -d overlay --attachable proxy
 # Install on all box sshfs docker volume pluggin
 docker plugin install vieux/sshfs DEBUG=1 sshkey.source=/home/ubuntu/.ssh/
+# (Optional) Tot test the sshvolume with vieux/sshfs (does not work on macosx)
 # Create the volumen sshvolume on all box
-docker volume create -d vieux/sshfs -o sshcmd=ubuntu@10.10.0.19:/home/ubuntu/sshvolume sshvolume
+docker volume create -d vieux/sshfs -o sshcmd=ubuntu@142.1.177.220:/home/ubuntu/sshvolume/certbot/conf -o allow_other sshvolume
 # To Test (does not work on docker for macosx)
 docker run -it -v sshvolume:/sshvolume busybox ls /sshvolume
 ```
@@ -90,6 +91,7 @@ cp -p docker.env patient.env
 `docker-compose up --build` to rebuild images
 
 or
+```Edit docker-compose to comment sshfs docker volume and uncomment local volume```
 
 `docker-compose up`
 
@@ -131,8 +133,8 @@ docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin
 docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:1.2.0
 docker push localhost:5000/clin-proxy-api-auth-service:1.2.0
 docker push localhost:5000/clin-proxy-api-patient-service:1.2.0
-docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.2.0
-docker service update qa-proxi-api_patient --image localhost:5000/clin-proxy-api-patient-service:1.2.0
+docker service update qa_auth --image localhost:5000/clin-proxy-api-auth-service:1.2.0
+docker service update qa_patient --image localhost:5000/clin-proxy-api-patient-service:1.2.0
 ```
 To scale the service up or down...
 ```

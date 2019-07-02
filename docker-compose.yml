@@ -13,8 +13,10 @@ services:
       dockerfile: Dockerfile-auth
     image: localhost:5000/clin-proxy-api-auth-service
     volumes:
-#      - ./data/certbot/conf:/etc/letsencrypt  -- for local
-      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
+#      -for local dev only:
+#      - ./data/certbot/conf:/etc/letsencrypt
+#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
+      - "sshfsdata:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -32,8 +34,10 @@ services:
       dockerfile: Dockerfile-patient
     image: localhost:5000/clin-proxy-api-patient-service
     volumes:
-#      - ./data/certbot/conf:/etc/letsencrypt  --for local usage
-      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
+#      --for local dev only:
+#      - ./data/certbot/conf:/etc/letsencrypt
+#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
+      - "sshfsdata:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -50,3 +54,10 @@ networks:
   clinnet:
   proxy:
     external: true
+
+volumes:
+  sshfsdata:
+    driver: vieux/sshfs:latest
+    driver_opts:
+      sshcmd: "ubuntu@10.10.0.19:/home/ubuntu/sshvolume/certbot/conf"
+      allow_other: ""
