@@ -147,7 +147,6 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
             currentCachedData.acl,
             currentCachedData.user,
         )
-
         const newToken = generateSignedToken(
             config.jwt.secret,
             cacheKey,
