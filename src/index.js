@@ -163,9 +163,6 @@ const generateApiConfig = ( serviceName ) => {
 
             getToken: ( req ) => {
                 if ( req.headers && req.headers.cookie ) {
-
-                    console.log( '+++++ getToken ')
-
                     const cookieJar = cookie.parse( req.headers.cookie )
                     let token = cookieJar[ serviceJwtPropertyName ] || null
 
@@ -178,23 +175,14 @@ const generateApiConfig = ( serviceName ) => {
                         }
 
                         // Signed JWT Token Is Expired
-                        // const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
+                        const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
 
-                        // if ( req.jwt.expiry <= currentTimeInSeconds ) {
-                        //    const refreshPayload = _refreshTokenMiddleware( req )
+                        if ( req.jwt.expiry <= currentTimeInSeconds ) {
+                            const refreshPayload = refreshTokenMiddleware( req )
 
-                        //    token = refreshPayload.data.token.value
-                        //    req.jwt = jwt.decode( token, jwtSecret )
-                        // }
-
-
-                        const refreshPayload = refreshTokenMiddleware( req )
-
-                        console.log( `refreshPayload ${refreshPayload}` )
-
-                        token = refreshPayload.data.token.value
-                        req.jwt = jwt.decode( token, jwtSecret )
-
+                            token = refreshPayload.data.token.value
+                            req.jwt = jwt.decode( token, jwtSecret )
+                        }
 
                         return token
                     }
