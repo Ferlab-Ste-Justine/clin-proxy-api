@@ -1,5 +1,4 @@
 import rjwt from 'restify-jwt-community'
-import http from 'http'
 import https from 'https'
 import axios from 'axios'
 
@@ -18,23 +17,43 @@ const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
 } )
 
 export const refreshTokenMiddlewareGenerator = ( config ) => {
-    return async ( req ) => {
+    return ( req ) => {
         try {
             const protocol = req.isSecure() ? 'https' : 'http'
             const host = req.headers.host.split( ':' )[ 0 ].replace( '//', '' )
             const port = config.port ? `:${config.port}` : ''
-            const endpoint = `${protocol}://${host}${port}${config.endpoint}/token`
-            const result = await axios( {
-                method: 'post',
+            const url = `${protocol}://${host}${port}`
+            const endpoint = `${url}${config.endpoint}/token`
+
+            let response = false
+
+            axios( {
+                method: 'POST',
                 url: endpoint,
+                data: {},
                 headers: {
                     Cookie: req.headers.cookie
                 },
-                json: true
+                timeout: 2500,
+                json: true,
+                httpsAgent: new https.Agent( { keepAlive: true, rejectUnauthorized: false } )
+            } ).then( ( result ) => {
+                response = result
+            } ).catch( ( e ) => {
+                response = e
             } )
 
-            req.refreshToken = result.headers[ 'set-cookie' ]
-            return result.data
+            /* eslint-disable */
+            require( 'deasync' ).loopWhile( () => {
+                return !response
+            } )
+
+            if (response instanceof Error) {
+                throw response
+            }
+
+            req.refreshToken = response.headers[ 'set-cookie' ]
+            return response.data
         } catch ( e ) {
             return null
         }
