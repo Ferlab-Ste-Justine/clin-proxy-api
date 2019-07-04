@@ -99,7 +99,8 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
         await cacheService.create( cacheKey, cacheData, refreshTokenExpiresInSeconds )
         await logService.debug( `Login for ${username} using ${cacheKey}` )
         res.setHeader( 'Set-Cookie', cookie.serialize( config.jwt.requestProperty, token, {
-            httpOnly: true
+            httpOnly: true,
+            secure: true
         } ) )
         return { user }
     } catch ( e ) {
@@ -116,6 +117,7 @@ const logout = async ( req, res, cacheService, logService, config ) => {
         await logService.debug( `Logout using ${cacheKey}` )
         res.setHeader( 'Set-Cookie', cookie.serialize( config.jwt.requestProperty, null, {
             httpOnly: true,
+            secure: true,
             maxAge: 0
         } ) )
         return {}
