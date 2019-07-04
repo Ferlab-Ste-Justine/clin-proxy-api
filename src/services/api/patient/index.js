@@ -80,6 +80,7 @@ export default class PatientService extends ApiService {
         } ) )
 
         // Register SOME searchPatients Route
+        // @TODO - need filters specifications
         this.instance.post( {
             path: `${this.config.endpoint}/search`
         }, restifyAsyncWrap( async( req, res, next ) => {
