@@ -76,13 +76,20 @@ export default class ElasticClient {
                         must: filters,
                         should: [
                             { match_phrase_prefix: { id: query } },
-                            { match_phrase_prefix: { familyId: query } },
+                            { match_phrase_prefix: { 'name.family': query } },
+                            { match_phrase_prefix: { 'name.given': query } },
+                            { match_phrase_prefix: { 'studies.title': query } },
                             { match_phrase_prefix: { 'specimens.id': query } },
                             { match_phrase_prefix: { 'identifier.MR': query } },
                             { match_phrase_prefix: { 'identifier.JHN': query } },
-                            { wildcard: { 'studies.title': `*${query}*` } },
-                            { wildcard: { 'name.family': `*${query}*` } },
-                            { wildcard: { 'name.given': `*${query}*` } }
+                            { match_phrase_prefix: { familyId: query } },
+                            { wildcard: { id: `*${query}` } },
+                            { wildcard: { 'identifier.MR': `*${query}` } },
+                            { wildcard: { 'identifier.MR': `*${query}` } },
+                            { wildcard: { 'identifier.JHN': `*${query}` } },
+                            { wildcard: { familyId: `*${query}` } },
+                            { fuzzy: { 'name.given': query } },
+                            { fuzzy: { 'name.family': query } }
                         ],
                         minimum_should_match: 1
                     }
