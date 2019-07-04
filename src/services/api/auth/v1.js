@@ -20,10 +20,10 @@ const generateSignedToken = (
 
     return jwt.sign( {
         uid: cacheKey,
-        expiry: currentTimeInSeconds + refreshTokenExpiresInSeconds,
+        expiry: currentTimeInSeconds + accessTokenExpiresInSeconds,
         version: packageVersion,
         scope
-    }, jwtSecret, { expiresIn: `${accessTokenExpiresInSeconds}s` } )
+    }, jwtSecret, { expiresIn: `${( accessTokenExpiresInSeconds + refreshTokenExpiresInSeconds )}s` } )
 }
 
 const generateCacheData = (
