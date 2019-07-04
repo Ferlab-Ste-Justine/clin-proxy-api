@@ -1,6 +1,6 @@
 {
   "name": "clin-proxy-api",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "main": "index.js",
   "scripts": {
     "test": "babel-node test/runner.js",

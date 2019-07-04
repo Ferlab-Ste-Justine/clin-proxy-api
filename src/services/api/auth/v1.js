@@ -72,6 +72,8 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
         )
         const user = {
             username,
+            firstName: decodedAccessToken.given_name,
+            lastName: decodedAccessToken.family_name,
             groups: decodedAccessToken.groups,
             roles: decodedAccessToken.realm_access.roles
         }
@@ -147,7 +149,6 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
             currentCachedData.acl,
             currentCachedData.user,
         )
-
         const newToken = generateSignedToken(
             config.jwt.secret,
             cacheKey,
