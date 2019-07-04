@@ -52,7 +52,6 @@ export const refreshTokenMiddlewareGenerator = ( config ) => {
                 throw response
             }
 
-            req.refreshToken = response.headers[ 'set-cookie' ]
             return response.data
         } catch ( e ) {
             return null

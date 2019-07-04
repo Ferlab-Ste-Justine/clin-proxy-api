@@ -127,6 +127,7 @@ const logout = async ( req, res, cacheService, logService, config ) => {
     }
 }
 
+// @NOTE Keep endpoint internal. It cannot be used directly; see refreshAccessToken middleware.
 const token = async ( req, res, keycloakService, cacheService, logService, config ) => {
     try {
         const cookieJar = cookie.parse( req.headers.cookie )
@@ -163,14 +164,11 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
         await cacheService.update( cacheKey, newCacheData, newRefreshTokenExpiresInSeconds )
 
         await logService.debug( `Refreshed token for ${currentCachedData.user.username} using ${cacheKey}` )
-        res.setHeader( 'Set-Cookie', cookie.serialize( config.jwt.requestProperty, newToken, {
-            httpOnly: true
-        } ) )
         return {
             user: currentCachedData.user,
             token: {
                 value: newToken,
-                expiry: newRefreshTokenExpiresInSeconds
+                expiry: newAccessTokenExpiresInSeconds
             }
         }
     } catch ( e ) {
