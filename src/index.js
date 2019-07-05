@@ -119,8 +119,8 @@ if ( !process.env.SSL_CERTIFICATE_PATH || !process.env.SSL_CERTIFICATE_KEY_PATH 
 
 const serviceToLaunch = args.service || null
 
-let refreshTokenMiddleware = async () => {
-    return true
+let refreshTokenMiddleware = () => {
+    return null
 }
 
 try {
@@ -182,6 +182,7 @@ const generateApiConfig = ( serviceName ) => {
 
                             token = refreshPayload.data.token.value
                             req.jwt = jwt.decode( token, jwtSecret )
+                            req.newAccessTokenIssued = token
                         }
 
                         return token
