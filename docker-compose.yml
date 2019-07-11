@@ -16,7 +16,7 @@ services:
 #      -for local dev only:
 #      - ./data/certbot/conf:/etc/letsencrypt
 #      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-      - "sshfsdata:/etc/letsencrypt"
+      - "sshvolume:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -37,7 +37,7 @@ services:
 #      --for local dev only:
 #      - ./data/certbot/conf:/etc/letsencrypt
 #      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-      - "sshfsdata:/etc/letsencrypt"
+      - "sshvolume:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -56,8 +56,5 @@ networks:
     external: true
 
 volumes:
-  sshfsdata:
-    driver: vieux/sshfs:latest
-    driver_opts:
-      sshcmd: "ubuntu@10.10.0.19:/home/ubuntu/sshvolume/certbot/conf"
-      allow_other: ""
+  sshvolume:
+    external: true
