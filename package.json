@@ -7,7 +7,8 @@
     "start": "nodemon --exec babel-node src/index.js",
     "build": "babel src --out-dir dist",
     "service-auth": "node dist/index.js --service auth",
-    "service-patient": "node dist/index.js --service patient"
+    "service-patient": "node dist/index.js --service patient",
+    "service-variant": "node dist/index.js --service variant"
   },
   "dependencies": {
     "@babel/cli": "^7.2.3",

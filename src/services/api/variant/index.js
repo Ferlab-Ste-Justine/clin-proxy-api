@@ -2,21 +2,21 @@ import rjwt from 'restify-jwt-community'
 
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
-// import restifyAsyncWrap from '../helpers/async'
 import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
-// import validators from '../helpers/validators'
 
-// import Apiv1 from './v1'
+import Apiv1 from './v1'
+import validators from '../helpers/validators'
+import restifyAsyncWrap from '../helpers/async'
 
 
-// const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
-//    1: Apiv1
-// } )
+const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
+    1: Apiv1
+} )
 
 export default class VariantService extends ApiService {
     constructor( config ) {
-        config.logService.info( 'Roger that.' )
+        config.logService.info( 'On it!' )
         super( config )
         this.config.cache = config.cacheConfig
         this.config.elastic = config.elasticConfig
@@ -43,8 +43,48 @@ export default class VariantService extends ApiService {
         this.instance.use( rjwt( this.config.jwt ).unless( {
             path: [
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` }
+                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` },
+                { methods: [ 'GET' ], url: `${this.config.endpoint}/schema` }
             ]
+        } ) )
+
+        // Register Schema Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/schema`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getSchema' )( this.logService )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register Sqon Route
+        this.instance.post( {
+            path: `${this.config.endpoint}/:sqon`,
+            validation: validators.byPatientId
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getVariantsFromSqon' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
         } ) )
 
         super.start()

@@ -49,6 +49,27 @@ services:
       - proxy
     env_file:
       - patient.env
+  variant:
+    build:
+      context: .
+      dockerfile: Dockerfile-variant
+    image: localhost:5000/clin-proxy-api-variant-service
+    volumes:
+#      --for local dev only:
+#      - ./data/certbot/conf:/etc/letsencrypt
+#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
+      - "sshvolume:/etc/letsencrypt"
+    depends_on:
+      - memcached
+    ports:
+      - "5000:5000"
+    deploy:
+      replicas: 2
+    networks:
+      - clinnet
+      - proxy
+    env_file:
+      - variant.env
 
 networks:
   clinnet:
