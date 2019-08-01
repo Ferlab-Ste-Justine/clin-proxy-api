@@ -23,3 +23,63 @@ export default {
     getSchema,
     getVariantsFromSqon
 }
+
+/*
+set size to 1 to get a document
+
+curl -XGET "http://localhost:9200/variants/_search" -H 'Content-Type: application/json' -d'
+{
+   "size": 0,
+   "aggs" : {
+       "text" : {
+           "terms" : {
+               "field" : "properties.functionalAnnotations.effet.keyword",
+               "order" : { "_count" : "asc" }
+           }
+       }
+   }
+}'
+
+curl -XGET "http://localhost:9200/variants/_search" -H 'Content-Type: application/json' -d'
+{
+   "size": 0,
+   "aggs" : {
+       "donor" : {
+           "terms" : {
+               "field" : "properties.donor.phenotypes.keyword",
+               "order" : { "_count": "asc" }
+           }
+       }
+   },
+   "query": {
+    "bool": {
+      "must": [
+        { "match": { "properties.chrom":   "1" }}
+      ]
+    }
+  }
+}'
+
+Kibana version:
+
+GET /variants/_search
+{
+   "size": 0,
+   "aggs" : {
+       "donor" : {
+           "terms" : {
+               "field" : "properties.donor.phenotypes.keyword",
+               "order" : { "_count": "asc" }
+           }
+       }
+   },
+   "query": {
+    "bool": {
+      "must": [
+        { "match": { "properties.chrom":   "1" }}
+      ]
+    }
+  }
+}
+
+ */

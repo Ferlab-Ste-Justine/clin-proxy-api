@@ -11,6 +11,10 @@ export default class CacheClient {
         this.expiry = expirationInSeconds
     }
 
+    async ping() {
+        return this.create( 'ping', new Date().getTime() )
+    }
+
     async create( key, value, expiration = this.expiry ) {
         return this.instance.set( key, value, expiration )
     }

@@ -65,6 +65,16 @@ export default class AuthService extends ApiService {
         super( config )
         this.config.cache = config.cacheConfig
         this.config.keykloak = config.keycloakConfig
+        this.runServicesHealthCheck = async () => {
+            try {
+                await this.cacheService.ping()
+                await this.logService.debug( 'Cache Service is healthy.' )
+                await this.keycloakService.ping()
+                await this.logService.debug( 'Keycloak Service is healthy.' )
+            } catch (e) {
+                throw new Error(`NOK with ${e.toString()}`)
+            }
+        }
     }
 
     async init() {
@@ -72,7 +82,7 @@ export default class AuthService extends ApiService {
 
         await this.logService.debug( 'Cache Service Client appears functional ... checking connectivity.' )
         this.cacheService = new CacheClient( this.config.cache )
-        await this.cacheService.create( 'authService', new Date().getTime() )
+        await this.cacheService.ping()
 
         await this.logService.debug( 'Keycloak Service Client appears functional ... checking connectivity.' )
         this.keycloakService = new KeycloakClient( this.config.keykloak )

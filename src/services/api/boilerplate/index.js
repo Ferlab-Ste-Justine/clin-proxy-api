@@ -14,6 +14,13 @@ const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
 
 export default class BoilerplateService extends ApiService {
 
+    constructor( config ) {
+        super( config )
+        this.runServicesHealthCheck = async () => {
+            return true
+        }
+    }
+
     async start() {
 
         super.start()

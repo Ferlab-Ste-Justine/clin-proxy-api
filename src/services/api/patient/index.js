@@ -22,6 +22,22 @@ export default class PatientService extends ApiService {
         this.config.cache = config.cacheConfig
         this.config.aidbox = config.aidboxConfig
         this.config.elastic = config.elasticConfig
+        this.runServicesHealthCheck = async () => {
+            try {
+                await this.cacheService.ping()
+                await this.logService.debug( 'Cache Service is healthy.' )
+                await this.aidboxService.ping()
+                await this.logService.debug( 'Aidbox Service is healthy.' )
+                const elasticPingResult = await this.elasticService.ping()
+
+                if ( !elasticPingResult.name ) {
+                    throw new Error( 'Elastic Search Service is dead.' )
+                }
+                await this.logService.debug( 'Elastic Search Service is healthy.' )
+            } catch ( e ) {
+                throw new Error( `NOK with ${e.toString()}` )
+            }
+        }
     }
 
     async init() {
@@ -29,7 +45,7 @@ export default class PatientService extends ApiService {
 
         await this.logService.debug( 'Cache Service Client appears functional ... checking connectivity.' )
         this.cacheService = new CacheClient( this.config.cache )
-        await this.cacheService.create( 'patientService', new Date().getTime() )
+        await this.cacheService.ping()
 
         await this.logService.debug( 'Elastic Search Client appears functional ... checking connectivity.' )
         this.elasticService = new ElasticClient( this.config.elastic )
