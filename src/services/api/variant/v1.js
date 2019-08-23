@@ -6,12 +6,17 @@ const schema = JSON.parse( readFileSync( `${__dirname}/schema/1.json`, 'utf8' ) 
 
 const getSchema = async ( logService ) => {
     try {
-        await logService.debug( `getSchema returned version ${schema.version}` )
+        await logService.debug( `Returned schema version ${schema.version}` )
         return schema
     } catch ( e ) {
-        await logService.warning( 'getSchema could not find version identifier' )
+        await logService.warning( 'Could not locate schema version' )
         return new errors.InternalServerError()
     }
+}
+
+/* eslint-disable-next-line */
+const getFilterVariantsCountFromSqon = async ( req, res, cacheService, elasticService, logService ) => {
+    return new errors.NotImplementedError()
 }
 
 /* eslint-disable-next-line */

@@ -1,3 +1,78 @@
 {
-  "version": "1.0"
+  "version": "1.0",
+  "categories": [
+    {
+      "id": "variant",
+      "label": "category_variant",
+      "filters": [
+        {
+          "id": "variant_type",
+          "label": "filter_variant_type",
+          "type": "generic"
+        },
+        {
+          "id": "consequence",
+          "label": "filter_consequence",
+          "type": "generic"
+        },
+        {
+          "id": "external",
+          "label": "filter_external",
+          "type": "generic"
+        },
+        {
+          "id": "impact",
+          "label": "filter_impact",
+          "type": "generic"
+        },
+        {
+          "id": "chromosome",
+          "label": "filter_chromosome",
+          "type": "generic",
+          "mapping": {
+            "index": "clin-mutation-centric",
+            "url": "/mutations/_search",
+            "field": "chrom"
+          },
+          "query": {
+            "size": 0,
+            "aggs" : {
+              "filterCount" : {
+                "terms" : {
+                  "field" : "properties.chrom.keyword",
+                  "order" : { "_count" : "desc" },
+                  "size": 24
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "genomic",
+      "label": "category_genomic",
+      "filters": []
+    },
+    {
+      "id": "prediction",
+      "label": "category_prediction",
+      "filters": []
+    },
+    {
+      "id": "cohort",
+      "label": "category_cohort",
+      "filters": []
+    },
+    {
+      "id": "zygosity",
+      "label": "category_zygosity",
+      "filters": []
+    },
+    {
+      "id": "metric",
+      "label": "category_metric",
+      "filters": []
+    }
+  ]
 }

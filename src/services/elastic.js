@@ -117,4 +117,41 @@ export default class ElasticClient {
         } )
     }
 
+    async countVariantsForFiltersByPatientId( uid, filters, acl ) {
+        const aclFilters = this.generateAcl( acl )
+        const uri = `${this.host}/variant/_search`
+
+        aclFilters.push( { match: { id: uid } } )
+        return rp( {
+            method: 'GET',
+            uri,
+            json: true,
+            body: {
+                query: {
+                    bool: {
+                        must: aclFilters
+                    }
+                }
+            }
+        } )
+    }
+
+    async getVariantsByPatientId( uid, acl ) {
+        const filters = this.generateAcl( acl )
+
+        filters.push( { match: { id: uid } } )
+        return rp( {
+            method: 'GET',
+            uri: `${this.host}/patient/_search`,
+            json: true,
+            body: {
+                query: {
+                    bool: {
+                        must: filters
+                    }
+                }
+            }
+        } )
+    }
+
 }
