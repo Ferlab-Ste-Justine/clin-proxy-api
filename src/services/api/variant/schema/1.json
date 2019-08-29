@@ -8,7 +8,22 @@
         {
           "id": "variant_type",
           "label": "filter_variant_type",
-          "type": "generic"
+          "type": "generic",
+          "mapping": {
+            "index": "clin-mutation-centric",
+            "url": "/mutations/_search",
+            "field": "properties.donor.type"
+          },
+          "query": {
+            "size": 0,
+            "aggs" : {
+              "keywords": {
+                "terms": {
+                  "field": "properties.type.keyword"
+                }
+              }
+            }
+          }
         },
         {
           "id": "consequence",
@@ -36,14 +51,7 @@
           },
           "query": {
             "size": 0,
-            "aggs" : {
-              "filterCount" : {
-                "terms" : {
-                  "field" : "properties.chrom.keyword",
-                  "order" : { "_count" : "desc" },
-                  "size": 24
-                }
-              }
+            "aggs": {
             }
           }
         }
@@ -52,12 +60,49 @@
     {
       "id": "genomic",
       "label": "category_genomic",
-      "filters": []
+      "filters": [
+        {
+          "id": "gene_type",
+          "label": "filter_gene_type",
+          "type": "generic"
+        }
+      ]
     },
     {
       "id": "prediction",
       "label": "category_prediction",
-      "filters": []
+      "filters": [
+        {
+          "id": "vep",
+          "label": "filter_vep",
+          "type": "generic"
+        },
+        {
+          "id": "sift",
+          "label": "filter_sift",
+          "type": "generic"
+        },
+        {
+          "id": "polyphen",
+          "label": "filter_polyphen",
+          "type": "generic"
+        },
+        {
+          "id": "lrt",
+          "label": "filter_lrt",
+          "type": "generic"
+        },
+        {
+          "id": "mutation_assessor",
+          "label": "filter_mutation_assessor",
+          "type": "generic"
+        },
+        {
+          "id": "fathmm",
+          "label": "filter_fathmm",
+          "type": "generic"
+        }
+      ]
     },
     {
       "id": "cohort",
@@ -67,7 +112,13 @@
     {
       "id": "zygosity",
       "label": "category_zygosity",
-      "filters": []
+      "filters": [
+        {
+          "id": "transmission",
+          "label": "filter_transmission",
+          "type": "generic"
+        }
+      ]
     },
     {
       "id": "metric",
