@@ -50,6 +50,7 @@ export default class ElasticClient {
         const filters = this.generateAcl( acl )
         const includes = []
 
+        // @TODO Field logic should be moved to versionned route
         if ( type === 'partial' ) {
             includes.push(
                 'id',
@@ -75,6 +76,7 @@ export default class ElasticClient {
                     bool: {
                         must: filters,
                         should: [
+                            // @TODO Field logic should be moved to versionned route
                             { match_phrase_prefix: { id: query } },
                             { match_phrase_prefix: { 'name.family': query } },
                             { match_phrase_prefix: { 'name.given': query } },
@@ -117,11 +119,16 @@ export default class ElasticClient {
         } )
     }
 
-    async countVariantsForFiltersByPatientId( uid, filters, acl ) {
+    async getVariantAggregationForPatientId( patient, variant, query, acl, schema, index, limit ) {
         const aclFilters = this.generateAcl( acl )
-        const uri = `${this.host}/variant/_search`
+        const uri = `${this.host}${schema.path}`
 
-        aclFilters.push( { match: { id: uid } } )
+        //const filter = schema.categories
+        //where filters array contains id === type
+        //must match donor id
+        //aclFilters.push( { match: { id: patient } } )
+
+
         return rp( {
             method: 'GET',
             uri,
@@ -136,22 +143,8 @@ export default class ElasticClient {
         } )
     }
 
-    async getVariantsByPatientId( uid, acl ) {
-        const filters = this.generateAcl( acl )
-
-        filters.push( { match: { id: uid } } )
-        return rp( {
-            method: 'GET',
-            uri: `${this.host}/patient/_search`,
-            json: true,
-            body: {
-                query: {
-                    bool: {
-                        must: filters
-                    }
-                }
-            }
-        } )
+    async getVariantResultsForPatientId( patient, variant, query, acl, schema, index, limit ) {
+        return null;
     }
 
 }

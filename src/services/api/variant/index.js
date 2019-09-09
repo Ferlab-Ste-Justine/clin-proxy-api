@@ -83,7 +83,7 @@ export default class VariantService extends ApiService {
             path: `${this.config.endpoint}/count`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getFilterVariantsCountFromSqon' )( this.logService )
+                const response = await getFunctionForApiVersion( req.version, 'getFilters' )( this.logService )
 
                 res.send( response )
                 next()
@@ -97,11 +97,11 @@ export default class VariantService extends ApiService {
 
         // Register Sqon Route
         this.instance.post( {
-            path: `${this.config.endpoint}/:sqon`,
+            path: `${this.config.endpoint}/search`,
             validation: validators.byPatientId
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getVariantsFromSqon' )(
+                const response = await getFunctionForApiVersion( req.version, 'getVariants' )(
                     req,
                     res,
                     this.cacheService,
