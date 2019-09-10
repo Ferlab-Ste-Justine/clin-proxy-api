@@ -1,4 +1,29 @@
+/* eslint-disable */
 import rp from 'request-promise-native'
+import { filter, pullAllBy, flatten, find, map } from 'lodash'
+
+
+const generateAclFiltersForPatientIndex = ( acl ) => {
+    const filters = []
+
+    if ( acl.role === 'practitioner' ) {
+        filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
+    } else if ( acl.role === 'genetician' ) {
+        filters.push( { match: { 'organization.id': acl.organization_id } } )
+    }
+    return filters
+}
+
+const generateAclFiltersForMutationIndex = ( acl ) => {
+    const filters = []
+
+    if ( acl.role === 'practitioner' ) {
+        filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
+    } else if ( acl.role === 'genetician' ) {
+        filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
+    }
+    return filters
+}
 
 
 export default class ElasticClient {
@@ -15,26 +40,14 @@ export default class ElasticClient {
         } )
     }
 
-    generateAcl( acl ) {
-        const filters = []
-
-        if ( acl.role === 'practitioner' ) {
-            filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
-        } else if ( acl.role === 'genetician' ) {
-            filters.push( { match: { 'organization.id': acl.organization_id } } )
-        }
-
-        return filters
-    }
-
-
     async getPatientById( uid, acl ) {
-        const filters = this.generateAcl( acl )
+        const uri = `${this.host}/patient/_search`
+        const filters = generateAclFiltersForPatientIndex( acl )
 
         filters.push( { match: { id: uid } } )
         return rp( {
             method: 'GET',
-            uri: `${this.host}/patient/_search`,
+            uri,
             json: true,
             body: {
                 query: {
@@ -47,10 +60,11 @@ export default class ElasticClient {
     }
 
     async getPatientsByAutoComplete( type, query, acl, index, limit ) {
-        const filters = this.generateAcl( acl )
+        const uri = `${this.host}/patient/_search`
+        const filters = generateAclFiltersForPatientIndex( acl )
         const includes = []
 
-        // @TODO Field logic should be moved to versionned route
+        // @TODO Field logic should be moved to versioned route
         if ( type === 'partial' ) {
             includes.push(
                 'id',
@@ -66,7 +80,7 @@ export default class ElasticClient {
 
         return rp( {
             method: 'GET',
-            uri: `${this.host}/patient/_search`,
+            uri,
             json: true,
             body: {
                 from: index,
@@ -76,7 +90,6 @@ export default class ElasticClient {
                     bool: {
                         must: filters,
                         should: [
-                            // @TODO Field logic should be moved to versionned route
                             { match_phrase_prefix: { id: query } },
                             { match_phrase_prefix: { 'name.family': query } },
                             { match_phrase_prefix: { 'name.given': query } },
@@ -101,11 +114,12 @@ export default class ElasticClient {
     }
 
     async searchPatients( acl, index, limit ) {
-        const filters = this.generateAcl( acl )
+        const uri = `${this.host}/patient/_search`
+        const filters = generateAclFiltersForPatientIndex( acl )
 
         return rp( {
             method: 'GET',
-            uri: `${this.host}/patient/_search`,
+            uri,
             json: true,
             body: {
                 from: index,
@@ -118,33 +132,80 @@ export default class ElasticClient {
             }
         } )
     }
+    /* eslint-disable */
 
-    async getVariantAggregationForPatientId( patient, variant, query, acl, schema, index, limit ) {
-        const aclFilters = this.generateAcl( acl )
+    async getVariantAggregationForPatientId( uid, variants, query, acl, schema ) {
         const uri = `${this.host}${schema.path}`
+        const schemaFilters = flatten(
+            map(schema.categories, 'filters')
+        );
 
-        //const filter = schema.categories
-        //where filters array contains id === type
-        //must match donor id
-        //aclFilters.push( { match: { id: patient } } )
+        const aggs = variants.reduce((accumulator, variant) => {
+            const filter = find(schemaFilters, { id: variant })
+            if (filter) {
+                return Object.assign(accumulator, { [variant]: filter.facet });
+            }
+        }, {});
 
+        const filters = generateAclFiltersForMutationIndex( acl )
+        filters.push( { match: { 'donors.patientId': uid } } )
+
+        // @TODO Add active query instructions to filters
+        // query
+
+        const body = {
+            size: 0,
+            aggs,
+            query: {
+                bool: {
+                    must: [
+                        filters
+                    ]
+                }
+            }
+        }
 
         return rp( {
             method: 'GET',
             uri,
             json: true,
-            body: {
-                query: {
-                    bool: {
-                        must: aclFilters
-                    }
-                }
-            }
-        } )
+            body
+        } );
     }
 
     async getVariantResultsForPatientId( patient, variant, query, acl, schema, index, limit ) {
-        return null;
+        return null
     }
+
+
+/*
+    GET /variants/_search
+{
+    "size": 0,
+    "aggs" : {
+        "chromosome" : {
+            "terms" : {
+                "field" : "chrom.keyword"
+            }
+        },
+        "variant_type" : {
+            "terms" : {
+                "field" : "type.keyword"
+            }
+        }
+    },
+
+    "query": {
+        "bool": {
+            "must": [
+                { "match": { "donor.patientId":   "PA00002" }}
+                ]
+        }
+    }
+
+}
+*/
+
+
 
 }

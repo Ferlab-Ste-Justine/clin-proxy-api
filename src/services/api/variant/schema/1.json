@@ -15,16 +15,11 @@
           "id": "variant_type",
           "label": "filter_variant_type",
           "type": "generic",
-          "search": "properties.type",
+          "search": "type.keyword",
           "facet": {
-            "aggs" : {
-              "text" : {
-                "terms" : {
-                  "field" : "type.keyword",
-                  "order" : { "_count" : "asc" },
-                  "size": 999
-                }
-              }
+            "terms" : {
+              "field" : "type.keyword",
+              "order" : { "_count" : "desc" }
             }
           }
         },
@@ -67,7 +62,14 @@
         {
           "id": "gene_type",
           "label": "filter_gene_type",
-          "type": "generic"
+          "type": "generic",
+          "search": "genes.biotype.keyword",
+          "facet": {
+            "terms" : {
+              "field" : "genes.biotype.keyword",
+              "order" : { "_count" : "desc" }
+            }
+          }
         }
       ]
     },

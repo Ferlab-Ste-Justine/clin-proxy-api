@@ -52,6 +52,9 @@ export default class VariantService extends ApiService {
         }
     }
 
+
+    /* eslint-disable */
+
     async start() {
         // JWT Endpoint Exceptions
         this.instance.use( rjwt( this.config.jwt ).unless( {
@@ -59,6 +62,10 @@ export default class VariantService extends ApiService {
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/health` },
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/schema` }
+
+
+
+                ,{ methods: [ 'GET' ], url: `${this.config.endpoint}/count` }
             ]
         } ) )
 
@@ -80,10 +87,17 @@ export default class VariantService extends ApiService {
 
         // Register Schema Route
         this.instance.get( {
-            path: `${this.config.endpoint}/count`
+            path: `${this.config.endpoint}/count`,
+            // validation: validators.variantCount
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getFilters' )( this.logService )
+                const response = await getFunctionForApiVersion( req.version, 'getFilters' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
 
                 res.send( response )
                 next()
@@ -98,7 +112,7 @@ export default class VariantService extends ApiService {
         // Register Sqon Route
         this.instance.post( {
             path: `${this.config.endpoint}/search`,
-            validation: validators.byPatientId
+            // validation: validators.variantSearch
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getVariants' )(

@@ -28,6 +28,7 @@
     "eslint": "^5.15.3",
     "eslint-config-airbnb": "^17.1.0",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
     "memcached-promisify": "^2.0.0",
     "newman": "^4.4.1",
     "nodemon": "^1.18.10",

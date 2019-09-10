@@ -21,23 +21,37 @@ const getSchema = async ( logService ) => {
 
 const getFilters = async ( req, res, cacheService, elasticService, logService ) => {
     try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params
-        const patient = params.patient
-        const variant = params.variant
-        const query = params.query || null
-        const limit = params.size || 25
-        const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const response = await elasticService.getVariantAggregationForPatientId( patient, variant, query, sessionData.acl.fhir, schema, index, limit )
+        //const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        //const params = req.query || req.params
+        //const patient = params.patient
+        //const variants = params.variants
+        //const query = params.query || null
 
+
+        const patient = 'PA00002';
+        const variants = ['variant_type', 'gene_type'];
+        const query = {};
+        const sessionData = { acl: { fhir: { role: 'administrator' } }};
+
+        const response = await elasticService.getVariantAggregationForPatientId( patient, variants, query, sessionData.acl.fhir, schema )
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
         }
 
-        await logService.debug( `Elastic getVariantAggregationForPatientId using ${variant}/${patient}/${query} [${index},${limit}] returns ${response.hits.total} matches` )
+        let hits = 0;
+        const aggregations = {}
+        Object.keys(response.aggregations).map((filter) => {
+            aggregations[filter] = response.aggregations[filter].buckets.reduce((accumulator, bucket) => {
+                hits += bucket.doc_count
+                return Object.assign(accumulator, { [bucket.key]: bucket.doc_count })
+            }, {})
+        })
+
+        await logService.debug( `Elastic getVariantAggregationForPatientId using ${variants}/${query} returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
-            hits: response.hits.hits
+            hits,
+            aggregations,
         }
     } catch ( e ) {
         await logService.warning( `Elastic getVariantAggregationForPatientId ${e.toString()}` )
