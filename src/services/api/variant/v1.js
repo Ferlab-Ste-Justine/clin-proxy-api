@@ -38,20 +38,19 @@ const getFilters = async ( req, res, cacheService, elasticService, logService ) 
             return new errors.NotFoundError()
         }
 
-        let hits = 0;
-        const aggregations = {}
+        let total = 0;
+        const hits = {}
         Object.keys(response.aggregations).map((filter) => {
-            aggregations[filter] = response.aggregations[filter].buckets.reduce((accumulator, bucket) => {
-                hits += bucket.doc_count
+            hits[filter] = response.aggregations[filter].buckets.reduce((accumulator, bucket) => {
+                total += bucket.doc_count
                 return Object.assign(accumulator, { [bucket.key]: bucket.doc_count })
             }, {})
         })
 
         await logService.debug( `Elastic getVariantAggregationForPatientId using ${variants}/${query} returns ${response.hits.total} matches` )
         return {
-            total: response.hits.total,
-            hits,
-            aggregations,
+            total,
+            hits
         }
     } catch ( e ) {
         await logService.warning( `Elastic getVariantAggregationForPatientId ${e.toString()}` )
