@@ -134,16 +134,16 @@ export default class ElasticClient {
     }
     /* eslint-disable */
 
-    async getVariantAggregationForPatientId( uid, variants, query, acl, schema ) {
+    async getVariantAggregationForPatientId( uid, types, query, acl, schema ) {
         const uri = `${this.host}${schema.path}`
         const schemaFilters = flatten(
             map(schema.categories, 'filters')
         );
 
-        const aggs = variants.reduce((accumulator, variant) => {
-            const filter = find(schemaFilters, { id: variant })
-            if (filter) {
-                return Object.assign(accumulator, { [variant]: filter.facet });
+        const aggs = types.reduce((accumulator, type) => {
+            const schemaFilter = find(schemaFilters, { id: type })
+            if (schemaFilter) {
+                return Object.assign(accumulator, { [type]: schemaFilter.facet });
             }
         }, {});
 
@@ -173,7 +173,7 @@ export default class ElasticClient {
         } );
     }
 
-    async getVariantResultsForPatientId( patient, variant, query, acl, schema, index, limit ) {
+    async getVariantResultsForPatientId( patient, types, query, acl, schema, index, limit ) {
         return null
     }
 

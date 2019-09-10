@@ -24,30 +24,29 @@ const getFilters = async ( req, res, cacheService, elasticService, logService ) 
         //const sessionData = await getSessionDataFromToken( req.token, cacheService )
         //const params = req.query || req.params
         //const patient = params.patient
-        //const variants = params.variants
+        //const filters = params.filters
         //const query = params.query || null
 
-
         const patient = 'PA00002';
-        const variants = ['variant_type', 'gene_type'];
+        const filters = ['variant_type', 'gene_type'];
         const query = {};
         const sessionData = { acl: { fhir: { role: 'administrator' } }};
 
-        const response = await elasticService.getVariantAggregationForPatientId( patient, variants, query, sessionData.acl.fhir, schema )
-        if ( response.hits.total < 1 ) {
-            return new errors.NotFoundError()
-        }
-
+        const response = await elasticService.getVariantAggregationForPatientId( patient, filters, query, sessionData.acl.fhir, schema )
+        const hits = []
         let total = 0;
-        const hits = {}
         Object.keys(response.aggregations).map((filter) => {
-            hits[filter] = response.aggregations[filter].buckets.reduce((accumulator, bucket) => {
+            const data = response.aggregations[filter].buckets.reduce((accumulator, bucket) => {
                 total += bucket.doc_count
-                return Object.assign(accumulator, { [bucket.key]: bucket.doc_count })
-            }, {})
+                return [...accumulator, { key: bucket.key, count: bucket.doc_count }]
+            }, [])
+            hits.push({
+                filter,
+                data
+            })
         })
 
-        await logService.debug( `Elastic getVariantAggregationForPatientId using ${variants}/${query} returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic getVariantAggregationForPatientId using ${filters} returns ${total} matches` )
         return {
             total,
             hits
