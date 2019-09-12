@@ -134,6 +134,11 @@ export default class ElasticClient {
     }
     /* eslint-disable */
 
+
+
+
+
+
     async getVariantAggregationForPatientId( uid, types, query, acl, schema ) {
         const uri = `${this.host}${schema.path}`
         const schemaFilters = flatten(

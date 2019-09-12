@@ -65,7 +65,9 @@ export default class VariantService extends ApiService {
 
 
 
-                ,{ methods: [ 'GET' ], url: `${this.config.endpoint}/count` }
+                //@TODO Disable these.
+                ,{ methods: [ 'POST' ], url: `${this.config.endpoint}/count` }
+                ,{ methods: [ 'POST' ], url: `${this.config.endpoint}/search` }
             ]
         } ) )
 
@@ -86,7 +88,7 @@ export default class VariantService extends ApiService {
         } ) )
 
         // Register Schema Route
-        this.instance.get( {
+        this.instance.post( {
             path: `${this.config.endpoint}/count`,
             // validation: validators.variantCount
         }, restifyAsyncWrap( async( req, res, next ) => {
