@@ -1,96 +1,114 @@
 /* eslint-disable */
 
-import { cloneDeep, isArray, isObject } from 'lodash';
+import { cloneDeep, isArray, isObject, filter, find, findIndex, isNil, omit, set, get, some, pullAllBy } from 'lodash';
 
-const BODY = {
-    from: 0,
-    size: 25,
-    query: {}
+
+export const validate = (statement) => {
+    if (!(statement instanceof Array) || !statement[0] || !statement[0].instructions || statement[0].instructions.length < 1) {
+        return false;
+    }
+
+    return true;
 }
 
-export const groupByPriorities = (queries = []) => {
-    const groupedQueries = []
+export const denormalize = (statement = []) => {
+    const denormalizeNestedQueries = (list) => {
+        return list.forEach( ( item ) => {
+            const nested = filter(item.instructions, { type: 'subquery' })
+            if (nested.length) {
+                let instructions = item.instructions.map( ( instruction ) => {
+                    return ( instruction.type !== 'subquery' ) ? instruction : find( statement, { 'key': instruction.data.query } ).instructions
+                })
+                item.instructions = instructions
+            }
+            denormalizedStatement.push(item)
+        } )
+    }
+
+    const denormalizedStatement = []
+    denormalizeNestedQueries(statement)
+    return denormalizedStatement
+}
+
+export const groupByPriorities = (query) => {
     const flattenByDepth = (list, depth = 0) => {
         list.forEach( ( item ) => {
             if (!isArray( item )) {
-                if (!groupedQueries[depth]) {
-                    groupedQueries[depth] = []
+                if (!flattenedStatement[depth]) {
+                    flattenedStatement[depth] = []
                 }
-
-                groupedQueries[depth].push( item )
+                flattenedStatement[depth].push(item)
             } else {
                 flattenByDepth( item, (depth+1) )
             }
-        } )
+        })
     }
 
-    flattenByDepth(queries)
-    return groupedQueries.reverse()
+    const flattenedStatement = []
+    flattenByDepth(query.instructions)
+    return flattenedStatement.reverse()
 }
 
+export const translateToElasticSearch = (query, index, limit) => {
 
-export const denormalizeSubqueries = (queries = []) => {
-    //@TODO Should inject matching queries content into subquery
-
-    const denormalizedQueries = []
-
-    const denormalize = (list) => {
-        list.forEach( ( item ) => {
-            if (isObject( item )) {
-
-                //@TODO denormalize subqueries, if any.
-                console.log('Denormalizing subqueries for ' + JSON.stringify(item))
-
-            } else {
-                // Array of instruction
-                // [ instructions ],
-
-                console.log('...........')
-                denormalize(item)
+    /*
+    GET /mutations/_search
+    {
+        "size": 10,
+        "query": {
+        "bool": {
+            "must": {
+                "bool" : {
+                    "must": [ {
+                        "match": { "functionalAnnotations.impact":   "HIGH" }},
+                        { "match": { "chrom":   "1" }}]
+                }
+            },
+            "should": { "match" : {"functionalAnnotations.consequence" : "upstream_gene_variant"} } ,
+            "must_not": [ { "match": { "type":   "SNV" }} ],
+                "filter": {
+                "bool" : {
+                    "must" : [
+                        { "match": { "donors.patientId":   "PA00002" }}
+                    ]
+                }
             }
-        } )
+        }
     }
+    }
+    */
 
-    // Find all subqueries
-    //
 
-    denormalize(queries)
-    return denormalizedQueries;
+
+
+
+    return {
+        from: index,
+        size: limit,
+        query: {}
+    }
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const transform = ( sqon ) => {
-    if (!(sqon instanceof Array) || sqon.length < 1) {
-        return null;
+const transform = (statement, queryIndex = 0, index = 0, limit = 25) => {
+    if (!isArray(statement)) {
+        statement = [ statement ]
     }
 
-    const query = Object.assign(BODY, {})
+    const isValid = validate(statement)
+    if (!isValid) {
+        return null
+    }
 
+    const denormalized = denormalize(statement)
+    const priority = groupByPriorities(denormalized[queryIndex])
 
+    console.log('priority by index');
+    console.log(priority)
+    console.log(JSON.stringify(priority))
 
-
-    // ???
-
-
-
-
-
-    return query
+   return translateToElasticSearch(priority);
 }
 
 export default transform

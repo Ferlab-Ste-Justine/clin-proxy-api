@@ -2,23 +2,34 @@
 
 import { expect } from 'chai'
 
-import transform, { groupByPriorities, denormalizeSubqueries } from '../../src/services/api/variant/sqon'
+import transform, { groupByPriorities, denormalize, validate } from '../../src/services/api/variant/sqon'
 
 import { cloneDeep } from 'lodash';
-
-const INVALID_SQON_MISSING_INSTRUCTIONS = [{}];
-const INVALID_SQON_ZERO_INSTRUCTIONS = [{ 'instructions': [] }];
 
 
 describe( 'query helpers', () => {
 
-    it( 'should group queries by priorities', () => {
-        const unsortedSet = [ 4.1, 4.2, [3.2, 3.3], [3.1, [2.1, 2.2, [1]]], 4.3 ];
-        const sortedSet   = [ [ 1 ], [ 2.1, 2.2 ], [ 3.2, 3.3, 3.1 ], [ 4.1, 4.2, 4.3 ] ];
-        const results = groupByPriorities(unsortedSet);
-        expect( results ).to.eql( sortedSet )
+    it( 'should return NULL on invalid query', () => {
+        const INVALID_SQON_MISSING_INSTRUCTIONS = [{}];
+        const INVALID_SQON_ZERO_INSTRUCTIONS = [{ 'instructions': [] }];
+
+        expect( validate() ).to.eql( false )
+        expect( validate( {} ) ).to.eql( false )
+        expect( validate( [] ) ).to.eql( false )
+        expect( validate(INVALID_SQON_MISSING_INSTRUCTIONS) ).to.eql( false )
+        expect( validate(INVALID_SQON_ZERO_INSTRUCTIONS) ).to.eql( false )
     } )
 
+    /*
+    it( 'should group queries by priorities', () => {
+        const unsortedSet = [ 4.1, 4.2, [3.2, 3.3], [3.1, [2.1, 2.2, [1]]], 4.3 ]
+        const sortedSet   = [ [ 1 ], [ 2.1, 2.2 ], [ 3.2, 3.3, 3.1 ], [ 4.1, 4.2, 4.3 ] ]
+        const results = groupByPriorities(unsortedSet)
+        expect( results ).to.eql( sortedSet )
+    } )
+    */
+
+    /*
     it( 'should denormalize subqueries', () => {
         const queryA = {
             'key': 'A',
@@ -71,151 +82,120 @@ describe( 'query helpers', () => {
                 }
             ]
         };
-        const queryCDenormalized = cloneDeep(queryC);
-        queryCDenormalized.instructions[0] = queryA.instructions;
-        queryCDenormalized.instructions[2] = queryB.instructions;
-        const normalized = [ queryA, queryB, queryC ]
-        const denormalized = [ queryA, queryB, queryCDenormalized ]
-        const results = denormalizeSubqueries(normalized);
-        //expect( results ).to.eql( denormalized )
+        const queryCDenormalized = cloneDeep(queryC)
+        queryCDenormalized.instructions[0] = queryA.instructions
+        queryCDenormalized.instructions[2] = queryB.instructions
+        const normalized = cloneDeep([ queryA, queryB, queryC ])
+        const denormalized = cloneDeep([ queryA, queryB, queryCDenormalized ])
+        const results = cloneDeep([ queryA, queryB, queryC ])
+        const denormalizeQueries = denormalize(normalized)
+        results[0].instructions = denormalizeQueries[0]
+        results[1].instructions = denormalizeQueries[1]
+        results[2].instructions = denormalizeQueries[2]
+        expect( results ).to.eql( denormalized )
     } )
-
-
-
-
-
-
+    */
 
 } );
 
+describe( 'request generation', () => {
 
-
-describe( 'query structure validation', () => {
-
-    const instructions = [
-        {
-            "key": "50c8d3d0",
-            "title": "Query One",
-            "instructions": [
+    it( 'should return valid request', () => {
+        const statement = [{
+            'key': 'A',
+            'instructions': [
                 {
-                    "type": "filter",
-                    "data": {
-                        "id": "variant_type",
-                        "type": "generic",
-                        "operand": "all",
-                        "values": ["SNP"]
+                    'type': 'filter',
+                    'data': {
+                        'id': 'variant_type',
+                        'type': 'generic',
+                        'operand': 'all',
+                        'values': ['VARIANT_TYPE_1', 'VARIANT_TYPE_2']
                     }
                 },
                 {
-                    "type": "operator",
-                    "data": {
-                        "type": "and not"
+                    'type': 'operator',
+                    'data': {
+                        'type': 'and'
                     }
                 },
                 {
-                    "type": "filter",
-                    "data": {
-                        "id": "variant_type",
-                        "type": "generic",
-                        "operand": "none",
-                        "values": ["DNP"]
+                    'type': 'filter',
+                    'data': {
+                        'id': 'gene_type',
+                        'type': 'generic',
+                        'operand': 'none',
+                        'values': ['GENE_TYPE_1']
+                    }
+                }
+            ]
+        }, {
+            'key': 'B',
+            'instructions': [
+                {
+                    'type': 'filter',
+                    'data': {
+                        'id': 'gene_type',
+                        'type': 'generic',
+                        'operand': 'one',
+                        'values': ['GENE_TYPE_2']
+                    }
+                },
+            ]
+        }, {
+            'key': 'C',
+            'instructions': [
+                {
+                    'type': 'subquery',
+                    'data': {
+                        'query': 'A'
+                    }
+                },
+                {
+                    'type': 'operator',
+                    'data': {
+                        'type': 'or'
+                    }
+                },
+                {
+                    'type': 'subquery',
+                    'data': {
+                        'query': 'B'
                     }
                 }
             ]
         },
-        [
-            [
-                {
-                    "key": "51c8d3d0",
-                    "title": "Query Five",
-                    "instructions": [
-                        {
-                            "type": "filter",
-                            "data": {
-                                "id": "variant_type",
-                                "type": "generic",
-                                "operand": "one",
-                                "values": ["SNP", "DNP"]
-                            }
-                        }
-                    ]
-                },
-            ]
-        ],
-        [
-            {
-                "key": "51c8d3d0",
-                "title": "Query Three",
-                "instructions": [
-                    {
-                        "type": "filter",
-                        "data": {
-                            "id": "variant_type",
-                            "type": "generic",
-                            "operand": "one",
-                            "values": ["SNP", "DNP"]
-                        }
-                    }
-                ]
-            },
-            {
-                "key": "51c8d3d0",
-                "title": "Query Four",
-                "instructions": [
-                    {
-                        "type": "filter",
-                        "data": {
-                            "id": "variant_type",
-                            "type": "generic",
-                            "operand": "one",
-                            "values": ["SNP", "DNP"]
-                        }
-                    }
-                ]
-            },
-        ],
         {
-            "key": "51c8d3d0",
-            "title": "Query Two",
-            "instructions": [
+            'key': 'D',
+            'instructions': [
                 {
-                    "type": "filter",
-                    "data": {
-                        "id": "variant_type",
-                        "type": "generic",
-                        "operand": "one",
-                        "values": ["SNP", "DNP"]
+                    'type': 'subquery',
+                    'data': {
+                        'query': 'C'
+                    }
+                },
+                {
+                    'type': 'operator',
+                    'data': {
+                        'type': 'and'
+                    }
+                },
+                {
+                    'type': 'subquery',
+                    'data': {
+                        'query': 'C'
                     }
                 }
             ]
         }
-    ]
+        ]
 
-
-    const BODY = {
-        from: 0,
-        size: 25,
-        query: {}
-    }
-
-
-
-
-
-
-
-
-/*
-
-    it( 'should return NULL on invalid query', () => {
-        expect( transform() ).to.eql( null )
-        expect( transform( {} ) ).to.eql( null )
-        expect( transform( [] ) ).to.eql( null )
-        //expect( transform(INVALID_SQON_MISSING_INSTRUCTIONS) ).to.eql( null )
-        //expect( transform(INVALID_SQON_ZERO_INSTRUCTIONS) ).to.eql( null )
+        const transformed = transform(statement, 3)
     } )
-*/
+
 } )
+
+
 
 /*
 const SINGLE_GENERIC_FILTER_ALL = [{
