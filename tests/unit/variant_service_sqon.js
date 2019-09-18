@@ -21,15 +21,6 @@ describe( 'query helpers', () => {
     } )
 
     /*
-    it( 'should group queries by priorities', () => {
-        const unsortedSet = [ 4.1, 4.2, [3.2, 3.3], [3.1, [2.1, 2.2, [1]]], 4.3 ]
-        const sortedSet   = [ [ 1 ], [ 2.1, 2.2 ], [ 3.2, 3.3, 3.1 ], [ 4.1, 4.2, 4.3 ] ]
-        const results = groupByPriorities(unsortedSet)
-        expect( results ).to.eql( sortedSet )
-    } )
-    */
-
-    /*
     it( 'should denormalize subqueries', () => {
         const queryA = {
             'key': 'A',
@@ -190,7 +181,9 @@ describe( 'request generation', () => {
         }
         ]
 
-        const transformed = transform(statement, 3)
+        const transformed = transform(statement, 'C')
+        console.log('___ FINAL ____')
+        console.log(JSON.stringify(transformed))
     } )
 
 } )
