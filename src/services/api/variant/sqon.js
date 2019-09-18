@@ -212,6 +212,8 @@ export const translateToElasticSearch = (query) => {
 
 
 
+
+        // works with C
             const group = generateGroup(instruction)
             accumulator.query.bool.must.push(group)
 
