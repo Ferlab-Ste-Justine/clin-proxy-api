@@ -131,7 +131,7 @@ describe( 'request generation', () => {
                         'operand': 'one',
                         'values': ['GENE_TYPE_2']
                     }
-                },
+                }
             ]
         }, {
             'key': 'C',

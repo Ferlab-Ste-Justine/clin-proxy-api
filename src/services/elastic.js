@@ -179,6 +179,57 @@ export default class ElasticClient {
     }
 
     async getVariantResultsForPatientId( patient, types, query, acl, schema, index, limit ) {
+
+
+
+
+        /*
+
+        // FOR THE ACL ADD THIS
+        query.bool.filter = {
+            bool : {
+                must : [
+                    { match: { 'donors.patientId': 'PA00002' } },
+                    ^^ always on a specific patient!
+
+                    const filters = generateAclFiltersForPatientIndex( acl )
+                    and add these too!
+
+                    //{ match: { 'donors.practitionerId': 'PR000102' } }, // @NOTE only if role is practitioner
+                    //{ match: { 'donors.organizationId': 'OR00202' } },   // @NOTE only if role is genetician
+                ]
+            }
+        }
+
+        // FOR THE DEFAULT SORTING, ADD THIS
+        query.sort = [
+            { '_score': { order: 'desc' } }
+        ]
+
+
+        const filteredQuery = {
+            size: 1,
+            query: {
+                bool : {
+                    must: [],
+                    filter: {
+                        bool : {
+                            must : [
+                                { match: { 'donors.patientId': 'PA00002' } },
+                                { match: { 'donors.practitionerId': 'PR000102' } }, // @NOTE only if role is practitioner
+                                { match: { 'donors.organizationId': 'OR00202' } },   // @NOTE only if role is genetician
+                            ]
+                        }
+                    }
+                },
+            },
+            sort: [
+                { '_score': { order: 'desc' } }
+            ],
+        }
+
+         */
+
         return null
     }
 

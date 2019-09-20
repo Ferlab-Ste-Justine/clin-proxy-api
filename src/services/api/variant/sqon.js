@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { cloneDeep, isArray, isObject, filter, find, findIndex, merge, isNil, omit, set, get, some, pullAllBy, has, mergeWith } from 'lodash';
+import { cloneDeep, isArray, isObject, every, filter, find, findIndex, merge, isNil, omit, set, get, some, pullAllBy, has, mergeWith } from 'lodash';
 
 
 export const validate = (statement) => {
@@ -27,14 +27,30 @@ const getQueryByKey = (statement, key) => {
     return find( statement, { key } )
 }
 
+const findAllSubqueryInstructions = (instructions) => {
+    return filter(instructions, { type: 'subquery' })
+}
+
+const findAllOperatorInstructions = (instructions) => {
+    return filter(instructions, { type: 'operator' })
+}
+
+const findAllFilterInstructions = (instructions) => {
+    return filter(instructions, { type: 'filter' })
+}
+
+const hasSubqueries = (query) => {
+    const nested = findAllSubqueryInstructions(query.instructions)
+    return (nested && nested.length > 0)
+}
+
 export const denormalize = (statement = []) => {
     const denormalizeNestedQueries = (list) => {
         return list.forEach( ( item ) => {
-            const nested = filter(item.instructions, { type: 'subquery' })
-            if (nested.length) {
+            if (hasSubqueries(item)) {
                 let instructions = item.instructions.map( ( instruction ) => {
-                    return ( !instructionIsSubquery(instruction) ) ? instruction : getQueryByKey(statement, instruction.data.query).instructions
-                })
+                    return ( !instructionIsSubquery( instruction ) ) ? instruction : getQueryByKey( statement, instruction.data.query ).instructions
+                } )
                 item.instructions = instructions
             }
             denormalizedStatement.push(item)
@@ -46,13 +62,10 @@ export const denormalize = (statement = []) => {
     return denormalizedStatement
 }
 
-export const translateToElasticSearch = (query) => {
-    console.log('----- translateToElasticSearch -----');
-    console.log(query.instructions)
+export const translateToElasticSearch = ( denormalizedQuery ) => {
 
-
-    const getVerbFromOperator = (operator) => {
-        switch(operator) {
+    const getVerbFromOperator = ( operator ) => {
+        switch (operator) {
             default:
             case 'and':
                 return 'must'
@@ -63,8 +76,8 @@ export const translateToElasticSearch = (query) => {
         }
     }
 
-    const getVerbFromOperand = (operand) => {
-        switch(operand) {
+    const getVerbFromOperand = ( operand ) => {
+        switch (operand) {
             default:
             case 'all':
                 return 'must'
@@ -75,255 +88,133 @@ export const translateToElasticSearch = (query) => {
         }
     }
 
-    const getFieldNameFromSchema = (id, schema) => {
+    const getFieldNameFromSchema = ( id, schema ) => {
         return 'MAP_FIELD_' + id
     }
 
-    const getQueryFromGenericFilter = (instruction) => {
-        return instruction.data.values.reduce((accumulator, value) => {
-            accumulator.push({ match: { [getFieldNameFromSchema(instruction.data.id)]: value } })
-            return accumulator
-        }, [])
-    }
-
-
-    console.log(JSON.stringify(query))
-
-
-    /*
-    GET /mutations/_search
-    {
-        "size": 10,
-        "query": {
-            "bool": {
-            "must": {
-                "bool" : {
-                    "must": [ {
-                        "match": { "functionalAnnotations.impact":   "HIGH" }},
-                        { "match": { "chrom":   "1" }}]
-                }
-            },
-            "should": { "match" : {"functionalAnnotations.consequence" : "upstream_gene_variant"} } ,
-            "must_not": [ { "match": { "type":   "SNV" }} ],
-                "filter": {
-                "bool" : {
-                    "must" : [
-                        { "match": { "donors.patientId":   "PA00002" }}
-                    ]
-                }
-            }
-        }
-    }
-    }
-    */
-
-    console.log('..... translating .....');
-
-    const paths = {
-        must: [],
-        should: [],
-        must_not: [],
-        filter: ['must']
-    }
-
-    const filteredQuery = {
-        size: 1,
-        query: {
-            bool : {
-                must: [],
-                filter: {
-                    bool : {
-                        must : [
-                            { match: { 'donors.patientId': 'PA00002' } },
-                            { match: { 'donors.practitionerId': 'PR000102' } }, // @NOTE only if role is practitioner
-                            { match: { 'donors.organizationId': 'OR00202' } },   // @NOTE only if role is genetician
-                        ]
-                    }
-                }
-            },
-        },
-        sort: [
-            { '_score': { order: 'desc' } }
-        ],
-    }
-
-    /*
-    const operator = find( query.instructions, { type: 'operator' } ) || { type: 'operator', data: { type: 'and' } }
-    const verb = getVerbFromOperator(operator)
-    paths[verb].push(verb)
-    filteredQuery.query.bool[verb] = []
-    */
-
-    const generateGroup = (instructions) => {
-        const groupOperator = find( instructions, { type: 'operator' } ) || { type: 'operator', data: { type: 'and' } }
-        const groupVerb = getVerbFromOperator(groupOperator.type)
-
-
-
-        console.log('===check');
-        console.log(instructions)
-
-
-        return filter(instructions, { type: 'filter' }).reduce((accumulator, filterInstruction) => {
-
-
-            console.log('Starting FROM')
-            console.log(JSON.stringify(filterInstruction))
-
-            // @NOTE Filter Type Logic
-            switch (filterInstruction.data.type) {
-                default:
-
-                case 'generic':
-                    const operandVerb = getVerbFromOperand(filterInstruction.data.operand)
-                        const path = [groupVerb, 'bool', operandVerb]
-                        if (!has(accumulator.bool, path)) {
-                            set(accumulator.bool, path, [])
-                        }
-                        filterInstruction.data.values.forEach((value) => {
-                            accumulator.bool[groupVerb].bool[operandVerb].push({ match: value })
-                        })
-                    break;
-            }
-
-            console.log('Converted TO')
-            console.log(JSON.stringify(accumulator))
-
-            return accumulator
-        }, {
-            bool: {}
-        })
-    }
-
-    if (!isArray(query.instructions[0])) {
-        query.instructions = [ query.instructions ]
-    }
-
-    return query.instructions.reduce((accumulator, instruction) => {
-
-
-
-
-        //let group = {};
-
-       // if (!isArray(instruction)) {
-       //     instruction = [ instruction ]
-       // }
-
-
-
-
-        // works with C
-            const group = generateGroup(instruction)
-            accumulator.query.bool.must.push(group)
-
-
-
-        /*
-            const innerGroupOperator = find( instruction, { type: 'operator' } ) || { type: 'operator', data: { type: 'and' } }
-            const innerGroupVerb = getVerbFromOperator(innerGroupOperator.type)
-
-            const path = ['bool', 'bool', operandVerb]
-            if (!has(accumulator.bool, path)) {
-                set(accumulator.bool, path, [])
-            }
-
-
-
-            console.log('== innerGroupOperator')
-            console.log(innerGroupOperator)
-
-
-            instruction.forEach((innerOperation) => {
-
-                accumulator.query.bool.must.push(group)
-
-
-
-            })
-        }
-*/
-
-
-        //console.log(JSON.stringify(accumulator));
-
-
-        return accumulator
-
-
-
-                // {"bool":{"must":[{"match":"VARIANT_TYPE_1"},{"match":"VARIANT_TYPE_2"}]}}
-
-
-
-                // bool: { [groupVerb]: [ {match} ]
-
-
-
-                //query.bool[eval(paths[verb].join('.'))] = group
-
-
-
-        /*
-
-        if ( !instructionIsOperator(instruction.type) ) {
-            console.log('---  Query Step - Not Operator ---');
-            console.log(instruction.type)
-            console.log(JSON.stringify(instruction))
-
-            const group = generateGroup(instruction)
-
-            console.log('--- GROUP RESULT === ')
-            console.log(group)
-        } else {
-            console.log('---  Query Step - IS Operator ---');
-        }
-*/
-
-
-
-        //console.log(paths)
-        //console.log(filteredQuery)
-
-        //if (!isArray(instruction)) {
-        //    instruction = [instruction]
-       // }
-
-      // if (isArray(instruction)) {
-
-           //const nestedOperator = find( instruction.instructions, { type: 'operator' } ) || { type: 'operator', data: { type: 'and' } }
-           //const nestedVerb = getVerbFromOperator(nestedOperator)
-
-
-           /*
-
-            paths[nestedVerb].push(nestedVerb, 'bool')
-            const newNestedFilter = filter(instruction, { type: 'filter' }).reduce((nestedAccumulator, nestedInstruction) => {
-                const newNestedInstruction = getQueryFromGenericFilter(nestedInstruction)
-                return [...nestedAccumulator, ...newNestedInstruction]
+    const mapPartFromFilter = (filter, fieldId) => {
+        const operand = filter.data.operand;
+        const verb = getVerbFromOperand(operand);
+        return {
+            [verb]: filter.data.values.reduce((accumulator, value) => {
+                const fieldName = getFieldNameFromSchema(fieldId)
+                accumulator.push( { match : { [fieldName]: value } } )
+                return accumulator;
             }, [])
+        }
+    }
 
-*/
-           /*
-            const current = get(accumulator, paths[nestedVerb]) || []
-            console.log('dddd ++++')
-            console.log(paths[nestedVerb])
-            console.log(current)
-            console.log('newNestedFilter ++++')
-            console.log(newNestedFilter)
-            set( accumulator, paths[nestedVerb], [...current, ...newNestedFilter] )
-*/
+    const mapPartFromComposite = (operator, bools) => {
+        const type = operator.data.type;
+        const verb = getVerbFromOperand(type);
+        return {
+            [verb]: bools.reduce((accumulator, bool) => {
+                accumulator.push( [ bool ] )
+                return accumulator;
+            }, [])
+        }
+    }
 
-       // } else if (instruction.type === 'filter') {
-         //   const newFilter = getQueryFromGenericFilter(instruction)
-       //     const current = get(accumulator, ['query', 'bool', verb, 'bool']) || []
-         //   set( accumulator, paths[verb], [...current, ...newFilter] )
-       // }
-        //return accumulator
-    }, filteredQuery )
+    const mapInstructions = ( instructions ) => {
+
+        console.log(' -- instructions -- needs tobe an array always! it is ' + isArray(instructions))
+
+        const isFilterOnly = ( !isArray( instructions[0] ) && Object.keys(instructions).length === 1 )
+        const instructionsLength = instructions.length || 0
+        const isComposite = ( instructionsLength === 1 && isArray( instructions[ 0 ] ) )
+        const isMultiComposite = ( instructionsLength > 1 )
+        //const isFilterGroup = ( isMultiComposite && isObject( instructions[ 0 ] ) )
+
+        console.log('isFilterOnly ' + isFilterOnly)
+        console.log('isComposite ' + isComposite)
+
+        if (isComposite || isMultiComposite) {
+
+            const operators = findAllOperatorInstructions(instructions[0])
+            console.log('operators?')
+            console.log(operators)
+            if (operators.length > 0) {
+
+                /*
+                if (isFilterGroup) {
+                    console.log('ding the funk')
+                    return mapInstructions(  [instructions] )
+                }
+                */
+
+
+                const composites = instructions[0].reduce((accumulator, composite) => {
+                    if (!instructionIsOperator(composite)) {
+                        console.log('==_+_+_')
+                        console.log(composite)
+
+                        const part = mapInstructions( [composite] )
+
+                        console.log( part )
+
+                        accumulator.push( part )
+                    }
+
+                    return accumulator
+                }, [])
+
+                console.log('beaitufl accu')
+                console.log(composites)
+
+                return mapPartFromComposite( operators[0], composites )
+            }
+
+        } else if (isFilterOnly) {
+
+
+            const instruction = instructions[0]
+            if (instructionIsFilter( instruction )) {
+                return mapPartFromFilter( instruction, 'variant_type' )
+            }
+
+
+        }
+
+        return {};
+    }
+
+
+
+
+    // should we wrap an array
+    /*
+    let yesOrNo = false
+    instructions.forEach((instruction) => {
+
+        if () {
+
+        }
+
+    })
+
+
+    if (every(denormalizedQuery.instructions, Object)) {
+
+        if (Object.keys(denormalizedQuery.instructions).length > 1) {
+            console.log('FUCKING DERNORMALIXKEJKH')
+
+            denormalizedQuery.instructions = [ denormalizedQuery.instructions ]
+        }
+    }*/
+
+
+
+
+
+    console.log('\n\n\n\n\n\n\n\ndenormalzied -===0-i9uog')
+    console.log(every(denormalizedQuery.instructions, isObject))
+    console.log(JSON.stringify(denormalizedQuery.instructions))
+
+    const translation = mapInstructions( denormalizedQuery.instructions );
+    return { query: { bool : translation } }
 }
 
-const translate = (statement, queryKey) => {
+const translate = (statement, queryKey, dialect = 'es') => {
     if (!isArray(statement)) {
         statement = [ statement ]
     }
@@ -336,7 +227,80 @@ const translate = (statement, queryKey) => {
     const denormalizedStatement = denormalize(statement)
     const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
 
-    return translateToElasticSearch(denormalizedQuery);
+    console.log('+++++ denormalizedQuery');
+    console.log(denormalizedQuery)
+
+
+
+
+
+
+
+
+    if (dialect === 'es') {
+        return translateToElasticSearch( denormalizedQuery );
+    }
+
+    return null;
 }
 
 export default translate
+
+
+
+
+
+/*
+
+    const filteredQuery = {
+    size: 1,
+    query: {
+        bool : {
+            must: [],
+            filter: {
+                bool : {
+                    must : [
+                        { match: { 'donors.patientId': 'PA00002' } },
+                        { match: { 'donors.practitionerId': 'PR000102' } }, // @NOTE only if role is practitioner
+                        { match: { 'donors.organizationId': 'OR00202' } },   // @NOTE only if role is genetician
+                    ]
+                }
+            }
+        },
+    },
+    sort: [
+        { '_score': { order: 'desc' } }
+    ],
+}
+
+
+GET /mutations/_search
+{
+    "size": 10,
+    "query": {
+        "bool": {
+        "must": {
+            "bool" : {
+                "must": [ {
+                    "match": { "functionalAnnotations.impact":   "HIGH" }},
+                    { "match": { "chrom":   "1" }}]
+            }
+        },
+        "should": { "match" : {"functionalAnnotations.consequence" : "upstream_gene_variant"} } ,
+        "must_not": [ { "match": { "type":   "SNV" }} ],
+            "filter": {
+            "bool" : {
+                "must" : [
+                    { "match": { "donors.patientId":   "PA00002" }}
+                ]
+            }
+        }
+    }
+}
+}
+*/
+
+
+
+
+
