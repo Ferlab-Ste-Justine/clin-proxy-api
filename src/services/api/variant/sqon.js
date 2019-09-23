@@ -105,8 +105,16 @@ export const translateToElasticSearch = ( denormalizedQuery ) => {
     }
 
     const mapPartFromComposite = (operator, bools) => {
+
+        console.log('+++ mapPartFromComposite')
+
         const type = operator.data.type;
-        const verb = getVerbFromOperand(type);
+        const verb = getVerbFromOperator(type);
+
+        console.log(operator)
+        console.log('verb (' + type + ')' + verb)
+        console.log(bools)
+
         return {
             [verb]: bools.reduce((accumulator, bool) => {
                 accumulator.push( [ bool ] )
@@ -125,14 +133,22 @@ export const translateToElasticSearch = ( denormalizedQuery ) => {
         const isMultiComposite = ( instructionsLength > 1 )
         //const isFilterGroup = ( isMultiComposite && isObject( instructions[ 0 ] ) )
 
-        console.log('isFilterOnly ' + isFilterOnly)
-        console.log('isComposite ' + isComposite)
+        console.log('== isFilterOnly ' + isFilterOnly)
+        console.log('== isComposite ' + isComposite)
+        console.log('== isMultiComposite ' + isMultiComposite)
 
         if (isComposite || isMultiComposite) {
 
-            const operators = findAllOperatorInstructions(instructions[0])
-            console.log('operators?')
+            const operators = findAllOperatorInstructions(instructions)
+
+
+
+            console.log('operators on what?')
+            console.log(instructions)
             console.log(operators)
+
+
+
             if (operators.length > 0) {
 
                 /*
@@ -142,13 +158,17 @@ export const translateToElasticSearch = ( denormalizedQuery ) => {
                 }
                 */
 
-
-                const composites = instructions[0].reduce((accumulator, composite) => {
+                const composites = instructions.reduce((accumulator, composite) => {
                     if (!instructionIsOperator(composite)) {
-                        console.log('==_+_+_')
+                        console.log('==_+_+_ COMPOSITE')
                         console.log(composite)
 
-                        const part = mapInstructions( [composite] )
+
+                        if (!isArray(composite)) {
+                            composite = [composite]
+                        }
+
+                        const part = mapInstructions( composite )
 
                         console.log( part )
 
@@ -158,7 +178,7 @@ export const translateToElasticSearch = ( denormalizedQuery ) => {
                     return accumulator
                 }, [])
 
-                console.log('beaitufl accu')
+                console.log('the final composites')
                 console.log(composites)
 
                 return mapPartFromComposite( operators[0], composites )

@@ -181,7 +181,7 @@ describe( 'request generation', () => {
         }
         ]
 
-        const transformed = transform(statement, 'A')
+        const transformed = transform(statement, 'D')
         console.log('___ FINAL ____')
         console.log(JSON.stringify(transformed))
     } )
