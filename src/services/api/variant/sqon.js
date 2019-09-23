@@ -154,8 +154,6 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
 
     const translation = mapInstructions( denormalizedQuery.instructions )
 
-    console.log(JSON.stringify({ query: { bool: translation } }))
-
     return { query: { bool: translation } }
 }
 
