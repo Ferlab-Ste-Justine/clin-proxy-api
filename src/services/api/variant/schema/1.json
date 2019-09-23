@@ -41,17 +41,7 @@
         {
           "id": "chromosome",
           "label": "filter_chromosome",
-          "type": "generic",
-          "mapping": {
-            "index": "clin-mutation-centric",
-            "url": "/mutations/_search",
-            "field": "chrom"
-          },
-          "query": {
-            "size": 0,
-            "aggs": {
-            }
-          }
+          "type": "generic"
         }
       ]
     },

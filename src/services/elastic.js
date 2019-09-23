@@ -1,6 +1,5 @@
-/* eslint-disable */
 import rp from 'request-promise-native'
-import { filter, pullAllBy, flatten, find, map } from 'lodash'
+import { flatten, map } from 'lodash'
 
 
 const generateAclFiltersForPatientIndex = ( acl ) => {
@@ -132,136 +131,48 @@ export default class ElasticClient {
             }
         } )
     }
-    /* eslint-disable */
 
-
-
-
-
-
-    async getVariantAggregationForPatientId( uid, types, query, acl, schema ) {
+    async getVariantsForPatientId( patient, query, acl, schema, index, limit ) {
         const uri = `${this.host}${schema.path}`
         const schemaFilters = flatten(
-            map(schema.categories, 'filters')
-        );
+            map( schema.categories, 'filters' )
+        )
 
-        const aggs = types.reduce((accumulator, type) => {
-            const schemaFilter = find(schemaFilters, { id: type })
-            if (schemaFilter) {
-                return Object.assign(accumulator, { [type]: schemaFilter.facet });
-            }
-        }, {});
+        const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
+            return Object.assign( accumulator, { [ filter.id ]: filter.facet } )
+        }, {} )
 
-        const filters = generateAclFiltersForMutationIndex( acl )
-        filters.push( { match: { 'donors.patientId': uid } } )
+        const sort = [
+            { _score: { order: 'desc' } }
+        ]
 
-        // @TODO Add active query instructions to filters
-        // query
+        const filter = generateAclFiltersForMutationIndex( acl )
 
-        const body = {
-            size: 0,
+        filter.push( { match: { 'donors.patientId': patient } } )
+        query.bool.filter = filter
+
+
+        console.log( ' +++ BODY +++' )
+        console.log( JSON.stringify( {
+            from: index,
+            size: limit,
+            query,
             aggs,
-            query: {
-                bool: {
-                    must: [
-                        filters
-                    ]
-                }
-            }
-        }
+            sort
+        } ) )
 
         return rp( {
             method: 'GET',
             uri,
             json: true,
-            body
-        } );
-    }
-
-    async getVariantResultsForPatientId( patient, types, query, acl, schema, index, limit ) {
-
-
-
-
-        /*
-
-        // FOR THE ACL ADD THIS
-        query.bool.filter = {
-            bool : {
-                must : [
-                    { match: { 'donors.patientId': 'PA00002' } },
-                    ^^ always on a specific patient!
-
-                    const filters = generateAclFiltersForPatientIndex( acl )
-                    and add these too!
-
-                    //{ match: { 'donors.practitionerId': 'PR000102' } }, // @NOTE only if role is practitioner
-                    //{ match: { 'donors.organizationId': 'OR00202' } },   // @NOTE only if role is genetician
-                ]
+            body: {
+                from: index,
+                size: limit,
+                query,
+                aggs,
+                sort
             }
-        }
-
-        // FOR THE DEFAULT SORTING, ADD THIS
-        query.sort = [
-            { '_score': { order: 'desc' } }
-        ]
-
-
-        const filteredQuery = {
-            size: 1,
-            query: {
-                bool : {
-                    must: [],
-                    filter: {
-                        bool : {
-                            must : [
-                                { match: { 'donors.patientId': 'PA00002' } },
-                                { match: { 'donors.practitionerId': 'PR000102' } }, // @NOTE only if role is practitioner
-                                { match: { 'donors.organizationId': 'OR00202' } },   // @NOTE only if role is genetician
-                            ]
-                        }
-                    }
-                },
-            },
-            sort: [
-                { '_score': { order: 'desc' } }
-            ],
-        }
-
-         */
-
-        return null
+        } )
     }
-
-
-/*
-    GET /variants/_search
-{
-    "size": 0,
-    "aggs" : {
-        "chromosome" : {
-            "terms" : {
-                "field" : "chrom.keyword"
-            }
-        },
-        "variant_type" : {
-            "terms" : {
-                "field" : "type.keyword"
-            }
-        }
-    },
-
-    "query": {
-        "bool": {
-            "must": [
-                { "match": { "donor.patientId":   "PA00002" }}
-                ]
-        }
-    }
-
-}
-*/
-
-
 
 }

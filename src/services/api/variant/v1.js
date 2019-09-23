@@ -1,7 +1,8 @@
-/* eslint-disable */
-
 import errors from 'restify-errors'
 import { readFileSync } from 'fs'
+
+import translate from 'sqon'
+
 
 const schema = JSON.parse( readFileSync( `${__dirname}/schema/1.json`, 'utf8' ) )
 
@@ -19,29 +20,27 @@ const getSchema = async ( logService ) => {
     }
 }
 
-const getFilters = async ( req, res, cacheService, elasticService, logService ) => {
+const getVariants = async ( req, res, cacheService, elasticService, logService ) => {
     try {
-        //const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.body
-        //const patient = params.patient
-        //const filters = params.filters
-        //const query = params.query || null
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const params = req.query || req.params
+        const patient = params.patient
+        const statement = params.statement || null
+        const queryKey = params.queryKey || null
+        const limit = params.size || 25
+        const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
+        const translatedQuery = translate( statement, queryKey, 'es', schema )
 
-        console.log(params)
+        const response = await elasticService.getVariantsForPatientId( patient, translatedQuery, sessionData.acl.fhir, schema, index, limit )
 
-
-        const patient = 'PA00002';
-        const filters = ['variant_type', 'gene_type'];
-        const query = {};
-        const sessionData = { acl: { fhir: { role: 'administrator' } }};
-
+        console.log( response )
 
 
+        if ( response.hits.total < 1 ) {
+            return new errors.NotFoundError()
+        }
 
-
-
-
-        const response = await elasticService.getVariantAggregationForPatientId( patient, filters, query, sessionData.acl.fhir, schema )
+        /*
         const hits = []
         let total = 0;
         Object.keys(response.aggregations).map((filter) => {
@@ -54,51 +53,23 @@ const getFilters = async ( req, res, cacheService, elasticService, logService ) 
                 results
             })
         })
+        */
 
-        await logService.debug( `Elastic getVariantAggregationForPatientId using ${filters} returns ${total} matches` )
-        return {
-            total,
-            hits
-        }
-    } catch ( e ) {
-        await logService.warning( `Elastic getVariantAggregationForPatientId ${e.toString()}` )
-        return new errors.InternalServerError()
-    }
-}
-
-const getVariants = async ( req, res, cacheService, elasticService, logService ) => {
-    try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params
-        const patient = params.patient
-        const variant = params.variant
-        const query = params.query || null
-        const limit = params.size || 25
-        const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const response = await elasticService.getVariantResultsForPatientId( patient, variant, query, sessionData.acl.fhir, schema, index, limit )
-
-        if ( response.hits.total < 1 ) {
-            return new errors.NotFoundError()
-        }
-
-        await logService.debug( `Elastic getVariantResultsForPatientId using ${variant}/${patient}/${query} [${index},${limit}] returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic getVariantsForPatientId using ${patient}/${queryKey} [${index},${limit}] returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
             hits: response.hits.hits
         }
     } catch ( e ) {
-        await logService.warning( `Elastic getVariantResultsForPatientId ${e.toString()}` )
+        await logService.warning( `Elastic getVariantsForPatientId ${e.toString()}` )
         return new errors.InternalServerError()
     }
 }
 
 export default {
     getSchema,
-    getFilters,
-    getVariants,
+    getVariants
 }
-
-
 
 
 /*

@@ -91,71 +91,70 @@ describe( 'query helpers', () => {
 
 describe( 'request generation', () => {
 
-    it( 'should return valid request', () => {
-        const statement = [{
-            'key': 'A',
-            'instructions': [
-                {
-                    'type': 'filter',
-                    'data': {
-                        'id': 'variant_type',
-                        'type': 'generic',
-                        'operand': 'all',
-                        'values': ['VARIANT_TYPE_1', 'VARIANT_TYPE_2']
-                    }
-                },
-                {
-                    'type': 'operator',
-                    'data': {
-                        'type': 'and'
-                    }
-                },
-                {
-                    'type': 'filter',
-                    'data': {
-                        'id': 'gene_type',
-                        'type': 'generic',
-                        'operand': 'none',
-                        'values': ['GENE_TYPE_1']
-                    }
+    const statement = [{
+        'key': 'A',
+        'instructions': [
+            {
+                'type': 'filter',
+                'data': {
+                    'id': 'variant_type',
+                    'type': 'generic',
+                    'operand': 'all',
+                    'values': ['VARIANT_TYPE_1', 'VARIANT_TYPE_2']
                 }
-            ]
-        }, {
-            'key': 'B',
-            'instructions': [
-                {
-                    'type': 'filter',
-                    'data': {
-                        'id': 'gene_type',
-                        'type': 'generic',
-                        'operand': 'one',
-                        'values': ['GENE_TYPE_2']
-                    }
+            },
+            {
+                'type': 'operator',
+                'data': {
+                    'type': 'and'
                 }
-            ]
-        }, {
-            'key': 'C',
-            'instructions': [
-                {
-                    'type': 'subquery',
-                    'data': {
-                        'query': 'A'
-                    }
-                },
-                {
-                    'type': 'operator',
-                    'data': {
-                        'type': 'or'
-                    }
-                },
-                {
-                    'type': 'subquery',
-                    'data': {
-                        'query': 'B'
-                    }
+            },
+            {
+                'type': 'filter',
+                'data': {
+                    'id': 'gene_type',
+                    'type': 'generic',
+                    'operand': 'none',
+                    'values': ['GENE_TYPE_1']
                 }
-            ]
-        },
+            }
+        ]
+    }, {
+        'key': 'B',
+        'instructions': [
+            {
+                'type': 'filter',
+                'data': {
+                    'id': 'gene_type',
+                    'type': 'generic',
+                    'operand': 'one',
+                    'values': ['GENE_TYPE_2']
+                }
+            }
+        ]
+    }, {
+        'key': 'C',
+        'instructions': [
+            {
+                'type': 'subquery',
+                'data': {
+                    'query': 'A'
+                }
+            },
+            {
+                'type': 'operator',
+                'data': {
+                    'type': 'or'
+                }
+            },
+            {
+                'type': 'subquery',
+                'data': {
+                    'query': 'B'
+                }
+            }
+        ]
+    },
         {
             'key': 'D',
             'instructions': [
@@ -179,11 +178,31 @@ describe( 'request generation', () => {
                 }
             ]
         }
-        ]
+    ]
 
-        const transformed = transform(statement, 'D')
-        console.log('___ FINAL ____')
-        console.log(JSON.stringify(transformed))
+    it( 'should return request from a single instruction query', () => {
+        expect( transform(statement, 'B') ).to.eql('[{"type":"filter","data":{"id":"gene_type","type":"generic","operand":"one","values":["GENE_TYPE_2"]}}]{"query":{"bool":{"should":[{"match":{"MAP_FIELD_variant_type":"GENE_TYPE_2"}}]}}}')
+    } )
+
+
+    it( 'should return request from a simple multi-instruction query', () => {
+
+        console.log('HELLO A')
+        console.log( JSON.stringify(transform(statement, 'A')) )
+
+
+        //expect( transform(statement, 'A') ).to.eql('')
+
+
+        //const transformedA = transform(statement, 'A')
+        //const transformedB = transform(statement, 'B')
+        //const transformedC = transform(statement, 'C')
+        //const transformedD = transform(statement, 'D')
+
+
+
+
+
     } )
 
 } )
