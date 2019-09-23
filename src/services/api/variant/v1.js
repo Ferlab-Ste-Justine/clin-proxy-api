@@ -1,7 +1,7 @@
 import errors from 'restify-errors'
 import { readFileSync } from 'fs'
 
-import translate from 'sqon'
+import translate from './sqon'
 
 
 const schema = JSON.parse( readFileSync( `${__dirname}/schema/1.json`, 'utf8' ) )
@@ -23,42 +23,76 @@ const getSchema = async ( logService ) => {
 const getVariants = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params
-        const patient = params.patient
-        const statement = params.statement || null
-        const queryKey = params.queryKey || null
+        const params = req.query || req.params || req.body
+        // const patient = params.patient
+        // const statement = params.statement || null
+        // const query = params.query || null
+        const group = params.group || null
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const translatedQuery = translate( statement, queryKey, 'es', schema )
 
-        const response = await elasticService.getVariantsForPatientId( patient, translatedQuery, sessionData.acl.fhir, schema, index, limit )
 
-        console.log( response )
+        const TEST = {
+            patient: 'PA00002',
+            statement: [
+                {
+                    key: 'A',
+                    instructions: [
+                        {
+                            type: 'filter',
+                            data: {
+                                id: 'variant_type',
+                                type: 'generic',
+                                operand: 'all',
+                                values: [ 'SNV' ]
+                            }
+                        },
+                        {
+                            type: 'operator',
+                            data: {
+                                type: 'or'
+                            }
+                        },
+                        {
+                            type: 'filter',
+                            data: {
+                                id: 'variant_type',
+                                type: 'generic',
+                                operand: 'all',
+                                values: [ 'SNV' ]
+                            }
+                        }
+                    ]
+                }
+            ],
+            query: 'A'
+        }
 
+        const patient = TEST.patient
+        const statement = TEST.statement
+        const query = TEST.query
+
+        const translatedQuery = translate( statement, query, 'es', schema )
+        const response = await elasticService.getVariantsForPatientId( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
         }
 
-        /*
-        const hits = []
-        let total = 0;
-        Object.keys(response.aggregations).map((filter) => {
-            const results = response.aggregations[filter].buckets.reduce((accumulator, bucket) => {
-                total += bucket.doc_count
-                return [...accumulator, { value: bucket.key, total: bucket.doc_count }]
-            }, [])
-            hits.push({
-                filter,
-                results
-            })
-        })
-        */
+        const aggs = Object.keys( response.aggregations ).map( ( aggregation ) => {
+            return response.aggregations[ aggregation ].buckets.reduce( ( accumulator, bucket ) => {
+                return [ ...accumulator, { value: bucket.key, total: bucket.doc_count } ]
+            }, [] )
+        } )
+
+        console.log(aggs)
+
 
         await logService.debug( `Elastic getVariantsForPatientId using ${patient}/${queryKey} [${index},${limit}] returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
-            hits: response.hits.hits
+            hits: response.hits.hits,
+            aggs
         }
     } catch ( e ) {
         await logService.warning( `Elastic getVariantsForPatientId ${e.toString()}` )

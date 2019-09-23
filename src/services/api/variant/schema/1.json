@@ -15,7 +15,7 @@
           "id": "variant_type",
           "label": "filter_variant_type",
           "type": "generic",
-          "search": "type.keyword",
+          "search": "type",
           "facet": {
             "terms" : {
               "field" : "type.keyword",

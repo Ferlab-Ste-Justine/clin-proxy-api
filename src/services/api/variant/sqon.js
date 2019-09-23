@@ -88,13 +88,9 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
     }
 
     const getFieldNameFromSchema = ( id ) => {
-        return flattenedSchema.filter( ( accumulator, schemaFilters ) => {
-            const schemaFilter = find( schemaFilters, { id } )
+        const schemaFilter = find( flattenedSchema, { id } )
 
-            if ( schemaFilter ) {
-                return schemaFilter.search
-            }
-        } )
+        return schemaFilter.search
     }
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
@@ -117,7 +113,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
 
         return {
             [ verb ]: bools.reduce( ( accumulator, bool ) => {
-                accumulator.push( [ bool ] )
+                accumulator.push( { bool: bool } )
                 return accumulator
             }, [] )
         }
@@ -149,7 +145,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
             const instruction = instructions[ 0 ]
 
             if ( instructionIsFilter( instruction ) ) {
-                return mapPartFromFilter( instruction, 'variant_type' )
+                return mapPartFromFilter( instruction, instruction.data.id )
             }
         }
 
@@ -157,6 +153,8 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
     }
 
     const translation = mapInstructions( denormalizedQuery.instructions )
+
+    console.log(JSON.stringify({ query: { bool: translation } }))
 
     return { query: { bool: translation } }
 }

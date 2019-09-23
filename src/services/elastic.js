@@ -132,7 +132,7 @@ export default class ElasticClient {
         } )
     }
 
-    async getVariantsForPatientId( patient, query, acl, schema, index, limit ) {
+    async getVariantsForPatientId( patient, request, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}`
         const schemaFilters = flatten(
             map( schema.categories, 'filters' )
@@ -143,22 +143,27 @@ export default class ElasticClient {
         }, {} )
 
         const sort = [
-            { _score: { order: 'desc' } }
+            schema.groups[ ( !group ? schema.defaultGroup : group ) ]
         ]
 
         const filter = generateAclFiltersForMutationIndex( acl )
 
         filter.push( { match: { 'donors.patientId': patient } } )
-        query.bool.filter = filter
+        request.query.bool.filter = filter
 
 
         console.log( ' +++ BODY +++' )
         console.log( JSON.stringify( {
-            from: index,
-            size: limit,
-            query,
-            aggs,
-            sort
+            method: 'GET',
+            uri,
+            json: true,
+            body: {
+                from: index,
+                size: limit,
+                query: request.query,
+                aggs,
+                sort
+            }
         } ) )
 
         return rp( {
@@ -168,7 +173,7 @@ export default class ElasticClient {
             body: {
                 from: index,
                 size: limit,
-                query,
+                query: request.query,
                 aggs,
                 sort
             }

@@ -6,7 +6,7 @@ import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
-import validators from '../helpers/validators'
+// import validators from '../helpers/validators'
 import restifyAsyncWrap from '../helpers/async'
 
 
