@@ -1,4 +1,30 @@
 import rp from 'request-promise-native'
+import { flatten, map } from 'lodash'
+
+
+// @TODO ACL field logic should be moved to versioned route
+const generateAclFiltersForPatientIndex = ( acl ) => {
+    const filters = []
+
+    if ( acl.role === 'practitioner' ) {
+        filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
+    } else if ( acl.role === 'genetician' ) {
+        filters.push( { match: { 'organization.id': acl.organization_id } } )
+    }
+    return filters
+}
+
+// @TODO ACL field logic should be moved to versioned route
+const generateAclFiltersForMutationIndex = ( acl ) => {
+    const filters = []
+
+    if ( acl.role === 'practitioner' ) {
+        filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
+    } else if ( acl.role === 'genetician' ) {
+        filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
+    }
+    return filters
+}
 
 
 export default class ElasticClient {
@@ -15,26 +41,14 @@ export default class ElasticClient {
         } )
     }
 
-    generateAcl( acl ) {
-        const filters = []
-
-        if ( acl.role === 'practitioner' ) {
-            filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
-        } else if ( acl.role === 'genetician' ) {
-            filters.push( { match: { 'organization.id': acl.organization_id } } )
-        }
-
-        return filters
-    }
-
-
     async getPatientById( uid, acl ) {
-        const filters = this.generateAcl( acl )
+        const uri = `${this.host}/patient/_search`
+        const filters = generateAclFiltersForPatientIndex( acl )
 
         filters.push( { match: { id: uid } } )
         return rp( {
             method: 'GET',
-            uri: `${this.host}/patient/_search`,
+            uri,
             json: true,
             body: {
                 query: {
@@ -47,9 +61,11 @@ export default class ElasticClient {
     }
 
     async getPatientsByAutoComplete( type, query, acl, index, limit ) {
-        const filters = this.generateAcl( acl )
+        const uri = `${this.host}/patient/_search`
+        const filters = generateAclFiltersForPatientIndex( acl )
         const includes = []
 
+        // @TODO Field logic should be moved to versioned route
         if ( type === 'partial' ) {
             includes.push(
                 'id',
@@ -65,7 +81,7 @@ export default class ElasticClient {
 
         return rp( {
             method: 'GET',
-            uri: `${this.host}/patient/_search`,
+            uri,
             json: true,
             body: {
                 from: index,
@@ -99,11 +115,12 @@ export default class ElasticClient {
     }
 
     async searchPatients( acl, index, limit ) {
-        const filters = this.generateAcl( acl )
+        const uri = `${this.host}/patient/_search`
+        const filters = generateAclFiltersForPatientIndex( acl )
 
         return rp( {
             method: 'GET',
-            uri: `${this.host}/patient/_search`,
+            uri,
             json: true,
             body: {
                 from: index,
@@ -117,39 +134,49 @@ export default class ElasticClient {
         } )
     }
 
-    async countVariantsForFiltersByPatientId( uid, filters, acl ) {
-        const aclFilters = this.generateAcl( acl )
-        const uri = `${this.host}/variant/_search`
+    async getVariantsForPatientId( patient, request, acl, schema, group, index, limit ) {
+        const uri = `${this.host}${schema.path}`
+        const schemaFilters = flatten(
+            map( schema.categories, 'filters' )
+        )
 
-        aclFilters.push( { match: { id: uid } } )
+        const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
+            return Object.assign( accumulator, { [ filter.id ]: filter.facet } )
+        }, {} )
+
+        const sort = [
+            schema.groups[ ( !group ? schema.defaultGroup : group ) ]
+        ]
+
+        const filter = generateAclFiltersForMutationIndex( acl )
+
+        filter.push( { match: { 'donors.patientId': patient } } )
+        request.query.bool.filter = filter
+
+        console.log( ' +++ BODY +++' )
+        console.log( JSON.stringify( {
+            method: 'GET',
+            uri,
+            json: true,
+            body: {
+                from: index,
+                size: limit,
+                query: request.query,
+                aggs,
+                sort
+            }
+        } ) )
+
         return rp( {
             method: 'GET',
             uri,
             json: true,
             body: {
-                query: {
-                    bool: {
-                        must: aclFilters
-                    }
-                }
-            }
-        } )
-    }
-
-    async getVariantsByPatientId( uid, acl ) {
-        const filters = this.generateAcl( acl )
-
-        filters.push( { match: { id: uid } } )
-        return rp( {
-            method: 'GET',
-            uri: `${this.host}/patient/_search`,
-            json: true,
-            body: {
-                query: {
-                    bool: {
-                        must: filters
-                    }
-                }
+                from: index,
+                size: limit,
+                query: request.query,
+                aggs,
+                sort
             }
         } )
     }

@@ -1,8 +1,14 @@
 import errors from 'restify-errors'
 import { readFileSync } from 'fs'
 
+import translate from './sqon'
+
 
 const schema = JSON.parse( readFileSync( `${__dirname}/schema/1.json`, 'utf8' ) )
+
+const getSessionDataFromToken = async ( token, cacheService ) => {
+    return await cacheService.read( token.uid )
+}
 
 const getSchema = async ( logService ) => {
     try {
@@ -14,77 +20,44 @@ const getSchema = async ( logService ) => {
     }
 }
 
-/* eslint-disable-next-line */
-const getFilterVariantsCountFromSqon = async ( req, res, cacheService, elasticService, logService ) => {
-    return new errors.NotImplementedError()
-}
+const getVariants = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const params = req.query || req.params || req.body
+        const patient = params.patient
+        const statement = params.statement
+        const query = params.query
+        const group = params.group || null
+        const limit = params.size || 25
+        const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
+        const translatedQuery = translate( statement, query, 'es', schema )
+        const response = await elasticService.getVariantsForPatientId( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
 
-/* eslint-disable-next-line */
-const getVariantsFromSqon = async ( req, res, cacheService, elasticService, logService ) => {
-    return new errors.NotImplementedError()
+        if ( response.hits.total < 1 ) {
+            return new errors.NotFoundError()
+        }
+
+        const facets = Object.keys( response.aggregations ).reduce( ( aggs, category ) => {
+            aggs[ category ] = response.aggregations[ category ].buckets.reduce( ( accumulator, bucket ) => {
+                return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+            }, [] )
+            return aggs
+        }, {} )
+
+        await logService.debug( `Elastic getVariantsForPatientId using ${patient}/${query} [${index},${limit}] found ${response.hits.total} matches` )
+
+        return {
+            total: response.hits.total,
+            hits: response.hits.hits,
+            facets
+        }
+    } catch ( e ) {
+        await logService.warning( `Elastic getVariantsForPatientId ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
 }
 
 export default {
     getSchema,
-    getVariantsFromSqon
+    getVariants
 }
-
-/*
-set size to 1 to get a document
-
-curl -XGET "http://localhost:9200/variants/_search" -H 'Content-Type: application/json' -d'
-{
-   "size": 0,
-   "aggs" : {
-       "text" : {
-           "terms" : {
-               "field" : "properties.functionalAnnotations.effet.keyword",
-               "order" : { "_count" : "asc" }
-           }
-       }
-   }
-}'
-
-curl -XGET "http://localhost:9200/variants/_search" -H 'Content-Type: application/json' -d'
-{
-   "size": 0,
-   "aggs" : {
-       "donor" : {
-           "terms" : {
-               "field" : "properties.donor.phenotypes.keyword",
-               "order" : { "_count": "asc" }
-           }
-       }
-   },
-   "query": {
-    "bool": {
-      "must": [
-        { "match": { "properties.chrom":   "1" }}
-      ]
-    }
-  }
-}'
-
-Kibana version:
-
-GET /variants/_search
-{
-   "size": 0,
-   "aggs" : {
-       "donor" : {
-           "terms" : {
-               "field" : "properties.donor.phenotypes.keyword",
-               "order" : { "_count": "asc" }
-           }
-       }
-   },
-   "query": {
-    "bool": {
-      "must": [
-        { "match": { "properties.chrom":   "1" }}
-      ]
-    }
-  }
-}
-
- */

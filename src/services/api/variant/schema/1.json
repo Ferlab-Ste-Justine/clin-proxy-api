@@ -1,5 +1,11 @@
 {
   "version": "1.0",
+  "index": "clin-mutation-centric",
+  "path": "/mutations/_search",
+  "groups": {
+    "impact" : { "impactScore": {"order" : "desc"}}
+  },
+  "defaultGroup": "impact",
   "categories": [
     {
       "id": "variant",
@@ -9,19 +15,11 @@
           "id": "variant_type",
           "label": "filter_variant_type",
           "type": "generic",
-          "mapping": {
-            "index": "clin-mutation-centric",
-            "url": "/mutations/_search",
-            "field": "properties.donor.type"
-          },
-          "query": {
-            "size": 0,
-            "aggs" : {
-              "keywords": {
-                "terms": {
-                  "field": "properties.type.keyword"
-                }
-              }
+          "search": "type",
+          "facet": {
+            "terms" : {
+              "field" : "type.keyword",
+              "order" : { "_count" : "desc" }
             }
           }
         },
@@ -43,17 +41,7 @@
         {
           "id": "chromosome",
           "label": "filter_chromosome",
-          "type": "generic",
-          "mapping": {
-            "index": "clin-mutation-centric",
-            "url": "/mutations/_search",
-            "field": "chrom"
-          },
-          "query": {
-            "size": 0,
-            "aggs": {
-            }
-          }
+          "type": "generic"
         }
       ]
     },
@@ -64,7 +52,14 @@
         {
           "id": "gene_type",
           "label": "filter_gene_type",
-          "type": "generic"
+          "type": "generic",
+          "search": "genes.biotype.keyword",
+          "facet": {
+            "terms" : {
+              "field" : "genes.biotype.keyword",
+              "order" : { "_count" : "desc" }
+            }
+          }
         }
       ]
     },

@@ -6,7 +6,7 @@ import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
-import validators from '../helpers/validators'
+// import validators from '../helpers/validators'
 import restifyAsyncWrap from '../helpers/async'
 
 
@@ -47,6 +47,7 @@ export default class VariantService extends ApiService {
         this.elasticService = new ElasticClient( this.config.elastic )
         const elasticPingResult = await this.elasticService.ping()
 
+        // @TODO We probably should also validate that the schema's index is healthy
         if ( !elasticPingResult.name ) {
             throw new Error( 'Elastic Search Client health check failed' )
         }
@@ -78,30 +79,13 @@ export default class VariantService extends ApiService {
 
         } ) )
 
-        // Register Schema Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/count`
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getFilterVariantsCountFromSqon' )( this.logService )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-
-        // Register Sqon Route
+        // Register Search Route
         this.instance.post( {
-            path: `${this.config.endpoint}/:sqon`,
-            validation: validators.byPatientId
+            path: `${this.config.endpoint}/search`
+            // @TODO validation: validators.variantSearch
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getVariantsFromSqon' )(
+                const response = await getFunctionForApiVersion( req.version, 'getVariants' )(
                     req,
                     res,
                     this.cacheService,
