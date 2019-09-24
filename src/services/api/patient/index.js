@@ -73,7 +73,8 @@ export default class PatientService extends ApiService {
             ]
         } ) )
 
-        // Register ALL searchPatients Route
+        // Register SOME searchPatients Route
+        // @TODO - need filters specifications
         this.instance.get( {
             path: `${this.config.endpoint}/search`
         }, restifyAsyncWrap( async( req, res, next ) => {
@@ -95,35 +96,12 @@ export default class PatientService extends ApiService {
 
         } ) )
 
-        // Register SOME searchPatients Route
-        // @TODO - need filters specifications
-        this.instance.post( {
-            path: `${this.config.endpoint}/search`
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'searchPatients' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.elasticService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getPatientsByAutoComplete Route
+        // Register searchPatientsByAutoComplete Route
         this.instance.get( {
             path: `${this.config.endpoint}/autocomplete`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getPatientsByAutoComplete' )(
+                const response = await getFunctionForApiVersion( req.version, 'searchPatientsByAutoComplete' )(
                     req,
                     res,
                     this.cacheService,
@@ -143,7 +121,7 @@ export default class PatientService extends ApiService {
         // Register getPatientById Route
         this.instance.get( {
             path: `${this.config.endpoint}/:uid`,
-            validation: validators.byPatientId
+            validation: validators.searchPatientByPatientId
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getPatientById' )(

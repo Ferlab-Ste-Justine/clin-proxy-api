@@ -31,7 +31,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const translatedQuery = translate( statement, query, 'es', schema )
-        const response = await elasticService.getVariantsForPatientId( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
+        const response = await elasticService.searchVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()

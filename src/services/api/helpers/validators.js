@@ -9,19 +9,21 @@ export default {
             } ).required()
         }
     },
-    byPatientId: {
+    searchPatientByPatientId: {
         schema: {
             params: Joi.object( {
                 uid: Joi.string().alphanum().min( 3 ).max( 32 ).required()
             } ).required()
         }
     },
-    byPatientIdAndObservationType: {
-        schema: {
-            params: Joi.object( {
-                uid: Joi.string().alphanum().min( 3 ).max( 32 ).required(),
-                type: Joi.string().valid( [ 'medical', 'phenotype' ] )
-            } ).required()
-        }
+    searchVariantsForPatientByQuery: {
+        body: Joi.object( {
+            patient: Joi.string().required(),
+            statement: Joi.array().required(),
+            query: Joi.string().required(),
+            group: Joi.string(),
+            index: Joi.number().integer().min( 0 ),
+            limit: Joi.number().integer().min( 1 ).max( 1000 )
+        } ).required()
     }
 }

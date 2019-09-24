@@ -6,7 +6,7 @@ import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
-// import validators from '../helpers/validators'
+import validators from '../helpers/validators'
 import restifyAsyncWrap from '../helpers/async'
 
 
@@ -81,8 +81,8 @@ export default class VariantService extends ApiService {
 
         // Register Search Route
         this.instance.post( {
-            path: `${this.config.endpoint}/search`
-            // @TODO validation: validators.variantSearch
+            path: `${this.config.endpoint}/search`,
+            validation: validators.searchVariantsForPatientByQuery
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getVariants' )(

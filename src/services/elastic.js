@@ -2,30 +2,27 @@ import rp from 'request-promise-native'
 import { flatten, map } from 'lodash'
 
 
-// @TODO ACL field logic should be moved to versioned route
-const generateAclFiltersForPatientIndex = ( acl ) => {
+const generateAclFilters = ( acl, index = 'patient' ) => {
     const filters = []
 
     if ( acl.role === 'practitioner' ) {
-        filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
+        if ( index === 'patient' ) {
+            filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
+        } else if ( index === 'mutation' ) {
+            filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
+        }
+
     } else if ( acl.role === 'genetician' ) {
-        filters.push( { match: { 'organization.id': acl.organization_id } } )
+        if ( index === 'patient' ) {
+            filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
+        } else if ( index === 'mutation' ) {
+            filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
+        }
+
     }
+
     return filters
 }
-
-// @TODO ACL field logic should be moved to versioned route
-const generateAclFiltersForMutationIndex = ( acl ) => {
-    const filters = []
-
-    if ( acl.role === 'practitioner' ) {
-        filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
-    } else if ( acl.role === 'genetician' ) {
-        filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
-    }
-    return filters
-}
-
 
 export default class ElasticClient {
 
@@ -41,100 +38,37 @@ export default class ElasticClient {
         } )
     }
 
-    async getPatientById( uid, acl ) {
+    async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
         const uri = `${this.host}/patient/_search`
-        const filters = generateAclFiltersForPatientIndex( acl )
-
-        filters.push( { match: { id: uid } } )
-        return rp( {
-            method: 'GET',
-            uri,
-            json: true,
-            body: {
-                query: {
-                    bool: {
-                        must: filters
-                    }
+        const aclFilters = generateAclFilters( acl, 'patient' )
+        const body = {
+            from: index,
+            size: limit,
+            query: {
+                bool: {
+                    must: filters.concat( aclFilters )
                 }
             }
-        } )
-    }
+        }
 
-    async getPatientsByAutoComplete( type, query, acl, index, limit ) {
-        const uri = `${this.host}/patient/_search`
-        const filters = generateAclFiltersForPatientIndex( acl )
-        const includes = []
+        if ( includes.length > 0 ) {
+            body._source = { includes }
+        }
 
-        // @TODO Field logic should be moved to versioned route
-        if ( type === 'partial' ) {
-            includes.push(
-                'id',
-                'familyId',
-                'specimens.id',
-                'identifier.MR',
-                'identifier.JHN',
-                'name.family',
-                'name.given',
-                'studies.title'
-            )
+        if ( shoulds.length > 0 ) {
+            body.query.bool.should = shoulds
+            body.query.bool.minimum_should_match = 1
         }
 
         return rp( {
             method: 'GET',
             uri,
             json: true,
-            body: {
-                from: index,
-                size: limit,
-                _source: { includes },
-                query: {
-                    bool: {
-                        must: filters,
-                        should: [
-                            { match_phrase_prefix: { id: query } },
-                            { match_phrase_prefix: { 'name.family': query } },
-                            { match_phrase_prefix: { 'name.given': query } },
-                            { match_phrase_prefix: { 'studies.title': query } },
-                            { match_phrase_prefix: { 'specimens.id': query } },
-                            { match_phrase_prefix: { 'identifier.MR': query } },
-                            { match_phrase_prefix: { 'identifier.JHN': query } },
-                            { match_phrase_prefix: { familyId: query } },
-                            { wildcard: { id: `*${query}` } },
-                            { wildcard: { 'identifier.MR': `*${query}` } },
-                            { wildcard: { 'identifier.MR': `*${query}` } },
-                            { wildcard: { 'identifier.JHN': `*${query}` } },
-                            { wildcard: { familyId: `*${query}` } },
-                            { fuzzy: { 'name.given': query } },
-                            { fuzzy: { 'name.family': query } }
-                        ],
-                        minimum_should_match: 1
-                    }
-                }
-            }
+            body
         } )
     }
 
-    async searchPatients( acl, index, limit ) {
-        const uri = `${this.host}/patient/_search`
-        const filters = generateAclFiltersForPatientIndex( acl )
-
-        return rp( {
-            method: 'GET',
-            uri,
-            json: true,
-            body: {
-                from: index,
-                size: limit,
-                query: {
-                    bool: {
-                        must: filters
-                    }
-                }
-            }
-        } )
-    }
-
-    async getVariantsForPatientId( patient, request, acl, schema, group, index, limit ) {
+    async searchVariantsForPatient( patient, request, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}`
         const schemaFilters = flatten(
             map( schema.categories, 'filters' )
@@ -148,24 +82,10 @@ export default class ElasticClient {
             schema.groups[ ( !group ? schema.defaultGroup : group ) ]
         ]
 
-        const filter = generateAclFiltersForMutationIndex( acl )
+        const filter = generateAclFilters( acl, 'mutation' )
 
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
-
-        console.log( ' +++ BODY +++' )
-        console.log( JSON.stringify( {
-            method: 'GET',
-            uri,
-            json: true,
-            body: {
-                from: index,
-                size: limit,
-                query: request.query,
-                aggs,
-                sort
-            }
-        } ) )
 
         return rp( {
             method: 'GET',
