@@ -26,7 +26,15 @@
         {
           "id": "consequence",
           "label": "filter_consequence",
-          "type": "generic"
+          "type": "generic",
+          "search": "consequences.consequence",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.consequence.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
           "id": "external",
@@ -36,12 +44,28 @@
         {
           "id": "impact",
           "label": "filter_impact",
-          "type": "generic"
+          "type": "generic",
+          "search": "consequences.impact",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.impact.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
           "id": "chromosome",
           "label": "filter_chromosome",
-          "type": "generic"
+          "type": "generic",
+          "search": "chrom",
+          "facet": {
+            "terms" : {
+              "field" : "chrom.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 24
+            }
+          }
         }
       ]
     },
@@ -53,11 +77,12 @@
           "id": "gene_type",
           "label": "filter_gene_type",
           "type": "generic",
-          "search": "genes.biotype.keyword",
+          "search": "genes.biotype",
           "facet": {
             "terms" : {
               "field" : "genes.biotype.keyword",
-              "order" : { "_count" : "desc" }
+              "order" : { "_count" : "desc" },
+              "size": 999
             }
           }
         }
@@ -111,7 +136,15 @@
         {
           "id": "transmission",
           "label": "filter_transmission",
-          "type": "generic"
+          "type": "generic",
+          "search": "donors.zygosity",
+          "facet": {
+            "terms" : {
+              "field" : "donors.zygosity.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 9
+            }
+          }
         }
       ]
     },
