@@ -47,6 +47,7 @@ export default class VariantService extends ApiService {
         this.elasticService = new ElasticClient( this.config.elastic )
         const elasticPingResult = await this.elasticService.ping()
 
+        // @TODO We probably should also validate that the schema's index is healthy
         if ( !elasticPingResult.name ) {
             throw new Error( 'Elastic Search Client health check failed' )
         }
@@ -78,7 +79,7 @@ export default class VariantService extends ApiService {
 
         } ) )
 
-        // Register Sqon Route
+        // Register Search Route
         this.instance.post( {
             path: `${this.config.endpoint}/search`
             // @TODO validation: validators.variantSearch

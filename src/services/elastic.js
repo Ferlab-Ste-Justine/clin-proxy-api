@@ -2,6 +2,7 @@ import rp from 'request-promise-native'
 import { flatten, map } from 'lodash'
 
 
+// @TODO ACL field logic should be moved to versioned route
 const generateAclFiltersForPatientIndex = ( acl ) => {
     const filters = []
 
@@ -13,6 +14,7 @@ const generateAclFiltersForPatientIndex = ( acl ) => {
     return filters
 }
 
+// @TODO ACL field logic should be moved to versioned route
 const generateAclFiltersForMutationIndex = ( acl ) => {
     const filters = []
 
@@ -150,7 +152,6 @@ export default class ElasticClient {
 
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
-
 
         console.log( ' +++ BODY +++' )
         console.log( JSON.stringify( {
