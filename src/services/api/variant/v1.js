@@ -44,7 +44,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
             return aggs
         }, {} )
 
-        await logService.debug( `Elastic getVariantsForPatientId using ${patient}/${query} [${index},${limit}] found ${response.hits.total} matches` )
+        await logService.debug( `Elastic searchVariantsForPatient using ${patient}/${query} [${index},${limit}] found ${response.hits.total} matches` )
 
         return {
             total: response.hits.total,
@@ -52,7 +52,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
             facets
         }
     } catch ( e ) {
-        await logService.warning( `Elastic getVariantsForPatientId ${e.toString()}` )
+        await logService.warning( `Elastic searchVariantsForPatient ${e.toString()}` )
         return new errors.InternalServerError()
     }
 }

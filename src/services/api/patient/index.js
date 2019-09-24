@@ -98,7 +98,8 @@ export default class PatientService extends ApiService {
 
         // Register searchPatientsByAutoComplete Route
         this.instance.get( {
-            path: `${this.config.endpoint}/autocomplete`
+            path: `${this.config.endpoint}/autocomplete`,
+            validation: validators.searchPatientByAutoComplete
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'searchPatientsByAutoComplete' )(
