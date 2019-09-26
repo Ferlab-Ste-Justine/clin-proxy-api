@@ -87,17 +87,20 @@ export default class ElasticClient {
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
 
+        const body = {
+            from: index,
+            size: limit,
+            query: request.query,
+            aggs,
+            sort
+        }
+
+        console.debug( JSON.stringify( body ) )
         return rp( {
             method: 'GET',
             uri,
             json: true,
-            body: {
-                from: index,
-                size: limit,
-                query: request.query,
-                aggs,
-                sort
-            }
+            body,
         } )
     }
 

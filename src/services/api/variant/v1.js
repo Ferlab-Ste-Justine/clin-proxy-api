@@ -23,7 +23,7 @@ const getSchema = async ( logService ) => {
 const getVariants = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        const params = req.body
         const patient = params.patient
         const statement = params.statement
         const query = params.query

@@ -31,7 +31,7 @@ export default {
             body: Joi.object( {
                 patient: Joi.string().required(),
                 statement: Joi.array().required(),
-                query: Joi.string().alphanum().min( 1 ).max( 256 ).required(),
+                query: Joi.string().min( 1 ).max( 256 ).required(),
                 group: Joi.string(),
                 page: Joi.number().integer().min( 0 ),
                 size: Joi.number().integer().min( 1 ).max( 1000 )
