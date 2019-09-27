@@ -39,7 +39,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
 
         const hits = response.hits.hits.map( ( hit ) => {
             return hit._source
-        })
+        } )
 
         const facets = Object.keys( response.aggregations ).reduce( ( aggs, category ) => {
             aggs[ category ] = response.aggregations[ category ].buckets.reduce( ( accumulator, bucket ) => {
@@ -52,6 +52,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
 
         return {
             total: response.hits.total,
+            query,
             hits,
             facets
         }
