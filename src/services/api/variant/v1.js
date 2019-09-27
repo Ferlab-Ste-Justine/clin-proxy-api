@@ -37,6 +37,10 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
             return new errors.NotFoundError()
         }
 
+        const hits = response.hits.hits.map( ( hit ) => {
+            return hit._source
+        })
+
         const facets = Object.keys( response.aggregations ).reduce( ( aggs, category ) => {
             aggs[ category ] = response.aggregations[ category ].buckets.reduce( ( accumulator, bucket ) => {
                 return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
@@ -48,7 +52,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
 
         return {
             total: response.hits.total,
-            hits: response.hits.hits,
+            hits,
             facets
         }
     } catch ( e ) {
