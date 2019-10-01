@@ -161,7 +161,9 @@ const translate = ( statement, queryKey, dialect = 'es', dialectOptions ) => {
     const isValid = validate( isArray( statement ) ? statement : [ statement ] )
 
     if ( !isValid ) {
-        return null
+        if ( dialect === 'es' ) {
+            return { query: { bool: {} } }
+        }
     }
 
     const denormalizedStatement = denormalize( statement )
