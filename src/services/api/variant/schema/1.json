@@ -37,9 +37,69 @@
           }
         },
         {
-          "id": "external",
-          "label": "filter_external",
-          "type": "generic"
+          "id": "extref_dbsnp",
+          "label": "filter_extref_dbsnp",
+          "type": "generic",
+          "search": "bdExt.dbSNP",
+          "facet": {
+            "terms" : {
+              "field" : "bdExt.dbSNP.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
+        },
+        {
+          "id": "extref_pubmed",
+          "label": "filter_extref_pubmed",
+          "type": "generic",
+          "search": "bdExt.pubmed",
+          "facet": {
+            "terms" : {
+              "field" : "bdExt.pubmed.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
+        },
+        {
+          "id": "extref_orphanet",
+          "label": "filter_extref_orphanet",
+          "type": "generic",
+          "search": "bdExt.orphanet",
+          "facet": {
+            "terms" : {
+              "field" : "bdExt.orphanet.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
+        },
+        {
+          "id": "extref_omim",
+          "label": "filter_extref_omim",
+          "type": "generic",
+          "search": "bdExt.omim",
+          "facet": {
+            "terms" : {
+              "field" : "bdExt.omim.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
+        },
+        {
+          "id": "extref_clinvar",
+          "label": "filter_extref_clinvar",
+          "type": "generic",
+          "search": "clinvar.clinvar_id",
+          "facet": {
+            "terms" : {
+              "field" : "clinvar.clinvar_id.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
           "id": "impact",
@@ -85,6 +145,45 @@
               "size": 999
             }
           }
+        },
+        {
+          "id": "genegroup_radboud",
+          "label": "filter_genegroup_radboud",
+          "type": "generic",
+          "search": "genes.radboudumc",
+          "facet": {
+            "terms" : {
+              "field" : "genes.radboudumc.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
+        },
+        {
+          "id": "genegroup_orphanet",
+          "label": "filter_genegroup_orphanet",
+          "type": "generic",
+          "search": "genes.orphanet",
+          "facet": {
+            "terms" : {
+              "field" : "genes.orphanet.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
+        },
+        {
+          "id": "genegroup_ensemble",
+          "label": "filter_genegroup_ensemble",
+          "type": "generic",
+          "search": "genes.ensemblId",
+          "facet": {
+            "terms" : {
+              "field" : "genes.ensemblId.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         }
       ]
     },
@@ -93,34 +192,82 @@
       "label": "category_prediction",
       "filters": [
         {
-          "id": "vep",
-          "label": "filter_vep",
-          "type": "generic"
+          "id": "prediction_fathmm",
+          "label": "filter_prediction_fathmm",
+          "type": "generic",
+          "search": "consequences.predictions.FATHMM",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.predictions.FATHMM.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
-          "id": "sift",
-          "label": "filter_sift",
-          "type": "generic"
+          "id": "prediction_sift",
+          "label": "filter_prediction_sift",
+          "type": "generic",
+          "search": "consequences.predictions.SIFT",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.predictions.SIFT.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
-          "id": "polyphen",
-          "label": "filter_polyphen",
-          "type": "generic"
+          "id": "prediction_lrt",
+          "label": "filter_prediction_lrt",
+          "type": "generic",
+          "search": "consequences.predictions.LRT_pred",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.predictions.LRT_pred.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
-          "id": "lrt",
-          "label": "filter_lrt",
-          "type": "generic"
+          "id": "prediction_mutation_assessor",
+          "label": "filter_prediction_mutation_assessor",
+          "type": "generic",
+          "search": "consequences.predictions.MutationAssessor_pred",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.predictions.MutationAssessor_pred.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
-          "id": "mutation_assessor",
-          "label": "filter_mutation_assessor",
-          "type": "generic"
+          "id": "prediction_polyphen2_hdiv",
+          "label": "filter_prediction_polyphen2_hdiv",
+          "type": "generic",
+          "search": "consequences.predictions.Polyphen2_HDIV",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.predictions.Polyphen2_HDIV.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         },
         {
-          "id": "fathmm",
-          "label": "filter_fathmm",
-          "type": "generic"
+          "id": "prediction_polyphen2_hvar",
+          "label": "filter_prediction_polyphen2_hvar",
+          "type": "generic",
+          "search": "consequences.predictions.Polyphen2_HVAR_pred",
+          "facet": {
+            "terms" : {
+              "field" : "consequences.predictions.Polyphen2_HVAR_pred.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 999
+            }
+          }
         }
       ]
     },
