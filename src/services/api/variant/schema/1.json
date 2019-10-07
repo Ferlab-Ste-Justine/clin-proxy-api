@@ -268,6 +268,12 @@
               "size": 999
             }
           }
+        },
+        {
+          "id": "prediction_gerp",
+          "label": "filter_prediction_gerp",
+          "type": "numcomparison",
+          "search": "consequences.conservationsScores.GERP"
         }
       ]
     },
