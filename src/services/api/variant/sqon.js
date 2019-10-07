@@ -1,3 +1,5 @@
+/* eslint-disable no-case-declarations */
+
 import { isArray, filter, find, map, flatten } from 'lodash'
 
 
@@ -75,7 +77,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
         }
     }
 
-    const getVerbFromOperand = ( operand ) => {
+    const getVerbFromGenericOperand = ( operand ) => {
         switch ( operand ) {
             default:
             case 'all':
@@ -87,6 +89,20 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
         }
     }
 
+    const getVerbFromNumericalComparator = ( comparator ) => {
+        switch ( comparator ) {
+            default:
+            case '>':
+                return 'gt'
+            case '>=':
+                return 'gte'
+            case '<':
+                return 'lt'
+            case '<=':
+                return 'lte'
+        }
+    }
+
     const getFieldNameFromSchema = ( id ) => {
         const schemaFilter = find( flattenedSchema, { id } )
 
@@ -94,16 +110,33 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
     }
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
-        const operand = instruction.data.operand
-        const verb = getVerbFromOperand( operand )
+        const type = instruction.data.type
+        const fieldName = getFieldNameFromSchema( fieldId )
+        let verb = null
 
-        return {
-            [ verb ]: instruction.data.values.reduce( ( accumulator, value ) => {
-                const fieldName = getFieldNameFromSchema( fieldId )
+        // @NOTE Logic based on filter type
+        switch ( type ) {
+            default:
+            case 'generic':
+                const operand = instruction.data.operand
 
-                accumulator.push( { match: { [ fieldName ]: value } } )
-                return accumulator
-            }, [] )
+                verb = getVerbFromGenericOperand( operand )
+                return {
+                    [ verb ]: instruction.data.values.reduce( ( accumulator, value ) => {
+                        accumulator.push( { match: { [ fieldName ]: value } } )
+                        return accumulator
+                    }, [] )
+                }
+
+            case 'numcomparison':
+                const comparator = instruction.data.comparator
+
+                verb = getVerbFromNumericalComparator( comparator )
+                return {
+                    must: {
+                        range: { [ fieldName ]: { [ verb ]: instruction.data.value } }
+                    }
+                }
         }
     }
 
