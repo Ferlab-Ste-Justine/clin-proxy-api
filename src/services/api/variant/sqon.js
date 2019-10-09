@@ -137,6 +137,14 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                         range: { [ fieldName ]: { [ verb ]: instruction.data.value } }
                     }
                 }
+
+            case 'genericbool':
+                return {
+                    must: {
+                        match: { [ fieldName ]: true }
+                    }
+                }
+
         }
     }
 
