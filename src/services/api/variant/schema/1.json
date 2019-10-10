@@ -207,8 +207,11 @@
         {
           "id": "prediction_sift",
           "label": "filter_prediction_sift",
-          "type": "generic",
-          "search": "consequences.predictions.SIFT",
+          "type": "composite",
+          "search": {
+            "score": "consequences.predictions.SIFT_score",
+            "quality": "consequences.predictions.SIFT"
+          },
           "facet": {
             "terms" : {
               "field" : "consequences.predictions.SIFT.keyword",
