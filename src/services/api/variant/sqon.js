@@ -145,6 +145,29 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                     }
                 }
 
+            case 'composite':
+                const isNumericalComparison = !!( instruction.data.value.comparator && instruction.data.value.score )
+
+                if ( isNumericalComparison ) {
+                    verb = getVerbFromNumericalComparator( instruction.data.value.comparator )
+                    return {
+                        must: {
+                            range: { [ fieldName.score ]: { [ verb ]: instruction.data.value.score } }
+                        }
+                    }
+                }
+
+                const isQualityComparison = !!instruction.data.value.quality
+
+                if ( isQualityComparison ) {
+                    return {
+                        must: {
+                            match: { [ fieldName.quality ]: instruction.data.value.quality }
+                        }
+                    }
+                }
+
+                return {}
         }
     }
 
