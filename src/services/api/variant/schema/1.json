@@ -286,6 +286,9 @@
           "id": "transmission",
           "label": "filter_transmission",
           "type": "generic",
+          "config": {
+            "operands": ["one", "none"]
+          },
           "search": "donors.zygosity",
           "facet": {
             "terms" : {
