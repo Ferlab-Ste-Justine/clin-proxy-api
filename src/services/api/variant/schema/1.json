@@ -49,36 +49,50 @@
             "radboudumc": "availableDbExt.radboudumc",
             "omim": "availableDbExt.omim"
           },
-          "facet": {
-            "pubmed": { "terms" : {
-              "field" : "availableDbExt.pubmed",
-              "size": 1
-            } },
-            "clinvar": { "terms" : {
-              "field" : "availableDbExt.clinvar",
-              "size": 1
-            } },
-            "hpo": { "terms" : {
-              "field" : "availableDbExt.hpo",
-              "size": 1
-            } },
-            "dbsnp": { "terms" : {
-              "field" : "availableDbExt.dbSNP",
-              "size": 1
-            } },
-            "orphanet": { "terms" : {
-              "field" : "availableDbExt.orphanet",
-              "size": 1
-            } },
-            "radboudumc": { "terms" : {
-              "field" : "availableDbExt.radboudumc",
-              "size": 1
-            } },
-            "omim": { "terms" : {
-              "field" : "availableDbExt.omim",
-              "size": 1
-            } }
-          }
+          "facet": [
+            { "id": "pubmed",
+              "terms" : {
+                "field" : "availableDbExt.pubmed",
+                "size": 1
+              }
+            },
+            { "id": "clinvar",
+              "terms" : {
+                "field" : "availableDbExt.clinvar",
+                "size": 1
+              }
+            },
+            { "id": "hpo",
+              "terms" : {
+                "field" : "availableDbExt.hpo",
+                "size": 1
+              }
+            },
+            { "id": "dbsnp",
+              "terms" : {
+                "field" : "availableDbExt.dbSNP",
+                "size": 1
+              }
+            },
+            { "id": "orphanet",
+              "terms" : {
+                "field" : "availableDbExt.orphanet",
+                "size": 1
+              }
+            },
+            { "id": "radboudumc",
+              "terms" : {
+                "field" : "availableDbExt.radboudumc",
+                "size": 1
+              }
+            },
+            { "id": "omim",
+              "terms" : {
+                "field" : "availableDbExt.omim",
+                "size": 1
+              }
+            }
+          ]
         },
         {
           "id": "impact",

@@ -1,5 +1,5 @@
 import rp from 'request-promise-native'
-import { flatten, map } from 'lodash'
+import { flatten, map, isArray } from 'lodash'
 
 
 const generateAclFilters = ( acl, index = 'patient' ) => {
@@ -75,7 +75,15 @@ export default class ElasticClient {
         )
 
         const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
-            return Object.assign( accumulator, { [ filter.id ]: filter.facet } )
+            if ( !isArray( filter.facet ) ) {
+                return Object.assign( accumulator, { [ filter.id ]: filter.facet } )
+            }
+            const filters = {}
+
+            filter.facet.forEach( ( facet ) => {
+                filters[ [ facet.id ] ] = { terms: facet.terms }
+            } )
+            return Object.assign( accumulator, filters )
         }, {} )
 
         const sort = [
@@ -100,7 +108,7 @@ export default class ElasticClient {
             method: 'GET',
             uri,
             json: true,
-            body,
+            body
         } )
     }
 
