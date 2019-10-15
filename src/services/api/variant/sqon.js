@@ -118,6 +118,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
         switch ( type ) {
             default:
             case 'generic':
+            case 'specific':
                 return {
                     [ getVerbFromGenericOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
                         ( accumulator, value ) => {
