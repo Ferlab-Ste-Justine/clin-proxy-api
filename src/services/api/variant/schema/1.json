@@ -37,69 +37,62 @@
           }
         },
         {
-          "id": "extref_dbsnp",
-          "label": "filter_extref_dbsnp",
-          "type": "generic",
-          "search": "bdExt.dbSNP",
-          "facet": {
-            "terms" : {
-              "field" : "bdExt.dbSNP.keyword",
-              "order" : { "_count" : "desc" },
-              "size": 999
+          "id": "extdb",
+          "label": "filter_extdb",
+          "type": "genericbool",
+          "search": {
+            "pubmed": "availableDbExt.pubmed",
+            "clinvar": "availableDbExt.clinvar",
+            "hpo": "availableDbExt.hpo",
+            "dbsnp": "availableDbExt.dbSNP",
+            "orphanet": "availableDbExt.orphanet",
+            "radboudumc": "availableDbExt.radboudumc",
+            "omim": "availableDbExt.omim"
+          },
+          "facet": [
+            { "id": "pubmed",
+              "terms" : {
+                "field" : "availableDbExt.pubmed",
+                "size": 1
+              }
+            },
+            { "id": "clinvar",
+              "terms" : {
+                "field" : "availableDbExt.clinvar",
+                "size": 1
+              }
+            },
+            { "id": "hpo",
+              "terms" : {
+                "field" : "availableDbExt.hpo",
+                "size": 1
+              }
+            },
+            { "id": "dbsnp",
+              "terms" : {
+                "field" : "availableDbExt.dbSNP",
+                "size": 1
+              }
+            },
+            { "id": "orphanet",
+              "terms" : {
+                "field" : "availableDbExt.orphanet",
+                "size": 1
+              }
+            },
+            { "id": "radboudumc",
+              "terms" : {
+                "field" : "availableDbExt.radboudumc",
+                "size": 1
+              }
+            },
+            { "id": "omim",
+              "terms" : {
+                "field" : "availableDbExt.omim",
+                "size": 1
+              }
             }
-          }
-        },
-        {
-          "id": "extref_pubmed",
-          "label": "filter_extref_pubmed",
-          "type": "generic",
-          "search": "bdExt.pubmed",
-          "facet": {
-            "terms" : {
-              "field" : "bdExt.pubmed.keyword",
-              "order" : { "_count" : "desc" },
-              "size": 999
-            }
-          }
-        },
-        {
-          "id": "extref_orphanet",
-          "label": "filter_extref_orphanet",
-          "type": "generic",
-          "search": "bdExt.orphanet",
-          "facet": {
-            "terms" : {
-              "field" : "bdExt.orphanet.keyword",
-              "order" : { "_count" : "desc" },
-              "size": 999
-            }
-          }
-        },
-        {
-          "id": "extref_omim",
-          "label": "filter_extref_omim",
-          "type": "generic",
-          "search": "bdExt.omim",
-          "facet": {
-            "terms" : {
-              "field" : "bdExt.omim.keyword",
-              "order" : { "_count" : "desc" },
-              "size": 999
-            }
-          }
-        },
-        {
-          "id": "extref_clinvar",
-          "label": "filter_extref_clinvar",
-          "type": "generic",
-          "search": "clinvar.clinvar_id",
-          "facet": {
-            "terms" : {
-              "field" : "clinvar.clinvar_id.keyword",
-              "order" : { "_count" : "desc" },
-              "size": 999
-            }
-          }
+          ]
         },
         {
           "id": "impact",

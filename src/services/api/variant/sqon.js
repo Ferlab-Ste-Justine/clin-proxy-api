@@ -111,48 +111,68 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
         const type = instruction.data.type
-        const fieldName = getFieldNameFromSchema( fieldId )
-        let verb = null
+        const fieldMap = getFieldNameFromSchema( fieldId )
 
         // @NOTE Logic based on filter type
+        // @NOTE Only numcomparison and genericbool are groupeable right now
         switch ( type ) {
             default:
             case 'generic':
-                const operand = instruction.data.operand
-
-                verb = getVerbFromGenericOperand( operand )
                 return {
-                    [ verb ]: instruction.data.values.reduce( ( accumulator, value ) => {
-                        accumulator.push( { match: { [ fieldName ]: value } } )
+                    [ getVerbFromGenericOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
+                        ( accumulator, value ) => {
+                            accumulator.push( { match: { [ fieldMap ]: value } } )
+                            return accumulator
+                        }, [] )
+                }
+
+            case 'numcomparison':
+                if ( !instruction.data.values ) {
+                    return {
+                        must: {
+                            range: {
+                                [ fieldMap ]: {
+                                    [ getVerbFromNumericalComparator( instruction.data.comparator ) ]: instruction.data.value
+                                }
+                            }
+                        }
+                    }
+                }
+                return {
+                    must: instruction.data.values.reduce( ( accumulator, group ) => {
+                        accumulator.push( {
+                            range: {
+                                [ fieldMap[ group.id ] ]: {
+                                    [ getVerbFromNumericalComparator( group.comparator ) ]: instruction.data.value
+                                }
+                            }
+                        } )
                         return accumulator
                     }, [] )
                 }
 
-            case 'numcomparison':
-                const comparator = instruction.data.comparator
-
-                verb = getVerbFromNumericalComparator( comparator )
-                return {
-                    must: {
-                        range: { [ fieldName ]: { [ verb ]: instruction.data.value } }
+            case 'genericbool':
+                if ( !instruction.data.values ) {
+                    return {
+                        must: {
+                            match: { [ fieldMap ]: true }
+                        }
                     }
                 }
-
-            case 'genericbool':
                 return {
-                    must: {
-                        match: { [ fieldName ]: true }
-                    }
+                    must: instruction.data.values.reduce( ( accumulator, group ) => {
+                        accumulator.push( { match: { [ fieldMap[ group.id ] ]: true } } )
+                        return accumulator
+                    }, [] )
                 }
 
             case 'composite':
                 const isNumericalComparison = !!( instruction.data.value.comparator && instruction.data.value.score )
 
                 if ( isNumericalComparison ) {
-                    verb = getVerbFromNumericalComparator( instruction.data.value.comparator )
                     return {
                         must: {
-                            range: { [ fieldName.score ]: { [ verb ]: instruction.data.value.score } }
+                            range: { [ fieldMap.score ]: { [ getVerbFromNumericalComparator( instruction.data.value.comparator ) ]: instruction.data.value.score } }
                         }
                     }
                 }
@@ -162,7 +182,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                 if ( isQualityComparison ) {
                     return {
                         must: {
-                            match: { [ fieldName.quality ]: instruction.data.value.quality }
+                            match: { [ fieldMap.quality ]: instruction.data.value.quality }
                         }
                     }
                 }
