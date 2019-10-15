@@ -114,6 +114,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
         const fieldMap = getFieldNameFromSchema( fieldId )
 
         // @NOTE Logic based on filter type
+        // @NOTE Only numcomparison and genericbool are groupeable right now
         switch ( type ) {
             default:
             case 'generic':
@@ -166,9 +167,6 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                 }
 
             case 'composite':
-
-                // @TODO
-
                 const isNumericalComparison = !!( instruction.data.value.comparator && instruction.data.value.score )
 
                 if ( isNumericalComparison ) {
