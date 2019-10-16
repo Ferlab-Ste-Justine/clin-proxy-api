@@ -223,6 +223,22 @@
           ]
         },
         {
+          "id": "gene_hpo",
+          "label": "filter_gene_hpo",
+          "type": "specific",
+          "config": {
+            "operands": ["all", "one", "none"]
+          },
+          "search": "genes.hpo",
+          "facet": {
+            "terms" : {
+              "field" : "genes.hpo.keyword",
+              "order" : { "_count" : "desc" },
+              "size": 9999
+            }
+          }
+        },
+        {
           "id": "genegroup_radboud",
           "label": "filter_genegroup_radboud",
           "type": "generic",
