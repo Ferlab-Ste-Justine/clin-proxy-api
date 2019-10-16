@@ -75,14 +75,13 @@ export default class ElasticClient {
         )
 
         const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
-            if ( !isArray( filter.facet ) ) {
-                return Object.assign( accumulator, { [ filter.id ]: filter.facet } )
-            }
             const filters = {}
 
-            filter.facet.forEach( ( facet ) => {
-                filters[ [ facet.id ] ] = { terms: facet.terms }
-            } )
+            if ( isArray( filter.facet ) ) {
+                filter.facet.forEach( ( facet ) => {
+                    filters[ [ facet.id ] ] = { terms: facet.terms }
+                } )
+            }
             return Object.assign( accumulator, filters )
         }, {} )
 
