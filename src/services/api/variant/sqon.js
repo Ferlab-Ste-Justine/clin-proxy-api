@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 
-import { isArray, filter, find, map, flatten } from 'lodash'
+import { isArray, filter, find } from 'lodash'
 
 
 export const validate = ( statement ) => {
@@ -61,9 +61,11 @@ export const denormalize = ( statement = [] ) => {
 }
 
 export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
-    const flattenedSchema = flatten(
-        map( schema.categories, 'filters' )
-    )
+    const flattenedSchema = schema.categories.reduce( ( categoryAccumulator, category ) => {
+        return Object.assign( categoryAccumulator, ( category.filters ? category.filters.reduce( ( filterAccumulator, filterConfig ) => {
+            return Object.assign( filterAccumulator, { [ filterConfig.id ]: filterConfig } )
+        }, {} ) : {} ) )
+    }, {} )
 
     const getVerbFromOperator = ( operator ) => {
         switch ( operator ) {
@@ -106,7 +108,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
     const getFieldNameFromSchema = ( id ) => {
         const schemaFilter = find( flattenedSchema, { id } )
 
-        return schemaFilter.search
+        return schemaFilter.search[ [ id ] ]
     }
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
