@@ -229,14 +229,19 @@
           "config": {
             "operands": ["all", "one", "none"]
           },
-          "search": "genes.hpo",
-          "facet": {
-            "terms" : {
-              "field" : "genes.hpo.keyword",
-              "order" : { "_count" : "desc" },
-              "size": 9999
+          "search": {
+            "gene_hpo": "genes.hpo"
+          },
+          "facet": [
+            {
+              "id": "gene_hpo",
+              "terms" : {
+                "field" : "genes.hpo.keyword",
+                "order" : { "_count" : "desc" },
+                "size": 9999
+              }
             }
-          }
+          ]
         },
         {
           "id": "genegroup_radboud",
