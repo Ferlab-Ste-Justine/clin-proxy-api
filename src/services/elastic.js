@@ -118,52 +118,56 @@ export default class ElasticClient {
         } )
     }
 
-    async searchMeta( acl, type, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/${type}/_search`
-        const aclFilters = generateAclFilters( acl, 'statement' )
-        const body = {
-            from: index,
-            size: limit,
-            query: {
-                bool: {
-                    must: filters.concat( aclFilters )
+    async searchMeta( acl, type = null, includes = [], filters = [], shoulds = [], index, limit ) {
+        if ( type !== null ) {
+            const uri = `${this.host}/${type}/_search`
+            const aclFilters = generateAclFilters( acl, 'statement' )
+            const body = {
+                from: index,
+                size: limit,
+                query: {
+                    bool: {
+                        must: filters.concat( aclFilters )
+                    }
                 }
             }
-        }
 
-        if ( includes.length > 0 ) {
-            body._source = { includes }
-        }
+            if ( includes.length > 0 ) {
+                body._source = { includes }
+            }
 
-        if ( shoulds.length > 0 ) {
-            body.query.bool.should = shoulds
-            body.query.bool.minimum_should_match = 1
-        }
+            if ( shoulds.length > 0 ) {
+                body.query.bool.should = shoulds
+                body.query.bool.minimum_should_match = 1
+            }
 
-        return rp( {
-            method: 'GET',
-            uri,
-            json: true,
-            body
-        } )
+            return rp( {
+                method: 'GET',
+                uri,
+                json: true,
+                body
+            } )
+        }
     }
 
-    async createMeta( acl, index, data = {} ) {
-        const uri = `${this.host}/${index}/_doc`
+    async createMeta( acl, index = null, data = {} ) {
+        if ( index !== null ) {
+            const uri = `${this.host}/${index}/_doc`
 
-        data.practitionerId = acl.practitioner_id
-        data.organizationId = acl.organization_id
-        return rp( {
-            method: 'POST',
-            uri,
-            json: true,
-            body: data
-        } )
+            data.practitionerId = acl.practitioner_id
+            data.organizationId = acl.organization_id
+            return rp( {
+                method: 'POST',
+                uri,
+                json: true,
+                body: data
+            } )
+        }
     }
 
-    async updateMeta( acl, index, uid, data = {} ) {
+    async updateMeta( acl, index = null, uid, data = {} ) {
         // @NOTE Otherwise, we could create a meta
-        if ( uid !== null ) {
+        if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/${uid}`
 
             data.practitionerId = acl.practitioner_id
@@ -177,9 +181,9 @@ export default class ElasticClient {
         }
     }
 
-    async deleteMeta( acl, index, uid = null ) {
+    async deleteMeta( acl, index = null, uid = null ) {
         // @NOTE Otherwise, we could delete the entire meta index :)
-        if ( uid !== null ) {
+        if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/${uid}`
 
             return rp( {
