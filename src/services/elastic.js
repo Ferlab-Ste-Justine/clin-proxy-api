@@ -7,14 +7,14 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
 
     if ( acl.role === 'practitioner' ) {
         if ( index === 'patient' ) {
-            filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
+            filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
         }
 
     } else if ( acl.role === 'genetician' ) {
         if ( index === 'patient' ) {
-            filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
+            filters.push( { match: { 'organization.id': acl.organization_id } } )
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
         }
