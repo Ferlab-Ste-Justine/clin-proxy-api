@@ -18,7 +18,6 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
         }
-
     }
 
     return filters
