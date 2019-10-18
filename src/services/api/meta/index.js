@@ -6,7 +6,7 @@ import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
-import validators from '../helpers/validators'
+// import validators from '../helpers/validators'
 import restifyAsyncWrap from '../helpers/async'
 
 
@@ -16,7 +16,7 @@ const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
 
 export default class MetaService extends ApiService {
     constructor( config ) {
-        config.logService.info( 'Oy.' )
+        config.logService.info( 'Oy?' )
         super( config )
         this.config.cache = config.cacheConfig
         this.config.elastic = config.elasticConfig
@@ -61,6 +61,29 @@ export default class MetaService extends ApiService {
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/health` }
             ]
         } ) )
+
+        // Register searchStatements
+        this.instance.get( {
+            path: `${this.config.endpoint}/statement`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'searchStatements' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
 
         super.start()
     }
