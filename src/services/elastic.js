@@ -166,7 +166,6 @@ export default class ElasticClient {
     }
 
     async updateMeta( acl, index = null, uid, data = {} ) {
-        // @NOTE Otherwise, we could create a meta
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/${uid}`
 
@@ -182,14 +181,24 @@ export default class ElasticClient {
     }
 
     async deleteMeta( acl, index = null, uid = null ) {
-        // @NOTE Otherwise, we could delete the entire meta index :)
         if ( index !== null && uid !== null ) {
-            const uri = `${this.host}/${index}/_doc/${uid}`
+            const uri = `${this.host}/${index}/_doc/_delete_by_query`
 
             return rp( {
-                method: 'DELETE',
+                method: 'POST',
                 uri,
-                json: true
+                json: true,
+                body: {
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { _id: uid } },
+                                { match: { practitionerId: acl.practitioner_id } },
+                                { match: { organizationId: acl.organization_id } }
+                            ]
+                        }
+                    }
+                }
             } )
         }
     }
