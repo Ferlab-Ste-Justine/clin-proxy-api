@@ -1,0 +1,469 @@
+{
+  "version": "1.0",
+  "index": "clin-mutation-centric",
+  "path": "/mutations/_search",
+  "groups": {
+    "impact": {
+      "impactScore": {
+        "order": "desc"
+      }
+    }
+  },
+  "defaultGroup": "impact",
+  "categories": [
+    {
+      "id": "variant",
+      "label": "category_variant",
+      "filters": [
+        {
+          "id": "variant_type",
+          "label": "filter_variant_type",
+          "type": "generic",
+          "search": {
+            "variant_type": "type"
+          },
+          "facet": [
+            {
+              "id": "variant_type",
+              "terms": {
+                "field": "type.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "consequence",
+          "label": "filter_consequence",
+          "type": "generic",
+          "search": {
+            "consequence": "consequences.consequence"
+          },
+          "facet": [
+            {
+              "id": "consequence",
+              "terms": {
+                "field": "consequences.consequence.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "extdb",
+          "label": "filter_extdb",
+          "type": "genericbool",
+          "search": {
+            "pubmed": "availableDbExt.pubmed",
+            "clinvar": "availableDbExt.clinvar",
+            "hpo": "availableDbExt.hpo",
+            "dbsnp": "availableDbExt.dbSNP",
+            "orphanet": "availableDbExt.orphanet",
+            "radboudumc": "availableDbExt.radboudumc",
+            "omim": "availableDbExt.omim"
+          },
+          "facet": [
+            {
+              "id": "pubmed",
+              "label": "filter_extdb_pubmed",
+              "terms": {
+                "field": "availableDbExt.pubmed",
+                "size": 1
+              }
+            },
+            {
+              "id": "clinvar",
+              "label": "filter_extdb_clinvar",
+              "terms": {
+                "field": "availableDbExt.clinvar",
+                "size": 1
+              }
+            },
+            {
+              "id": "hpo",
+              "label": "filter_extdb_hpo",
+              "terms": {
+                "field": "availableDbExt.hpo",
+                "size": 1
+              }
+            },
+            {
+              "id": "dbsnp",
+              "label": "filter_extdb_dbsnp",
+              "terms": {
+                "field": "availableDbExt.dbSNP",
+                "size": 1
+              }
+            },
+            {
+              "id": "orphanet",
+              "label": "filter_extdb_orphanet",
+              "terms": {
+                "field": "availableDbExt.orphanet",
+                "size": 1
+              }
+            },
+            {
+              "id": "radboudumc",
+              "label": "filter_extdb_radboudumc",
+              "terms": {
+                "field": "availableDbExt.radboudumc",
+                "size": 1
+              }
+            },
+            {
+              "id": "omim",
+              "label": "filter_extdb_omim",
+              "terms": {
+                "field": "availableDbExt.omim",
+                "size": 1
+              }
+            }
+          ]
+        },
+        {
+          "id": "impact",
+          "label": "filter_impact",
+          "type": "generic",
+          "search": {
+            "impact": "consequences.impact"
+          },
+          "facet": [
+            {
+              "id": "impact",
+              "terms": {
+                "field": "consequences.impact.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "chromosome",
+          "label": "filter_chromosome",
+          "type": "generic",
+          "search": {
+            "chromosome": "chrom.keyword"
+          },
+          "facet": [
+            {
+              "id": "chromosome",
+              "terms": {
+                "field": "chrom.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 24
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "genomic",
+      "label": "category_genomic",
+      "filters": [
+        {
+          "id": "gene_type",
+          "label": "filter_gene_type",
+          "type": "generic",
+          "search": {
+            "gene_type": "genes.biotype"
+          },
+          "facet": [
+            {
+              "id": "gene_type",
+              "terms": {
+                "field": "genes.biotype.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "gene_hpo",
+          "label": "filter_gene_hpo",
+          "type": "specific",
+          "config": {
+            "gene_hpo": {
+              "operands": [
+                "all",
+                "one",
+                "none"
+              ]
+            }
+          },
+          "search": {
+            "gene_hpo": "genes.hpo"
+          },
+          "facet": [
+            {
+              "id": "gene_hpo",
+              "terms": {
+                "field": "genes.hpo.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 9999
+              }
+            }
+          ]
+        },
+        {
+          "id": "genegroup_radboud",
+          "label": "filter_genegroup_radboud",
+          "type": "generic",
+          "search": {
+            "genegroup_radboud": "genes.radboudumc"
+          },
+          "facet": [
+            {
+              "id": "genegroup_radboud",
+              "terms": {
+                "field": "genes.radboudumc.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "genegroup_orphanet",
+          "label": "filter_genegroup_orphanet",
+          "type": "generic",
+          "search": {
+            "genegroup_orphanet": "genes.orphanet"
+          },
+          "facet": [
+            {
+              "id": "genegroup_orphanet",
+              "terms": {
+                "field": "genes.orphanet.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "genegroup_ensemble",
+          "label": "filter_genegroup_ensemble",
+          "type": "generic",
+          "search": {
+            "genegroup_ensemble": "genes.ensemblId"
+          },
+          "facet": [
+            {
+              "id": "genegroup_ensemble",
+              "terms": {
+                "field": "genes.ensemblId.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prediction",
+      "label": "category_prediction",
+      "filters": [
+        {
+          "id": "prediction_fathmm",
+          "label": "filter_prediction_fathmm",
+          "type": "generic",
+          "search": {
+            "prediction_fathmm": "consequences.predictions.FATHMM"
+          },
+          "facet": [
+            {
+              "id": "prediction_fathmm",
+              "terms": {
+                "field": "consequences.predictions.FATHMM.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "prediction_sift",
+          "label": "filter_prediction_sift",
+          "type": "composite",
+          "search": {
+            "prediction_sift": {
+              "score": "consequences.predictions.SIFT_score",
+              "quality": "consequences.predictions.SIFT"
+            }
+          },
+          "facet": [
+            {
+              "id": "prediction_sift",
+              "terms": {
+                "field": "consequences.predictions.SIFT.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "prediction_lrt",
+          "label": "filter_prediction_lrt",
+          "type": "generic",
+          "search": {
+            "prediction_lrt": "consequences.predictions.LRT_pred"
+          },
+          "facet": [
+            {
+              "id": "prediction_lrt",
+              "terms": {
+                "field": "consequences.predictions.LRT_pred.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "prediction_mutation_assessor",
+          "label": "filter_prediction_mutation_assessor",
+          "type": "generic",
+          "search": {
+            "prediction_mutation_assessor": "consequences.predictions.MutationAssessor_pred"
+          },
+          "facet": [
+            {
+              "id": "prediction_mutation_assessor",
+              "terms": {
+                "field": "consequences.predictions.MutationAssessor_pred.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "prediction_polyphen2_hdiv",
+          "label": "filter_prediction_polyphen2_hdiv",
+          "type": "generic",
+          "search": {
+            "prediction_polyphen2_hdiv": "consequences.predictions.Polyphen2_HDIV"
+          },
+          "facet": [
+            {
+              "id": "prediction_polyphen2_hdiv",
+              "terms": {
+                "field": "consequences.predictions.Polyphen2_HDIV.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "prediction_polyphen2_hvar",
+          "label": "filter_prediction_polyphen2_hvar",
+          "type": "generic",
+          "search": {
+            "prediction_polyphen2_hvar": "consequences.predictions.Polyphen2_HVAR_pred"
+          },
+          "facet": [
+            {
+              "id": "prediction_polyphen2_hvar",
+              "terms": {
+                "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "prediction_gerp",
+          "label": "filter_prediction_gerp",
+          "type": "numcomparison",
+          "search": {
+            "prediction_gerp": "consequences.conservationsScores.GERP"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cohort",
+      "label": "category_cohort",
+      "filters": []
+    },
+    {
+      "id": "zygosity",
+      "label": "category_zygosity",
+      "filters": [
+        {
+          "id": "transmission",
+          "label": "filter_transmission",
+          "type": "generic",
+          "config": {
+            "transmission": {
+              "operands": [
+                "one",
+                "none"
+              ]
+            }
+          },
+          "search": {
+            "transmission": "donors.zygosity"
+          },
+          "facet": [
+            {
+              "id": "transmission",
+              "terms": {
+                "field": "donors.zygosity.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 9
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "metric",
+      "label": "category_metric",
+      "filters": []
+    }
+  ]
+}

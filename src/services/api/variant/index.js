@@ -2,32 +2,28 @@ import rjwt from 'restify-jwt-community'
 
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
-import restifyAsyncWrap from '../helpers/async'
 import CacheClient from '../../cache'
-import AidboxClient from '../../aidbox'
 import ElasticClient from '../../elastic'
-import validators from '../helpers/validators'
 
 import Apiv1 from './v1'
+import validators from '../helpers/validators'
+import restifyAsyncWrap from '../helpers/async'
 
 
 const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
     1: Apiv1
 } )
 
-export default class PatientService extends ApiService {
+export default class VariantService extends ApiService {
     constructor( config ) {
-        config.logService.info( 'Roger that.' )
+        config.logService.info( 'On it!' )
         super( config )
         this.config.cache = config.cacheConfig
-        this.config.aidbox = config.aidboxConfig
         this.config.elastic = config.elasticConfig
         this.runServicesHealthCheck = async () => {
             try {
                 await this.cacheService.ping()
                 await this.logService.debug( 'Cache Service is healthy.' )
-                await this.aidboxService.ping()
-                await this.logService.debug( 'Aidbox Service is healthy.' )
                 const elasticPingResult = await this.elasticService.ping()
 
                 if ( !elasticPingResult.name ) {
@@ -51,16 +47,9 @@ export default class PatientService extends ApiService {
         this.elasticService = new ElasticClient( this.config.elastic )
         const elasticPingResult = await this.elasticService.ping()
 
+        // @TODO We probably should also validate that the schema's index is healthy
         if ( !elasticPingResult.name ) {
             throw new Error( 'Elastic Search Client health check failed' )
-        }
-
-        await this.logService.debug( 'Aidbox Service Client appears functional ... checking connectivity.' )
-        this.aidboxService = new AidboxClient( this.config.aidbox )
-        const aidboxPingResult = await this.aidboxService.ping()
-
-        if ( aidboxPingResult.status !== 'pass' ) {
-            throw new Error( 'Aidbox Service Client health check failed' )
         }
     }
 
@@ -69,23 +58,17 @@ export default class PatientService extends ApiService {
         this.instance.use( rjwt( this.config.jwt ).unless( {
             path: [
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` }
+                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` },
+                { methods: [ 'GET' ], url: `${this.config.endpoint}/schema` }
             ]
         } ) )
 
-        // Register SOME searchPatients Route
-        // @TODO - need filters specifications
+        // Register Schema Route
         this.instance.get( {
-            path: `${this.config.endpoint}/search`
+            path: `${this.config.endpoint}/schema`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'searchPatients' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.elasticService,
-                    this.logService
-                )
+                const response = await getFunctionForApiVersion( req.version, 'getSchema' )( this.logService )
 
                 res.send( response )
                 next()
@@ -96,36 +79,13 @@ export default class PatientService extends ApiService {
 
         } ) )
 
-        // Register searchPatientsByAutoComplete Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/autocomplete`,
-            validation: validators.searchPatientByAutoComplete
+        // Register Search Route
+        this.instance.post( {
+            path: `${this.config.endpoint}/search`,
+            validation: validators.searchVariantsForPatientByQuery
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'searchPatientsByAutoComplete' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.elasticService,
-                    this.logService
-                )
-
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getPatientById Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid`,
-            validation: validators.searchPatientByPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getPatientById' )(
+                const response = await getFunctionForApiVersion( req.version, 'getVariants' )(
                     req,
                     res,
                     this.cacheService,

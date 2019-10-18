@@ -8,7 +8,7 @@ const getSessionDataFromToken = async ( token, cacheService ) => {
 const getPatientById = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const response = await elasticService.getPatientById( req.params.uid, sessionData.acl.fhir )
+        const response = await elasticService.searchPatients( sessionData.acl.fhir, [], [ { match: { id: req.params.uid } } ], [] )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
@@ -22,30 +22,6 @@ const getPatientById = async ( req, res, cacheService, elasticService, logServic
     }
 }
 
-const getPatientsByAutoComplete = async ( req, res, cacheService, elasticService, logService ) => {
-    try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params
-        const type = params.type || 'partial'
-        const limit = params.size || 25
-        const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const response = await elasticService.getPatientsByAutoComplete( type, params.query, sessionData.acl.fhir, index, limit )
-
-        if ( response.hits.total < 1 ) {
-            return new errors.NotFoundError()
-        }
-
-        await logService.debug( `Elastic getPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total} matches` )
-        return {
-            total: response.hits.total,
-            hits: response.hits.hits
-        }
-    } catch ( e ) {
-        await logService.warning( `Elastic getPatientsByAutoComplete ${e.toString()}` )
-        return new errors.InternalServerError()
-    }
-}
-
 const searchPatients = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
@@ -53,7 +29,7 @@ const searchPatients = async ( req, res, cacheService, elasticService, logServic
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
 
-        const response = await elasticService.searchPatients( sessionData.acl.fhir, index, limit )
+        const response = await elasticService.searchPatients( sessionData.acl.fhir, [], [], [], index, limit )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
@@ -70,8 +46,66 @@ const searchPatients = async ( req, res, cacheService, elasticService, logServic
     }
 }
 
+const searchPatientsByAutoComplete = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const params = req.query || req.params
+        const query = params.query
+        const type = params.type || 'partial'
+        const limit = params.size || 25
+        const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
+        const fields = []
+
+        if ( type === 'partial' ) {
+            fields.push(
+                'id',
+                'familyId',
+                'specimens.id',
+                'identifier.MR',
+                'identifier.JHN',
+                'name.family',
+                'name.given',
+                'studies.title'
+            )
+        }
+
+        const matches = [
+            { match_phrase_prefix: { id: query } },
+            { match_phrase_prefix: { 'name.family': query } },
+            { match_phrase_prefix: { 'name.given': query } },
+            { match_phrase_prefix: { 'studies.title': query } },
+            { match_phrase_prefix: { 'specimens.id': query } },
+            { match_phrase_prefix: { 'identifier.MR': query } },
+            { match_phrase_prefix: { 'identifier.JHN': query } },
+            { match_phrase_prefix: { familyId: query } },
+            { wildcard: { id: `*${query}` } },
+            { wildcard: { 'identifier.MR': `*${query}` } },
+            { wildcard: { 'identifier.MR': `*${query}` } },
+            { wildcard: { 'identifier.JHN': `*${query}` } },
+            { wildcard: { familyId: `*${query}` } },
+            { fuzzy: { 'name.given': query } },
+            { fuzzy: { 'name.family': query } }
+        ]
+
+        const response = await elasticService.searchPatients( sessionData.acl.fhir, fields, [], matches, index, limit )
+
+        if ( response.hits.total < 1 ) {
+            return new errors.NotFoundError()
+        }
+
+        await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total} matches` )
+        return {
+            total: response.hits.total,
+            hits: response.hits.hits
+        }
+    } catch ( e ) {
+        await logService.warning( `Elastic searchPatientsByAutoComplete ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
 export default {
     getPatientById,
-    getPatientsByAutoComplete,
-    searchPatients
+    searchPatients,
+    searchPatientsByAutoComplete
 }

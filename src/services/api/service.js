@@ -8,6 +8,8 @@ import addJoiValidatorMiddleware from './middleware/joi'
 import addQueryParserMiddleware from './middleware/queryParser'
 import addVersionMiddleware from './middleware/version'
 import addRefreshAccessTokenMiddleware from './middleware/refreshAccessToken'
+import validators from './helpers/validators'
+import restifyAsyncWrap from './helpers/async'
 
 export default class ApiService {
     constructor( config ) {
@@ -60,19 +62,30 @@ export default class ApiService {
         addAcceptMiddleware( this.instance )
         addRefreshAccessTokenMiddleware( this.instance, this.config.jwt.requestProperty )
 
-        this.instance.get( `${this.config.endpoint}/health`, ( req, res ) => {
-            requestsServed++
-            res.send( {
-                uid,
-                cuid,
-                packageVersion,
-                defaultApiVersion,
-                currentApiVersion: req.version,
-                apiVersions,
-                uptime: ( new Date().getTime() - startDate ),
-                served: requestsServed
-            } )
-        } )
+        // Register Helath Check Route
+        this.instance.get( `${this.config.endpoint}/health`, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                await this.runServicesHealthCheck()
+                requestsServed++
+                const response = {
+                    uid,
+                    cuid,
+                    status: 'OK',
+                    packageVersion,
+                    defaultApiVersion,
+                    currentApiVersion: req.version,
+                    apiVersions,
+                    uptime: ( new Date().getTime() - startDate ),
+                    served: requestsServed
+                }
+
+                res.send( response )
+                next()
+            } catch ( e ) {
+                next( e )
+            }
+
+        } ) )
 
         this.instance.get( `${this.config.endpoint}/docs`, ( req, res ) => {
             res.end( `
