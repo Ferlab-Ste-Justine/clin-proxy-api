@@ -84,7 +84,7 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
 
         const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct )
 
-        if ( response.result !== 'updated' ) {
+        if ( !response.updated ) {
             return new errors.ResourceNotFoundError()
         }
 
@@ -103,7 +103,7 @@ const deleteStatement = async ( req, res, cacheService, elasticService, logServi
         const uid = params.uid
         const response = await elasticService.deleteMeta( sessionData.acl.fhir, 'statement', uid )
 
-        if ( response.result !== 'deleted' ) {
+        if ( !response.deleted ) {
             return new errors.ResourceNotFoundError()
         }
 

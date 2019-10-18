@@ -167,15 +167,32 @@ export default class ElasticClient {
 
     async updateMeta( acl, index = null, uid, data = {} ) {
         if ( index !== null && uid !== null ) {
-            const uri = `${this.host}/${index}/_doc/${uid}`
+            const uri = `${this.host}/${index}/_doc/_update_by_query`
 
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
             return rp( {
-                method: 'PUT',
+                method: 'POST',
                 uri,
                 json: true,
-                body: data
+                body: {
+                    script: {
+                        source: 'ctx._source = params.data',
+                        lang: 'painless',
+                        params: {
+                            data
+                        }
+                    },
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { _id: uid } },
+                                { match: { practitionerId: acl.practitioner_id } },
+                                { match: { organizationId: acl.organization_id } }
+                            ]
+                        }
+                    }
+                }
             } )
         }
     }
