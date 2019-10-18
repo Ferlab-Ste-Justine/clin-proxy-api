@@ -75,6 +75,7 @@ export default class MetaService extends ApiService {
                     this.logService
                 )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {
@@ -84,6 +85,73 @@ export default class MetaService extends ApiService {
 
         } ) )
 
+        // Register createStatement
+        this.instance.post( {
+            path: `${this.config.endpoint}/statement`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'createStatement' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 201 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register updateStatement
+        this.instance.put( {
+            path: `${this.config.endpoint}/statement`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'updateStatement' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register updateStatement
+        this.instance.del( {
+            path: `${this.config.endpoint}/statement`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                await getFunctionForApiVersion( req.version, 'deleteStatement' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( 204 )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
 
         super.start()
     }

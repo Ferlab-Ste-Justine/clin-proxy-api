@@ -118,8 +118,8 @@ export default class ElasticClient {
         } )
     }
 
-    async searchStatements( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/statement/_search`
+    async searchMeta( acl, type, includes = [], filters = [], shoulds = [], index, limit ) {
+        const uri = `${this.host}/${type}/_search`
         const aclFilters = generateAclFilters( acl, 'statement' )
         const body = {
             from: index,
@@ -146,6 +146,48 @@ export default class ElasticClient {
             json: true,
             body
         } )
+    }
+
+    async createMeta( acl, index, data = {} ) {
+        const uri = `${this.host}/${index}/_doc`
+
+        data.practitionerId = acl.practitioner_id
+        data.organizationId = acl.organization_id
+        return rp( {
+            method: 'POST',
+            uri,
+            json: true,
+            body: data
+        } )
+    }
+
+    async updateMeta( acl, index, uid, data = {} ) {
+        // @NOTE Otherwise, we could create a meta
+        if ( uid !== null ) {
+            const uri = `${this.host}/${index}/_doc/${uid}`
+
+            data.practitionerId = acl.practitioner_id
+            data.organizationId = acl.organization_id
+            return rp( {
+                method: 'PUT',
+                uri,
+                json: true,
+                body: data
+            } )
+        }
+    }
+
+    async deleteMeta( acl, index, uid = null ) {
+        // @NOTE Otherwise, we could delete the entire meta index :)
+        if ( uid !== null ) {
+            const uri = `${this.host}/${index}/_doc/${uid}`
+
+            return rp( {
+                method: 'DELETE',
+                uri,
+                json: true
+            } )
+        }
     }
 
 }

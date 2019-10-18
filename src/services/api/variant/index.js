@@ -70,6 +70,7 @@ export default class VariantService extends ApiService {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getSchema' )( this.logService )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {
@@ -93,6 +94,7 @@ export default class VariantService extends ApiService {
                     this.logService
                 )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {
