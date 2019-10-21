@@ -410,13 +410,19 @@
               }
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "conservation",
+      "label": "category_conservation",
+      "filters": [
         {
-          "id": "prediction_gerp",
-          "label": "filter_prediction_gerp",
+          "id": "conservation_phylop",
+          "label": "filter_conservation_phylop",
           "type": "numcomparison",
           "search": {
-            "prediction_gerp": "consequences.conservationsScores.GERP"
+            "conservation_phylop": "consequences.conservationsScores.PhyloP17Way"
           }
         }
       ]
@@ -467,3 +473,9 @@
     }
   ]
 }
+
+
+
+
+
+
