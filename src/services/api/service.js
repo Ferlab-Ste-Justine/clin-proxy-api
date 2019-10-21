@@ -8,7 +8,6 @@ import addJoiValidatorMiddleware from './middleware/joi'
 import addQueryParserMiddleware from './middleware/queryParser'
 import addVersionMiddleware from './middleware/version'
 import addRefreshAccessTokenMiddleware from './middleware/refreshAccessToken'
-import validators from './helpers/validators'
 import restifyAsyncWrap from './helpers/async'
 
 export default class ApiService {

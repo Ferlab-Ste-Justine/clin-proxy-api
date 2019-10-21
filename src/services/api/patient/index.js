@@ -87,6 +87,7 @@ export default class PatientService extends ApiService {
                     this.logService
                 )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {
@@ -110,6 +111,7 @@ export default class PatientService extends ApiService {
                     this.logService
                 )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {
@@ -133,6 +135,7 @@ export default class PatientService extends ApiService {
                     this.logService
                 )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {

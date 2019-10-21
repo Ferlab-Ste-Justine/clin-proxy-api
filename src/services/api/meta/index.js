@@ -6,7 +6,7 @@ import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
-import validators from '../helpers/validators'
+// import validators from '../helpers/validators'
 import restifyAsyncWrap from '../helpers/async'
 
 
@@ -14,9 +14,9 @@ const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
     1: Apiv1
 } )
 
-export default class VariantService extends ApiService {
+export default class MetaService extends ApiService {
     constructor( config ) {
-        config.logService.info( 'On it!' )
+        config.logService.info( 'Oy?' )
         super( config )
         this.config.cache = config.cacheConfig
         this.config.elastic = config.elasticConfig
@@ -58,17 +58,22 @@ export default class VariantService extends ApiService {
         this.instance.use( rjwt( this.config.jwt ).unless( {
             path: [
                 { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/schema` }
+                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` }
             ]
         } ) )
 
-        // Register Schema Route
+        // Register searchStatements
         this.instance.get( {
-            path: `${this.config.endpoint}/schema`
+            path: `${this.config.endpoint}/statement`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getSchema' )( this.logService )
+                const response = await getFunctionForApiVersion( req.version, 'searchStatements' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
 
                 res.status( 200 )
                 res.send( response )
@@ -80,13 +85,35 @@ export default class VariantService extends ApiService {
 
         } ) )
 
-        // Register Search Route
+        // Register createStatement
         this.instance.post( {
-            path: `${this.config.endpoint}/search`,
-            validation: validators.searchVariantsForPatientByQuery
+            path: `${this.config.endpoint}/statement`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getVariants' )(
+                const response = await getFunctionForApiVersion( req.version, 'createStatement' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 201 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register updateStatement
+        this.instance.put( {
+            path: `${this.config.endpoint}/statement`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'updateStatement' )(
                     req,
                     res,
                     this.cacheService,
@@ -96,6 +123,28 @@ export default class VariantService extends ApiService {
 
                 res.status( 200 )
                 res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register updateStatement
+        this.instance.del( {
+            path: `${this.config.endpoint}/statement`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                await getFunctionForApiVersion( req.version, 'deleteStatement' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( 204 )
                 next()
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )

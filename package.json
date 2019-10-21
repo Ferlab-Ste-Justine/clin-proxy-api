@@ -8,6 +8,7 @@
     "service-auth": "node dist/index.js --service auth",
     "service-patient": "node dist/index.js --service patient",
     "service-variant": "node dist/index.js --service variant",
+    "service-meta": "node dist/index.js --service meta",
     "functional-tests": "babel-node tests/functional/runner.js",
     "unit-tests": "mocha --require @babel/register 'tests/unit/**.js'"
   },

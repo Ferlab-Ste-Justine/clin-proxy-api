@@ -6,17 +6,25 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
     const filters = []
 
     if ( acl.role === 'practitioner' ) {
+        const practitionerId = acl.practitioner_id
+
         if ( index === 'patient' ) {
-            filters.push( { match: { 'practitioners.id': acl.practitioner_id } } )
+            filters.push( { match: { 'practitioners.id': practitionerId } } )
         } else if ( index === 'mutation' ) {
-            filters.push( { match: { 'donors.practitionerId': acl.practitioner_id } } )
+            filters.push( { match: { 'donors.practitionerId': practitionerId } } )
+        } else if ( index === 'statement' ) {
+            filters.push( { match: { practitionerId: practitionerId } } )
         }
 
     } else if ( acl.role === 'genetician' ) {
+        const organizationId = acl.organization_id
+
         if ( index === 'patient' ) {
-            filters.push( { match: { 'organization.id': acl.organization_id } } )
+            filters.push( { match: { 'organization.id': organizationId } } )
         } else if ( index === 'mutation' ) {
-            filters.push( { match: { 'donors.organizationId': acl.organization_id } } )
+            filters.push( { match: { 'donors.organizationId': organizationId } } )
+        } else if ( index === 'statement' ) {
+            filters.push( { match: { organizationId: organizationId } } )
         }
     }
 
@@ -108,6 +116,108 @@ export default class ElasticClient {
             json: true,
             body
         } )
+    }
+
+    async searchMeta( acl, type = null, includes = [], filters = [], shoulds = [], index, limit ) {
+        if ( type !== null ) {
+            const uri = `${this.host}/${type}/_search`
+            const aclFilters = generateAclFilters( acl, 'statement' )
+            const body = {
+                from: index,
+                size: limit,
+                query: {
+                    bool: {
+                        must: filters.concat( aclFilters )
+                    }
+                }
+            }
+
+            if ( includes.length > 0 ) {
+                body._source = { includes }
+            }
+
+            if ( shoulds.length > 0 ) {
+                body.query.bool.should = shoulds
+                body.query.bool.minimum_should_match = 1
+            }
+
+            return rp( {
+                method: 'GET',
+                uri,
+                json: true,
+                body
+            } )
+        }
+    }
+
+    async createMeta( acl, index = null, data = {} ) {
+        if ( index !== null ) {
+            const uri = `${this.host}/${index}/_doc`
+
+            data.practitionerId = acl.practitioner_id
+            data.organizationId = acl.organization_id
+            return rp( {
+                method: 'POST',
+                uri,
+                json: true,
+                body: data
+            } )
+        }
+    }
+
+    async updateMeta( acl, index = null, uid, data = {} ) {
+        if ( index !== null && uid !== null ) {
+            const uri = `${this.host}/${index}/_doc/_update_by_query`
+
+            data.practitionerId = acl.practitioner_id
+            data.organizationId = acl.organization_id
+            return rp( {
+                method: 'POST',
+                uri,
+                json: true,
+                body: {
+                    script: {
+                        source: 'ctx._source = params.data',
+                        lang: 'painless',
+                        params: {
+                            data
+                        }
+                    },
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { _id: uid } },
+                                { match: { practitionerId: acl.practitioner_id } },
+                                { match: { organizationId: acl.organization_id } }
+                            ]
+                        }
+                    }
+                }
+            } )
+        }
+    }
+
+    async deleteMeta( acl, index = null, uid = null ) {
+        if ( index !== null && uid !== null ) {
+            const uri = `${this.host}/${index}/_doc/_delete_by_query`
+
+            return rp( {
+                method: 'POST',
+                uri,
+                json: true,
+                body: {
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { _id: uid } },
+                                { match: { practitionerId: acl.practitioner_id } },
+                                { match: { organizationId: acl.organization_id } }
+                            ]
+                        }
+                    }
+                }
+            } )
+        }
     }
 
 }
