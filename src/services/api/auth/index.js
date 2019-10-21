@@ -114,6 +114,7 @@ export default class AuthService extends ApiService {
                     this.config
                 )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {
@@ -131,6 +132,7 @@ export default class AuthService extends ApiService {
                     this.config
                 )
 
+                res.status( 200 )
                 res.send( response )
                 next()
             } catch ( e ) {
@@ -150,6 +152,7 @@ export default class AuthService extends ApiService {
                     this.config
                 )
 
+                res.status( 201 )
                 res.send( response )
                 next()
             } catch ( e ) {
