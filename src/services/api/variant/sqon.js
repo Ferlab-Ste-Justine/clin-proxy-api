@@ -116,7 +116,6 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
         const fieldMap = getFieldNameFromSchema( fieldId )
 
         // @NOTE Logic based on filter type
-        // @NOTE Only numcomparison and genericbool are groupeable right now
         switch ( type ) {
             default:
             case 'generic':
@@ -169,28 +168,24 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                     }, [] )
                 }
 
+            // @TODO Make groupeable
+            // @NOTE Only supports numerical comparison with aggs value as a quality match
             case 'composite':
-                const isNumericalComparison = !!( instruction.data.value.comparator && instruction.data.value.score )
+                const isNumericalComparison = !!instruction.data.comparator
 
                 if ( isNumericalComparison ) {
                     return {
                         must: {
-                            range: { [ fieldMap.score ]: { [ getVerbFromNumericalComparator( instruction.data.value.comparator ) ]: instruction.data.value.score } }
+                            range: { [ fieldMap.score ]: { [ getVerbFromNumericalComparator( instruction.data.comparator ) ]: instruction.data.value } }
                         }
                     }
                 }
-
-                const isQualityComparison = !!instruction.data.value.quality
-
-                if ( isQualityComparison ) {
-                    return {
-                        must: {
-                            match: { [ fieldMap.quality ]: instruction.data.value.quality }
-                        }
+                return {
+                    must: {
+                        match: { [ fieldMap.quality ]: instruction.data.value }
                     }
                 }
 
-                return {}
         }
     }
 
