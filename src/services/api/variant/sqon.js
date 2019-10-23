@@ -108,7 +108,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
     const getFieldNameFromSchema = ( id ) => {
         const schemaFilter = find( flattenedSchema, { id } )
 
-        return schemaFilter.search[ [ id ] ]
+        return schemaFilter.search[ [ id ] ] || schemaFilter.search
     }
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
@@ -116,7 +116,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
         const fieldMap = getFieldNameFromSchema( fieldId )
 
         // @NOTE Logic based on filter type
-        // @NOTE Only numcomparison and genericbool are groupeable right now
+        // @NOTE Only generic, specific, numcomparison and genericbool are groupeable right now
         switch ( type ) {
             default:
             case 'generic':
@@ -130,17 +130,6 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                 }
 
             case 'numcomparison':
-                if ( !instruction.data.values ) {
-                    return {
-                        must: {
-                            range: {
-                                [ fieldMap ]: {
-                                    [ getVerbFromNumericalComparator( instruction.data.comparator ) ]: instruction.data.value
-                                }
-                            }
-                        }
-                    }
-                }
                 return {
                     must: instruction.data.values.reduce( ( accumulator, group ) => {
                         accumulator.push( {
@@ -155,16 +144,9 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                 }
 
             case 'genericbool':
-                if ( !instruction.data.values ) {
-                    return {
-                        must: {
-                            match: { [ fieldMap ]: true }
-                        }
-                    }
-                }
                 return {
                     must: instruction.data.values.reduce( ( accumulator, group ) => {
-                        accumulator.push( { match: { [ fieldMap[ group.id ] ]: true } } )
+                        accumulator.push( { match: { [ fieldMap[ group ] ]: true } } )
                         return accumulator
                     }, [] )
                 }
