@@ -430,7 +430,48 @@
     {
       "id": "cohort",
       "label": "category_cohort",
-      "filters": []
+      "filters": [
+        {
+          "id": "cohort_gnomad_exomes",
+          "label": "filter_cohort_gnomad_exomes",
+          "type": "numcomparison",
+          "search": {
+            "cohort_gnomad_exomes": "frequencies.gnomAD_exomes"
+          }
+        },
+        {
+          "id": "cohort_gnomad_genomes",
+          "label": "filter_cohort_gnomad_genomes",
+          "type": "numcomparison",
+          "search": {
+            "cohort_gnomad_genomes": "frequencies.gnomAD_genomes"
+          }
+        },
+        {
+          "id": "cohort_exac",
+          "label": "filter_cohort_exac",
+          "type": "numcomparison",
+          "search": {
+            "cohort_exac": "frequencies.ExAc"
+          }
+        },
+        {
+          "id": "cohort_uk10k",
+          "label": "filter_cohort_uk10k",
+          "type": "numcomparison",
+          "search": {
+            "cohort_uk10k": "frequencies.Uk10k"
+          }
+        },
+        {
+          "id": "cohort_1000gp3",
+          "label": "filter_cohort_1000gp3",
+          "type": "numcomparison",
+          "search": {
+            "cohort_1000gp3": "frequencies.1000Gp3"
+          }
+        }
+      ]
     },
     {
       "id": "zygosity",
