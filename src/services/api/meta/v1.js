@@ -33,7 +33,7 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
 const createStatement = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        const params = req.body
         const patientId = params.patient || null
         const title = params.title || ''
         const description = params.description || ''
@@ -66,7 +66,7 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
 const updateStatement = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        const params = req.body
         const uid = params.uid
         const patientId = params.patient || null
         const title = params.title || ''
