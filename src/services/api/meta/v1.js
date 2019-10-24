@@ -44,8 +44,8 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
             patientId,
             title,
             description,
-            defaultQueries,
-            researchQueries
+            defaultQueries: JSON.stringify( defaultQueries ),
+            researchQueries: JSON.stringify( researchQueries )
         }
 
         const response = await elasticService.createMeta( sessionData.acl.fhir, 'statement', struct )
@@ -78,8 +78,8 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
             patientId,
             title,
             description,
-            defaultQueries,
-            researchQueries
+            defaultQueries: JSON.stringify( defaultQueries ),
+            researchQueries: JSON.stringify( researchQueries )
         }
 
         const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct )
