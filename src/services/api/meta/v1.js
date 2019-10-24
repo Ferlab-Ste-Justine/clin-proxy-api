@@ -16,6 +16,7 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
         const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], filters, [], index, limit )
 
         if ( response.hits.total < 1 ) {
+            await logService.info( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
             return new errors.NotFoundError()
         }
 
@@ -99,7 +100,7 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
 const deleteStatement = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        const params = req.body
         const uid = params.uid
         const response = await elasticService.deleteMeta( sessionData.acl.fhir, 'statement', uid )
 
