@@ -1,0 +1,57 @@
+{
+  "settings": {
+    "number_of_shards": 4
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "researchQueries": {
+          "type": "text"
+        },
+        "defaultQueries": {
+          "type": "text"
+        },
+        "title": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "lastUpdatedOn": { "type" : "date" },
+        "description": {
+          "type": "text"
+        },
+        "patientId": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "organizationId": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "practitionerId": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        }
+      }
+    }
+  }
+}

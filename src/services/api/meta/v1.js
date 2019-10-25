@@ -16,6 +16,7 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
         const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], filters, [], index, limit )
 
         if ( response.hits.total < 1 ) {
+            await logService.info( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
             return new errors.NotFoundError()
         }
 
@@ -33,7 +34,7 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
 const createStatement = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        const params = req.body
         const patientId = params.patient || null
         const title = params.title || ''
         const description = params.description || ''
@@ -44,8 +45,9 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
             patientId,
             title,
             description,
-            defaultQueries,
-            researchQueries
+            defaultQueries: JSON.stringify( defaultQueries ),
+            researchQueries: JSON.stringify( researchQueries ),
+            lastUpdatedOn: new Date().getTime()
         }
 
         const response = await elasticService.createMeta( sessionData.acl.fhir, 'statement', struct )
@@ -66,7 +68,7 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
 const updateStatement = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        const params = req.body
         const uid = params.uid
         const patientId = params.patient || null
         const title = params.title || ''
@@ -78,8 +80,9 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
             patientId,
             title,
             description,
-            defaultQueries,
-            researchQueries
+            defaultQueries: JSON.stringify( defaultQueries ),
+            researchQueries: JSON.stringify( researchQueries ),
+            lastUpdatedOn: new Date().getTime()
         }
 
         const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct )
@@ -99,7 +102,7 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
 const deleteStatement = async ( req, res, cacheService, elasticService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        const params = req.body
         const uid = params.uid
         const response = await elasticService.deleteMeta( sessionData.acl.fhir, 'statement', uid )
 
