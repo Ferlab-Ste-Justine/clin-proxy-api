@@ -130,12 +130,14 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                 }
 
             case 'numcomparison':
+                const comparisons = instruction.data.values ? instruction.data.values : [ instruction.data ]
+
                 return {
-                    must: instruction.data.values.reduce( ( accumulator, group ) => {
+                    must: comparisons.reduce( ( accumulator, group ) => {
                         accumulator.push( {
                             range: {
-                                [ fieldMap[ group.id ] ]: {
-                                    [ getVerbFromNumericalComparator( group.comparator ) ]: instruction.data.value
+                                [ fieldMap ]: {
+                                    [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
                                 }
                             }
                         } )
