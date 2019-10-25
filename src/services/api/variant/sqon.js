@@ -121,6 +121,16 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
             default:
             case 'generic':
             case 'specific':
+                // @NOTE Data Structure Example
+                /* Grouped
+                {
+                    type: 'generic',
+                    data: {
+                        id: 'variant_type',
+                        operand: 'all',
+                        values: ['SNP', 'deletion']
+                    }
+                } */
                 return {
                     [ getVerbFromGenericOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
                         ( accumulator, value ) => {
@@ -130,6 +140,34 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                 }
 
             case 'numcomparison':
+                // @NOTE Data Structure Example
+                /* Ungrouped
+                {
+                    type: 'numcomparison,
+                    data: {
+                        id: 'phylop'
+                        comparator: '>',
+                        value: '0.5'
+                    }
+                } */
+                /* Grouped
+                {
+                    type: 'numcomparison,
+                    data: {
+                        values: [
+                            {
+                                id: 'phylop'
+                                comparator: '>=',
+                                value: 0.1
+                            },
+                            {
+                                id: 'phylop2'
+                                comparator: '<',
+                                value: 0.1
+                            }
+                        ]
+                    }
+                } */
                 const comparisons = instruction.data.values ? instruction.data.values : [ instruction.data ]
 
                 return {
@@ -146,6 +184,14 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                 }
 
             case 'genericbool':
+                // @NOTE Data Structure Example
+                /* Grouped
+                {
+                    type: 'genericbool,
+                    data: {
+                        values: ['pubmed', 'clinvar']
+                    }
+                } */
                 return {
                     must: instruction.data.values.reduce( ( accumulator, group ) => {
                         accumulator.push( { match: { [ fieldMap[ group ] ]: true } } )
@@ -157,6 +203,15 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
             // @NOTE Only supports numerical comparison with aggs value as a quality match
             case 'composite':
                 const isNumericalComparison = !!instruction.data.comparator
+                // @NOTE Data Structure Example
+                /* Ungrouped - Score Comparator
+                {
+                    type: 'composite,
+                    data: {
+                        comparator: '>=',
+                        value: 0.5
+                    }
+                } */
 
                 if ( isNumericalComparison ) {
                     return {
@@ -165,6 +220,15 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                         }
                     }
                 }
+
+                /* Ungrouped - Quality Comparator
+                {
+                    type: 'composite,
+                    data: {
+                        quality: 'prediction_sift'
+                        value: 'T'
+                    }
+                } */
                 return {
                     must: {
                         match: { [ fieldMap.quality ]: instruction.data.value }
