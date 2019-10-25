@@ -54,6 +54,11 @@ pnpm start
   - Set an email
   - Set a non-temporary password under Credentials > Manage Password
 
+##### ElasticSearch Set-up
+To create the index 'statement', run the following command line where ElasticSearch is available (ssh -L or ssh thru environment)
+
+```curl -XPUT "http://localhost:9200/statement" -H 'Content-Type: application/json' -d @clin-meta-centric.json```
+
 ### Production Set-up
 
 #### Manual Mode
