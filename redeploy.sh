@@ -21,7 +21,7 @@ docker stack rm qa-proxy-api
 docker stack deploy -c docker-compose.yml qa-proxy-api
 sleep 20
 
-docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:${1}
-docker service update qa-proxi-api_patient --image localhost:5000/clin-proxy-api-patient-service:${1}
-docker service update qa-proxi-api_variant --image localhost:5000/clin-proxy-api-variant-service:${1}
-docker service update qa-proxi-api_meta --image localhost:5000/clin-proxy-api-meta-service:${1}
+docker service update qa-proxy-api_auth --image localhost:5000/clin-proxy-api-auth-service:${1}
+docker service update qa-proxy-api_patient --image localhost:5000/clin-proxy-api-patient-service:${1}
+docker service update qa-proxy-api_variant --image localhost:5000/clin-proxy-api-variant-service:${1}
+docker service update qa-proxy-api_meta --image localhost:5000/clin-proxy-api-meta-service:${1}
