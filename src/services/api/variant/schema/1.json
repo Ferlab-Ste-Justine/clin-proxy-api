@@ -291,9 +291,12 @@
         {
           "id": "prediction_fathmm",
           "label": "filter_prediction_fathmm",
-          "type": "generic",
+          "type": "composite",
           "search": {
-            "prediction_fathmm": "consequences.predictions.FATHMM"
+            "prediction_sift": {
+              "score": "consequences.predictions.FATHMM_score",
+              "quality": "consequences.predictions.FATHMM"
+            }
           },
           "facet": [
             {
@@ -303,7 +306,7 @@
                 "order": {
                   "_count": "desc"
                 },
-                "size": 999
+                "size": 9
               }
             }
           ]
@@ -326,7 +329,30 @@
                 "order": {
                   "_count": "desc"
                 },
-                "size": 999
+                "size": 9
+              }
+            }
+          ]
+        },
+        {
+          "id": "prediction_polyphen2hvar",
+          "label": "filter_prediction_polyphen2hvar",
+          "type": "composite",
+          "search": {
+            "prediction_sift": {
+              "score": "consequences.predictions.Polyphen2_HVAR_score",
+              "quality": "consequences.predictions.Polyphen2_HVAR_pred"
+            }
+          },
+          "facet": [
+            {
+              "id": "prediction_polyphen2hvar",
+              "terms": {
+                "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 9
               }
             }
           ]
@@ -334,9 +360,12 @@
         {
           "id": "prediction_lrt",
           "label": "filter_prediction_lrt",
-          "type": "generic",
+          "type": "composite",
           "search": {
-            "prediction_lrt": "consequences.predictions.LRT_pred"
+            "prediction_sift": {
+              "score": "consequences.predictions.LRT_score",
+              "quality": "consequences.predictions.LRT_pred"
+            }
           },
           "facet": [
             {
@@ -346,70 +375,34 @@
                 "order": {
                   "_count": "desc"
                 },
-                "size": 999
+                "size": 9
               }
             }
           ]
         },
         {
-          "id": "prediction_mutation_assessor",
-          "label": "filter_prediction_mutation_assessor",
-          "type": "generic",
+          "id": "prediction_dann",
+          "label": "filter_prediction_dann",
+          "type": "numcomparison",
           "search": {
-            "prediction_mutation_assessor": "consequences.predictions.MutationAssessor_pred"
-          },
-          "facet": [
-            {
-              "id": "prediction_mutation_assessor",
-              "terms": {
-                "field": "consequences.predictions.MutationAssessor_pred.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
-              }
-            }
-          ]
+            "prediction_dann": "consequences.predictions.DANN_score"
+          }
         },
         {
-          "id": "prediction_polyphen2_hdiv",
-          "label": "filter_prediction_polyphen2_hdiv",
-          "type": "generic",
+          "id": "prediction_cadd",
+          "label": "filter_prediction_cadd",
+          "type": "numcomparison",
           "search": {
-            "prediction_polyphen2_hdiv": "consequences.predictions.Polyphen2_HDIV"
-          },
-          "facet": [
-            {
-              "id": "prediction_polyphen2_hdiv",
-              "terms": {
-                "field": "consequences.predictions.Polyphen2_HDIV.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
-              }
-            }
-          ]
+            "prediction_cadd": "consequences.predictions.CADD_score"
+          }
         },
         {
-          "id": "prediction_polyphen2_hvar",
-          "label": "filter_prediction_polyphen2_hvar",
-          "type": "generic",
+          "id": "prediction_revel",
+          "label": "filter_prediction_revel",
+          "type": "prediction_revel",
           "search": {
-            "prediction_polyphen2_hvar": "consequences.predictions.Polyphen2_HVAR_pred"
-          },
-          "facet": [
-            {
-              "id": "prediction_polyphen2_hvar",
-              "terms": {
-                "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
-              }
-            }
-          ]
+            "prediction_cadd": "consequences.predictions.REVEL_score"
+          }
         }
       ]
     },
