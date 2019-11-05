@@ -201,9 +201,6 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
 
             // @NOTE Only supports numerical comparison with aggs value as a quality match
             case 'composite':
-
-                console.log( fieldMap )
-
                 const composites = instruction.data.values ? instruction.data.values : [ instruction.data ]
 
                 return {
