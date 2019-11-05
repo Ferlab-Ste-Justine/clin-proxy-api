@@ -293,7 +293,7 @@
           "label": "filter_prediction_fathmm",
           "type": "composite",
           "search": {
-            "prediction_sift": {
+            "prediction_fathmm": {
               "score": "consequences.predictions.FATHMM_score",
               "quality": "consequences.predictions.FATHMM"
             }
@@ -339,7 +339,7 @@
           "label": "filter_prediction_polyphen2hvar",
           "type": "composite",
           "search": {
-            "prediction_sift": {
+            "prediction_polyphen2hvar": {
               "score": "consequences.predictions.Polyphen2_HVAR_score",
               "quality": "consequences.predictions.Polyphen2_HVAR_pred"
             }
@@ -362,7 +362,7 @@
           "label": "filter_prediction_lrt",
           "type": "composite",
           "search": {
-            "prediction_sift": {
+            "prediction_lrt": {
               "score": "consequences.predictions.LRT_score",
               "quality": "consequences.predictions.LRT_pred"
             }
@@ -401,7 +401,7 @@
           "label": "filter_prediction_revel",
           "type": "prediction_revel",
           "search": {
-            "prediction_cadd": "consequences.predictions.REVEL_score"
+            "prediction_revel": "consequences.predictions.REVEL_score"
           }
         }
       ]

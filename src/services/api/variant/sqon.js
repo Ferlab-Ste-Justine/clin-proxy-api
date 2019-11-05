@@ -205,8 +205,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
 
                 return {
                     must: composites.reduce( ( accumulator, group ) => {
-                        const isNumericalComparison = !!group.score
-                        const isQualitativeComparison = !!group.quality
+                        const isNumericalComparison = !!group.comparator
 
                         if ( isNumericalComparison ) {
                             // @NOTE Data Structure Example
@@ -234,12 +233,12 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                             } */
                             accumulator.push( {
                                 range: {
-                                    [ fieldMap[ group.score ] ]: {
+                                    [ ( fieldMap.score || fieldMap[ group.id ].score ) ]: {
                                         [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
                                     }
                                 }
                             } )
-                        } else if ( isQualitativeComparison ) {
+                        } else {
                             // @NOTE Data Structure Example
                             /* Ungrouped
                             {
@@ -262,7 +261,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                                 }
                             } */
                             accumulator.push( {
-                                match: { [ fieldMap[ group.quality ] ]: group.value }
+                                match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: group.value }
                             } )
                         }
 
