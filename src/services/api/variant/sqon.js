@@ -199,40 +199,74 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
                     }, [] )
                 }
 
-            // @TODO Make groupeable
             // @NOTE Only supports numerical comparison with aggs value as a quality match
             case 'composite':
-                const isNumericalComparison = !!instruction.data.comparator
-                // @NOTE Data Structure Example
-                /* Ungrouped - Score Comparator
-                {
-                    type: 'composite,
-                    data: {
-                        comparator: '>=',
-                        value: 0.5
-                    }
-                } */
+                const composites = instruction.data.values ? instruction.data.values : [ instruction.data ]
 
-                if ( isNumericalComparison ) {
-                    return {
-                        must: {
-                            range: { [ fieldMap.score ]: { [ getVerbFromNumericalComparator( instruction.data.comparator ) ]: instruction.data.value } }
-                        }
-                    }
-                }
-
-                /* Ungrouped - Quality Comparator
-                {
-                    type: 'composite,
-                    data: {
-                        quality: 'prediction_sift'
-                        value: 'T'
-                    }
-                } */
                 return {
-                    must: {
-                        match: { [ fieldMap.quality ]: instruction.data.value }
-                    }
+                    must: composites.reduce( ( accumulator, group ) => {
+                        const isNumericalComparison = !!group.comparator
+
+                        if ( isNumericalComparison ) {
+                            // @NOTE Data Structure Example
+                            /* Ungrouped
+                            {
+                                type: 'composite,
+                                data: {
+                                    score: 'prediction_sift',
+                                    comparator: '>=',
+                                    value: 0.5
+                                }
+                            } */
+                            /* Grouped
+                            {
+                                type: 'composite,
+                                data: {
+                                    values: [
+                                        {
+                                            score: 'prediction_sift',
+                                            comparator: '>=',
+                                            value: 0.5
+                                        }
+                                    ]
+                                }
+                            } */
+                            accumulator.push( {
+                                range: {
+                                    [ ( fieldMap.score || fieldMap[ group.id ].score ) ]: {
+                                        [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
+                                    }
+                                }
+                            } )
+                        } else {
+                            // @NOTE Data Structure Example
+                            /* Ungrouped
+                            {
+                                type: 'composite,
+                                data: {
+                                    quality: 'prediction_sift'
+                                    value: 'T'
+                                }
+                            } */
+                            /* Grouped
+                            {
+                                type: 'composite,
+                                data: {
+                                    values: [
+                                        {
+                                            quality: 'prediction_sift'
+                                            value: 'T'
+                                        }
+                                    ]
+                                }
+                            } */
+                            accumulator.push( {
+                                match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: group.value }
+                            } )
+                        }
+
+                        return accumulator
+                    }, [] )
                 }
 
         }
