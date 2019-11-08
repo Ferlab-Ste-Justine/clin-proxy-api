@@ -9,7 +9,7 @@ docker push localhost:5000/clin-proxy-api-meta-service:latest
 
 docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:${1}
 docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:${1}
-docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-variant-service:${1}
+docker tag localhost:5000/clin-proxy-api-variant-service:latest localhost:5000/clin-proxy-api-variant-service:${1}
 docker tag localhost:5000/clin-proxy-api-meta-service:latest localhost:5000/clin-proxy-api-meta-service:${1}
 
 docker push localhost:5000/clin-proxy-api-auth-service:${1}
