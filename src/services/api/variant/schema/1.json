@@ -261,26 +261,6 @@
               }
             }
           ]
-        },
-        {
-          "id": "genegroup_ensemble",
-          "label": "filter_genegroup_ensemble",
-          "type": "generic",
-          "search": {
-            "genegroup_ensemble": "genes.ensemblId"
-          },
-          "facet": [
-            {
-              "id": "genegroup_ensemble",
-              "terms": {
-                "field": "genes.ensemblId.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
-              }
-            }
-          ]
         }
       ]
     },
