@@ -60,17 +60,17 @@
           "label": "filter_extdb",
           "type": "genericbool",
           "search": {
-            "pubmed": "availableDbExt.pubmed",
-            "clinvar": "availableDbExt.clinvar",
-            "hpo": "availableDbExt.hpo",
-            "dbsnp": "availableDbExt.dbSNP",
-            "orphanet": "availableDbExt.orphanet",
-            "radboudumc": "availableDbExt.radboudumc",
-            "omim": "availableDbExt.omim"
+            "extdb_pubmed": "availableDbExt.pubmed",
+            "extdb_clinvar": "availableDbExt.clinvar",
+            "extdb_hpo": "availableDbExt.hpo",
+            "extdb_dbsnp": "availableDbExt.dbSNP",
+            "extdb_orphanet": "availableDbExt.orphanet",
+            "extdb_radboudumc": "availableDbExt.radboudumc",
+            "extdb_omim": "availableDbExt.omim"
           },
           "facet": [
             {
-              "id": "pubmed",
+              "id": "extdb_pubmed",
               "label": "filter_extdb_pubmed",
               "terms": {
                 "field": "availableDbExt.pubmed",
@@ -78,7 +78,7 @@
               }
             },
             {
-              "id": "clinvar",
+              "id": "extdb_clinvar",
               "label": "filter_extdb_clinvar",
               "terms": {
                 "field": "availableDbExt.clinvar",
@@ -86,7 +86,7 @@
               }
             },
             {
-              "id": "hpo",
+              "id": "extdb_hpo",
               "label": "filter_extdb_hpo",
               "terms": {
                 "field": "availableDbExt.hpo",
@@ -94,7 +94,7 @@
               }
             },
             {
-              "id": "dbsnp",
+              "id": "extdb_dbsnp",
               "label": "filter_extdb_dbsnp",
               "terms": {
                 "field": "availableDbExt.dbSNP",
@@ -102,7 +102,7 @@
               }
             },
             {
-              "id": "orphanet",
+              "id": "extdb_orphanet",
               "label": "filter_extdb_orphanet",
               "terms": {
                 "field": "availableDbExt.orphanet",
@@ -110,7 +110,7 @@
               }
             },
             {
-              "id": "radboudumc",
+              "id": "extdb_radboudumc",
               "label": "filter_extdb_radboudumc",
               "terms": {
                 "field": "availableDbExt.radboudumc",
@@ -118,7 +118,7 @@
               }
             },
             {
-              "id": "omim",
+              "id": "extdb_omim",
               "label": "filter_extdb_omim",
               "terms": {
                 "field": "availableDbExt.omim",
