@@ -21,6 +21,7 @@ const process_request_token = R.curry((
     serviceJwtPropertyName,
     jwtSecret,
     launcherVersion,
+    autoRefreshToken,
     req 
     ) => {
     if ( req.headers && req.headers.cookie ) {
@@ -39,11 +40,15 @@ const process_request_token = R.curry((
             const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
 
             if ( req.jwt.expiry <= currentTimeInSeconds ) {
-                const refreshPayload = refreshTokenMiddleware( req )
+                if(autoRefreshToken) {
+                    const refreshPayload = refreshTokenMiddleware( req )
 
-                token = refreshPayload.data.token.value
-                req.jwt = jwt.decode( token, jwtSecret )
-                req.newAccessTokenIssued = token
+                    token = refreshPayload.data.token.value
+                    req.jwt = jwt.decode( token, jwtSecret )
+                    req.newAccessTokenIssued = token
+                } else {
+                    return new errors.InvalidCredentialsError( 'The token version is expired' )
+                }
             }
 
             return token

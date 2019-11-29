@@ -18,6 +18,7 @@ import { get_certificate } from './utils/certificate'
 import { LogService, launcherLog, logLevel } from './utils/logger'
 import { process_request_token } from './utils/jwt'
 
+const string_to_boolean = (value) => value == "true" ? true : false
 
 let load_launcher_json_env = load_env(R._, JSON.parse, launcherLog, json_err_handler);
 let load_launcher_string_env = load_string_env(R._, R.identity, launcherLog, R._);
@@ -46,6 +47,17 @@ const serviceJwtPropertyName = load_launcher_string_env(
     fixed_msg_warn_handler(
         'No JWT_PROPERTY_NAME defined in environment, using default: token.',
         () => 'token'
+    )
+)
+//WARNING: Leaving the defaut to auto-refresh tokens not to break backward compatibility,
+//but it is a much less secure setting. It means that any previously expired token can be used
+//to access the system. This setting should be set to 'false' as much as possible.
+const autoRefreshJwt = load_env(
+    'AUTO_REFRESH_JWT', 
+    string_to_boolean,
+    fixed_msg_warn_handler(
+        'No AUTO_REFRESH_JWT defined in environment. Defaulting to the less secure auto-refreshing',
+        () => true
     )
 )
 
@@ -95,6 +107,7 @@ const generateApiConfig = ( serviceName ) => {
                 serviceJwtPropertyName,
                 jwtSecret,
                 launcherVersion,
+                autoRefreshJwt,
             )
             // isRevoked: ( req, payload, done ) => {}
         },
