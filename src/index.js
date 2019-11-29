@@ -1,5 +1,6 @@
-import fs from 'fs'
 import errors from 'restify-errors'
+
+const R = require('ramda');
 
 try {
     require( 'babel-polyfill' )
@@ -15,6 +16,8 @@ import jwt from 'jsonwebtoken'
 import payloadFormatter from './services/api/helpers/payload'
 import { refreshTokenMiddlewareGenerator } from './services/api/auth'
 
+import { load_env, json_err_handler, fixed_msg_err_handler, fixed_msg_warn_handler } from './env_utils'
+import { get_certificate } from './certificate_utils'
 
 if ( !process.env.LOGGER ) {
     console.log( 'No LOGGER defined in environment, using default: console.' )
@@ -24,98 +27,45 @@ const LogService = require( `./loggers/${process.env.LOGGER}` )
 const logLevel = process.env.LOG_LEVEL || 'debug'
 const launcherLog = new LogService( 'Kennedy Space Center', logLevel )
 
-if ( !process.env.npm_package_version ) {
-    console.log( 'Version missing from package.json file. Exiting...' ) // eslint-disable-line
-    process.exit( 1 )
-}
-const launcherVersion = process.env.npm_package_version
+let load_launcher_json_env = load_env(R._, JSON.parse, launcherLog, json_err_handler);
+let load_launcher_string_env = load_string_env(R._, R.identity, launcherLog, R._);
 
-let apiServices = null
+const launcherVersion = load_launcher_string_env(
+    'npm_package_version', 
+    fixed_msg_err_handler(
+        'Version missing from package.json file. Exiting...'
+    )
+)
+const serviceJwtSecret = load_launcher_string_env(
+    'JWT_SECRET',
+    fixed_msg_err_handler(
+        'No JWT_SECRET specified in environment'
+    )
+)
+const containerId = load_launcher_string_env(
+    'CONTAINER_ID',
+    fixed_msg_warn_handler(
+        'No CONTAINER_ID specified in environment, auto-generated.',
+        uniqid
+    )
+)
+const serviceJwtPropertyName = load_launcher_string_env(
+    'JWT_PROPERTY_NAME',
+    fixed_msg_warn_handler(
+        'No JWT_PROPERTY_NAME defined in environment, using default: token.',
+        () => 'token'
+    )
+)
 
-try {
-    apiServices = JSON.parse( process.env.API_SERVICES )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing API_SERVICES in environment.' )
-    process.exit( 1 )
-}
 
-let serviceCorsOrigins = null
+let apiServices = load_launcher_json_env('API_SERVICES')
+let serviceCorsOrigins = load_launcher_json_env('CORS_ORIGINS')
+let cacheServiceConfig = load_launcher_json_env('MEMCACHE_SERVICE')
+let keycloakServiceConfig = load_launcher_json_env('KEYCLOAK_SERVICE')
+let aidboxServiceConfig = load_launcher_json_env('AIDBOX_SERVICE')
+let elasticServiceConfig = load_launcher_json_env('ELASTIC_SERVICE')
 
-try {
-    serviceCorsOrigins = JSON.parse( process.env.CORS_ORIGINS )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing CORS_ORIGINS in environment.' )
-    process.exit( 1 )
-}
-
-if ( !process.env.JWT_SECRET ) {
-    launcherLog.error( 'No JWT_SECRET specified in environment' )
-    process.exit( 1 )
-}
-const serviceJwtSecret = process.env.JWT_SECRET
-
-let cacheServiceConfig = null
-
-try {
-    cacheServiceConfig = JSON.parse( process.env.MEMCACHE_SERVICE )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing MEMCACHE_SERVICE in environment.' )
-    process.exit( 1 )
-}
-
-let keycloakServiceConfig = null
-
-try {
-    keycloakServiceConfig = JSON.parse( process.env.KEYCLOAK_SERVICE )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing KEYCLOAK_SERVICE in environment.' )
-    process.exit( 1 )
-}
-
-let aidboxServiceConfig = null
-
-try {
-    aidboxServiceConfig = JSON.parse( process.env.AIDBOX_SERVICE )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing AIDBOX_SERVICE in environment.' )
-    process.exit( 1 )
-}
-
-let elasticServiceConfig = null
-
-try {
-    elasticServiceConfig = JSON.parse( process.env.ELASTIC_SERVICE )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing ELASTIC_SERVICE in environment.' )
-    process.exit( 1 )
-}
-
-if ( !process.env.CONTAINER_ID ) {
-    process.env.CONTAINER_ID = uniqid()
-    launcherLog.warning( 'No CONTAINER_ID specified in environment, auto-generated.' )
-}
-const containerId = process.env.CONTAINER_ID
-
-if ( !process.env.JWT_PROPERTY_NAME ) {
-    launcherLog.warning( 'No JWT_PROPERTY_NAME defined in environment, using default: token.' )
-    process.env.JWT_PROPERTY_NAME = 'token'
-}
-const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
-
-let sslCertificate = null
-let sslCertificateKey = null
-
-if ( !process.env.SSL_CERTIFICATE_PATH || !process.env.SSL_CERTIFICATE_KEY_PATH ) {
-    launcherLog.warning( 'No SSL_CERTIFICATE_PATH or SSL_CERTIFICATE_KEY_PATH defined in environment.' )
-} else {
-    try {
-        sslCertificate = fs.readFileSync( process.env.SSL_CERTIFICATE_PATH )
-        sslCertificateKey = fs.readFileSync( process.env.SSL_CERTIFICATE_KEY_PATH )
-    } catch ( e ) {
-        launcherLog.error( 'SSL_CERTIFICATE_PATH or SSL_CERTIFICATE_KEY_PATH could not be read.' )
-        process.exit( 1 )
-    }
-}
+const { sslCertificate, sslCertificateKey } = get_certificate(launcherLog)
 
 const serviceToLaunch = args.service || null
 

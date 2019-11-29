@@ -1,7 +1,6 @@
 /* eslint-disable no-case-declarations */
 
-import { isArray, filter, find } from 'lodash'
-
+import { filter, propEq, find } from 'ramda'
 
 export const validate = ( statement ) => {
     if ( !( statement instanceof Array ) || !statement[ 0 ] || !statement[ 0 ].instructions || statement[ 0 ].instructions.length < 1 ) {
@@ -11,29 +10,21 @@ export const validate = ( statement ) => {
     return true
 }
 
-const instructionIsSubquery = ( instruction ) => {
-    return ( instruction.type === 'subquery' )
-}
+const instructionIsSubquery = propEq('type', 'subquery');
 
-const instructionIsFilter = ( instruction ) => {
-    return ( instruction.type === 'filter' )
-}
+const instructionIsFilter = propEq('type', 'filter');
 
-const instructionIsOperator = ( instruction ) => {
-    return ( instruction.type === 'operator' )
-}
+const instructionIsOperator = propEq('type', 'operator');
+
+const statementKeyEquals = propEq('key')
 
 const getQueryByKey = ( statement, key ) => {
-    return find( statement, { key } )
+    return find( statementKeyEquals(key), statement )
 }
 
-const findAllSubqueryInstructions = ( instructions ) => {
-    return filter( instructions, { type: 'subquery' } )
-}
+const findAllSubqueryInstructions = filter(instructionIsSubquery);
 
-const findAllOperatorInstructions = ( instructions ) => {
-    return filter( instructions, { type: 'operator' } )
-}
+const findAllOperatorInstructions = filter(instructionIsOperator);
 
 const hasSubqueries = ( query ) => {
     const nested = findAllSubqueryInstructions( query.instructions )
@@ -285,9 +276,9 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
     }
 
     const mapInstructions = ( instructions ) => {
-        const isFilterOnly = ( !isArray( instructions[ 0 ] ) && Object.keys( instructions ).length === 1 )
+        const isFilterOnly = ( !Array.isArray( instructions[ 0 ] ) && Object.keys( instructions ).length === 1 )
         const instructionsLength = instructions.length || 0
-        const isComposite = ( instructionsLength === 1 && isArray( instructions[ 0 ] ) )
+        const isComposite = ( instructionsLength === 1 && Array.isArray( instructions[ 0 ] ) )
         const isMultiComposite = ( instructionsLength > 1 )
 
         if ( isComposite || isMultiComposite ) {
@@ -296,7 +287,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
             if ( operators.length > 0 ) {
                 const composites = instructions.reduce( ( accumulator, composite ) => {
                     if ( !instructionIsOperator( composite ) ) {
-                        const part = mapInstructions( isArray( composite ) ? composite : [ composite ] )
+                        const part = mapInstructions( Array.isArray( composite ) ? composite : [ composite ] )
 
                         accumulator.push( part )
                     }
@@ -323,7 +314,7 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
 }
 
 const translate = ( statement, queryKey, dialect = 'es', dialectOptions ) => {
-    const isValid = validate( isArray( statement ) ? statement : [ statement ] )
+    const isValid = validate( Array.isArray( statement ) ? statement : [ statement ] )
 
     if ( !isValid ) {
         if ( dialect === 'es' ) {

@@ -1,5 +1,5 @@
 import rp from 'request-promise-native'
-import { flatten, map, isArray } from 'lodash'
+import { unnest, map, prop } from 'ramda'
 
 
 const generateAclFilters = ( acl, index = 'patient' ) => {
@@ -77,14 +77,14 @@ export default class ElasticClient {
 
     async searchVariantsForPatient( patient, request, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}`
-        const schemaFilters = flatten(
-            map( schema.categories, 'filters' )
+        const schemaFilters = unnest(
+            map(prop('filters'), schema.categories)
         )
 
         const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
             const filters = {}
 
-            if ( isArray( filter.facet ) ) {
+            if ( Array.isArray( filter.facet ) ) {
                 filter.facet.forEach( ( facet ) => {
                     filters[ [ facet.id ] ] = { terms: facet.terms }
                 } )

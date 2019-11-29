@@ -4,7 +4,7 @@ import { expect } from 'chai'
 
 import transform, { groupByPriorities, denormalize, validate } from '../../src/services/api/variant/sqon'
 
-import { cloneDeep } from 'lodash';
+import { clone } from 'ramda';
 
 
 describe( 'query helpers', () => {
@@ -73,12 +73,12 @@ describe( 'query helpers', () => {
                 }
             ]
         };
-        const queryCDenormalized = cloneDeep(queryC)
+        const queryCDenormalized = clone(queryC)
         queryCDenormalized.instructions[0] = queryA.instructions
         queryCDenormalized.instructions[2] = queryB.instructions
-        const normalized = cloneDeep([ queryA, queryB, queryC ])
-        const denormalized = cloneDeep([ queryA, queryB, queryCDenormalized ])
-        const results = cloneDeep([ queryA, queryB, queryC ])
+        const normalized = clone([ queryA, queryB, queryC ])
+        const denormalized = clone([ queryA, queryB, queryCDenormalized ])
+        const results = clone([ queryA, queryB, queryC ])
         const denormalizeQueries = denormalize(normalized)
         results[0].instructions = denormalizeQueries[0]
         results[1].instructions = denormalizeQueries[1]
