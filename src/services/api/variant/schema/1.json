@@ -3,15 +3,20 @@
   "index": "clin-mutation-centric",
   "path": "/mutations/_search",
   "groups": {
-    "impact": [
-      { "donors.exomiserScore" : {
-        "order" : "desc",
-          "nested": {
-            "path": "donors"
-          }
-        } },
-      {"impactScore": { "order": "desc" } }
-    ]
+    "impact": {
+      "sort": [
+          {
+            "donors.exomiserScore": {
+              "order" : "desc",
+              "nested": {
+                "path": "donors"
+              }
+            }
+          },
+          {"impactScore": { "order": "desc" } }
+      ],
+      "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { match: { 'donors.patientId': context.patient } }"
+    }
   },
   "defaultGroup": "impact",
   "categories": [

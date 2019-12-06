@@ -91,14 +91,28 @@ export default class ElasticClient {
             }
             return Object.assign( accumulator, filters )
         }, {} )
-        const sort =
-            schema.groups[ ( !group ? schema.defaultGroup : group ) ]
 
+
+        const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
+        let sort = sortDefinition.sort
+
+        if ( sortDefinition.postprocess ) {
+            const postprocess = new Function( 'context', sortDefinition.postprocess ) /* eslint-disable-line */
+            const context = {
+                sort,
+                acl,
+                patient,
+                index,
+                limit
+            }
+
+            sort = postprocess( context )
+        }
 
         const filter = generateAclFilters( acl, 'mutation' )
+
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
-        sort[0]["donors.exomiserScore"].nested.filter = { match: { 'donors.patientId': patient } }
 
         const body = {
             from: index,
