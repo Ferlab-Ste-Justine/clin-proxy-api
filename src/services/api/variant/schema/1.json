@@ -3,11 +3,15 @@
   "index": "clin-mutation-centric",
   "path": "/mutations/_search",
   "groups": {
-    "impact": {
-      "impactScore": {
-        "order": "desc"
-      }
-    }
+    "impact": [
+      { "donors.exomiserScore" : {
+        "order" : "desc",
+          "nested": {
+            "path": "donors"
+          }
+        } },
+      {"impactScore": { "order": "desc" } }
+    ]
   },
   "defaultGroup": "impact",
   "categories": [

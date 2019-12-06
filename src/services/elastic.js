@@ -91,15 +91,14 @@ export default class ElasticClient {
             }
             return Object.assign( accumulator, filters )
         }, {} )
-
-        const sort = [
+        const sort =
             schema.groups[ ( !group ? schema.defaultGroup : group ) ]
-        ]
+
 
         const filter = generateAclFilters( acl, 'mutation' )
-
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
+        sort[0]["donors.exomiserScore"].nested.filter = { match: { 'donors.patientId': patient } }
 
         const body = {
             from: index,
