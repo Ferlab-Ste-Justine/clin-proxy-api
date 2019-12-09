@@ -15,7 +15,7 @@
           },
           {"impactScore": { "order": "desc" } }
       ],
-      "postprocess": "return context.sort[0]['donors.exomiserScore'].nested.filter = { match: { 'donors.patientId': context.patient } }"
+      "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { match: { 'donors.patientId': context.patient } }; return context.sort"
     }
   },
   "defaultGroup": "impact",
