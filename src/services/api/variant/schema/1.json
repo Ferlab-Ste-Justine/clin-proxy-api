@@ -4,9 +4,18 @@
   "path": "/mutations/_search",
   "groups": {
     "impact": {
-      "impactScore": {
-        "order": "desc"
-      }
+      "sort": [
+          {
+            "donors.exomiserScore": {
+              "order" : "desc",
+              "nested": {
+                "path": "donors"
+              }
+            }
+          },
+          {"impactScore": { "order": "desc" } }
+      ],
+      "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { match: { 'donors.patientId': context.patient } }; return context.sort"
     }
   },
   "defaultGroup": "impact",
