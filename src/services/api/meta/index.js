@@ -22,14 +22,24 @@ export default class MetaService extends ApiService {
         this.config.elastic = config.elasticConfig
         this.runServicesHealthCheck = async () => {
             try {
-                await this.cacheService.ping()
+                try {
+                    await this.cacheService.ping()
+                } catch ( cacheException ) {
+                    throw new Error( `Cache Service Client health check failed with ${ cacheException.message}` )
+                }
                 await this.logService.debug( 'Cache Service is healthy.' )
-                const elasticPingResult = await this.elasticService.ping()
 
-                if ( !elasticPingResult.name ) {
-                    throw new Error( 'Elastic Search Service is dead.' )
+                try {
+                    const elasticPingResult = await this.elasticService.ping()
+
+                    if ( !elasticPingResult.name ) {
+                        throw new Error( 'Elastic Search Service is dead.' )
+                    }
+                } catch ( elasticException ) {
+                    throw new Error( `Elastic Service Client health check failed with ${ elasticException.message}` )
                 }
                 await this.logService.debug( 'Elastic Search Service is healthy.' )
+
             } catch ( e ) {
                 throw new Error( `NOK with ${e.toString()}` )
             }
@@ -39,18 +49,12 @@ export default class MetaService extends ApiService {
     async init() {
         super.init()
 
-        await this.logService.debug( 'Cache Service Client appears functional ... checking connectivity.' )
+        await this.logService.debug( 'Initializing service dependencies...' )
+
         this.cacheService = new CacheClient( this.config.cache )
-        await this.cacheService.ping()
-
-        await this.logService.debug( 'Elastic Search Client appears functional ... checking connectivity.' )
         this.elasticService = new ElasticClient( this.config.elastic )
-        const elasticPingResult = await this.elasticService.ping()
 
-        // @TODO We probably should also validate that the schema's index is healthy
-        if ( !elasticPingResult.name ) {
-            throw new Error( 'Elastic Search Client health check failed' )
-        }
+        await this.runServicesHealthCheck()
     }
 
     async start() {
