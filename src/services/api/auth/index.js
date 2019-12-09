@@ -64,12 +64,21 @@ export default class AuthService extends ApiService {
         config.logService.info( 'Roger.' )
         super( config )
         this.config.cache = config.cacheConfig
-        this.config.keykloak = config.keycloakConfig
+        this.config.keycloak = config.keycloakConfig
         this.runServicesHealthCheck = async () => {
             try {
-                await this.cacheService.ping()
+                try {
+                    await this.cacheService.ping()
+                } catch ( cacheException ) {
+                    throw new Error( `Cache Service Client health check failed with ${ cacheException.message}` )
+                }
                 await this.logService.debug( 'Cache Service is healthy.' )
-                await this.keycloakService.ping()
+
+                try {
+                    await this.keycloakService.ping()
+                } catch ( keycloakException ) {
+                    throw new Error( `Keycloak Service Client health check failed with ${ keycloakException.message}` )
+                }
                 await this.logService.debug( 'Keycloak Service is healthy.' )
             } catch (e) {
                 throw new Error(`NOK with ${e.toString()}`)
@@ -80,13 +89,12 @@ export default class AuthService extends ApiService {
     async init() {
         super.init()
 
-        await this.logService.debug( 'Cache Service Client appears functional ... checking connectivity.' )
-        this.cacheService = new CacheClient( this.config.cache )
-        await this.cacheService.ping()
+        await this.logService.debug( 'Initializing service dependencies...' )
 
-        await this.logService.debug( 'Keycloak Service Client appears functional ... checking connectivity.' )
-        this.keycloakService = new KeycloakClient( this.config.keykloak )
-        await this.keycloakService.ping()
+        this.cacheService = new CacheClient( this.config.cache )
+        this.keycloakService = new KeycloakClient( this.config.keycloak )
+
+        await this.runServicesHealthCheck()
     }
 
     async start() {
