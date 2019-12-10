@@ -71,11 +71,7 @@
           "search": {
             "extdb_pubmed": "availableDbExt.pubmed",
             "extdb_clinvar": "availableDbExt.clinvar",
-            "extdb_hpo": "availableDbExt.hpo",
-            "extdb_dbsnp": "availableDbExt.dbSNP",
-            "extdb_orphanet": "availableDbExt.orphanet",
-            "extdb_radboudumc": "availableDbExt.radboudumc",
-            "extdb_omim": "availableDbExt.omim"
+            "extdb_dbsnp": "availableDbExt.dbSNP"
           },
           "facet": [
             {
@@ -95,63 +91,11 @@
               }
             },
             {
-              "id": "extdb_hpo",
-              "label": "filter_extdb_hpo",
-              "terms": {
-                "field": "availableDbExt.hpo",
-                "size": 1
-              }
-            },
-            {
               "id": "extdb_dbsnp",
               "label": "filter_extdb_dbsnp",
               "terms": {
                 "field": "availableDbExt.dbSNP",
                 "size": 1
-              }
-            },
-            {
-              "id": "extdb_orphanet",
-              "label": "filter_extdb_orphanet",
-              "terms": {
-                "field": "availableDbExt.orphanet",
-                "size": 1
-              }
-            },
-            {
-              "id": "extdb_radboudumc",
-              "label": "filter_extdb_radboudumc",
-              "terms": {
-                "field": "availableDbExt.radboudumc",
-                "size": 1
-              }
-            },
-            {
-              "id": "extdb_omim",
-              "label": "filter_extdb_omim",
-              "terms": {
-                "field": "availableDbExt.omim",
-                "size": 1
-              }
-            }
-          ]
-        },
-        {
-          "id": "impact",
-          "label": "filter_impact",
-          "type": "generic",
-          "search": {
-            "impact": "consequences.impact"
-          },
-          "facet": [
-            {
-              "id": "impact",
-              "terms": {
-                "field": "consequences.impact.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
               }
             }
           ]
@@ -198,6 +142,51 @@
                   "_count": "desc"
                 },
                 "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "refExt",
+          "label": "filter_refExt",
+          "type": "genericbool",
+          "search": {
+            "refExt_hpo": "availableDbExt.hpo",
+            "refExt_orphanet": "availableDbExt.orphanet",
+            "refExt_radboudumc": "availableDbExt.radboudumc",
+            "refExt_omim": "availableDbExt.omim"
+          },
+          "facet": [
+            {
+              "id": "refExt_hpo",
+              "label": "filter_refExt_hpo",
+              "terms": {
+                "field": "availableDbExt.hpo",
+                "size": 1
+              }
+            },
+            {
+              "id": "refExt_orphanet",
+              "label": "filter_refExt_orphanet",
+              "terms": {
+                "field": "availableDbExt.orphanet",
+                "size": 1
+              }
+            },
+            {
+              "id": "refExt_radboudumc",
+              "label": "filter_refExt_radboudumc",
+              "terms": {
+                "field": "availableDbExt.radboudumc",
+                "size": 1
+              }
+            },
+            {
+              "id": "refExt_omim",
+              "label": "filter_refExt_omim",
+              "terms": {
+                "field": "availableDbExt.omim",
+                "size": 1
               }
             }
           ]
@@ -274,9 +263,59 @@
       ]
     },
     {
-      "id": "prediction",
-      "label": "category_prediction",
+      "id": "impacts",
+      "label": "category_impacts",
       "filters": [
+        {
+          "id": "exomiser_score",
+          "label": "filter_exomiser_score",
+          "type": "numcomparison",
+          "search": {
+            "exomiser_score": {
+              "exomiser_score": "donors.exomiserScore"
+            }
+          }
+        },
+        {
+          "id": "clinvar_clinsig",
+          "label": "filter_clinvar_clinsig",
+          "type": "generic",
+          "search": {
+            "clinvar_clinsig": "clinvar.clinvar_clinsig"
+          },
+          "facet": [
+            {
+              "id": "clinvar_clinsig",
+              "terms": {
+                "field": "clinvar.clinvar_clinsig.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
+        {
+          "id": "impact",
+          "label": "filter_impacts",
+          "type": "generic",
+          "search": {
+            "impact": "consequences.impact"
+          },
+          "facet": [
+            {
+              "id": "impact",
+              "terms": {
+                "field": "consequences.impact.keyword",
+                "order": {
+                  "_count": "desc"
+                },
+                "size": 999
+              }
+            }
+          ]
+        },
         {
           "id": "prediction_fathmm",
           "label": "filter_prediction_fathmm",
@@ -324,8 +363,8 @@
           ]
         },
         {
-          "id": "prediction_polyphen2hvar",
-          "label": "filter_prediction_polyphen2hvar",
+          "id": "prediction_polyphen2_hvar",
+          "label": "filter_prediction_polyphen2_hvar",
           "type": "composite",
           "search": {
             "prediction_polyphen2hvar": {
@@ -392,13 +431,7 @@
           "search": {
             "prediction_revel": "consequences.predictions.REVEL_score"
           }
-        }
-      ]
-    },
-    {
-      "id": "conservation",
-      "label": "category_conservation",
-      "filters": [
+        },
         {
           "id": "conservation_phylop",
           "label": "filter_conservation_phylop",
@@ -492,7 +525,58 @@
     {
       "id": "metric",
       "label": "category_metric",
-      "filters": []
+      "filters": [
+        {
+          "id": "metric_depth_quality",
+          "label": "filter_metric_depth_quality",
+          "type": "numcomparison",
+          "search": {
+            "metric_depth_quality": {
+              "depth_quality": "donors.qd"
+            }
+          }
+        },
+        {
+          "id": "metric_allelic_alt_depth",
+          "label": "filter_allelic_alt_depth",
+          "type": "numcomparison",
+          "search": {
+            "metric_allelic_alt_depth": {
+              "allelic_alt_depth": "donors.adAlt"
+            }
+          }
+        },
+        {
+          "id": "metric_total_depth",
+          "label": "filter_total_depth",
+          "type": "numcomparison",
+          "search": {
+            "metric_total_depth": {
+              "total_depth": "donors.adTotal"
+            }
+          }
+        },
+        {
+          "id": "metric_ratio",
+          "label": "filter_ratio",
+          "type": "numcomparison",
+          "search": {
+            "metric_ratio": {
+              "ratio": "donors.adFreq"
+            }
+          }
+        },
+        {
+          "id": "metric_genotype_quality",
+          "label": "filter_genotype_quality",
+          "type": "numcomparison",
+          "search": {
+            "metric_genotype_quality": {
+              "genotype_quality": "donors.gq"
+            }
+          }
+        }
+      ]
     }
   ]
 }
