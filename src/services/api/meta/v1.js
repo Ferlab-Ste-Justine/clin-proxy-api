@@ -9,11 +9,9 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params || req.body
-        const patient = params.patient || null
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const filters = patient ? [ { match: { patientId: patient } } ] : []
-        const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], filters, [], index, limit )
+        const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], [], [], index, limit )
 
         if ( response.hits.total < 1 ) {
             await logService.info( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
@@ -35,18 +33,16 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.body
-        const patientId = params.patient || null
         const title = params.title || ''
         const description = params.description || ''
-        const defaultQueries = params.defaultQueries || {}
-        const researchQueries = params.researchQueries || {}
+        const query = params.query || {}
+        const isDefault = params.isDefault || false
 
         const struct = {
-            patientId,
             title,
             description,
-            defaultQueries: JSON.stringify( defaultQueries ),
-            researchQueries: JSON.stringify( researchQueries ),
+            query: JSON.stringify( query ),
+            isDefault,
             lastUpdatedOn: new Date().getTime()
         }
 
@@ -70,18 +66,16 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.body
         const uid = params.uid
-        const patientId = params.patient || null
         const title = params.title || ''
         const description = params.description || ''
-        const defaultQueries = params.defaultQueries || {}
-        const researchQueries = params.researchQueries || {}
+        const query = params.query || {}
+        const isDefault = params.isDefault || false
 
         const struct = {
-            patientId,
             title,
             description,
-            defaultQueries: JSON.stringify( defaultQueries ),
-            researchQueries: JSON.stringify( researchQueries ),
+            query: JSON.stringify( query ),
+            isDefault,
             lastUpdatedOn: new Date().getTime()
         }
 
