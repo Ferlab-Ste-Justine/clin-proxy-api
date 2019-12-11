@@ -367,14 +367,14 @@
           "label": "filter_prediction_polyphen2_hvar",
           "type": "composite",
           "search": {
-            "prediction_polyphen2hvar": {
+            "prediction_polyphen2_hvar": {
               "score": "consequences.predictions.Polyphen2_HVAR_score",
               "quality": "consequences.predictions.Polyphen2_HVAR_pred"
             }
           },
           "facet": [
             {
-              "id": "prediction_polyphen2hvar",
+              "id": "prediction_polyphen2_hvar",
               "terms": {
                 "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
                 "order": {
