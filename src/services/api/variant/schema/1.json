@@ -447,11 +447,19 @@
       "label": "category_cohort",
       "filters": [
         {
+          "id": "cohort_rqdm",
+          "label": "filter_cohort_rqdm",
+          "type": "numcomparison",
+          "search": {
+            "cohort_rqdm": "frequencies.interne.AF"
+          }
+        },
+        {
           "id": "cohort_gnomad_exomes",
           "label": "filter_cohort_gnomad_exomes",
           "type": "numcomparison",
           "search": {
-            "cohort_gnomad_exomes": "frequencies.gnomAD_exomes"
+            "cohort_gnomad_exomes": "frequencies.gnomAD_exomes.AF"
           }
         },
         {
@@ -459,7 +467,7 @@
           "label": "filter_cohort_gnomad_genomes",
           "type": "numcomparison",
           "search": {
-            "cohort_gnomad_genomes": "frequencies.gnomAD_genomes"
+            "cohort_gnomad_genomes": "frequencies.gnomAD_genomes.AF"
           }
         },
         {
@@ -467,7 +475,7 @@
           "label": "filter_cohort_exac",
           "type": "numcomparison",
           "search": {
-            "cohort_exac": "frequencies.ExAc"
+            "cohort_exac": "frequencies.ExAc.AF"
           }
         },
         {
@@ -475,7 +483,7 @@
           "label": "filter_cohort_uk10k",
           "type": "numcomparison",
           "search": {
-            "cohort_uk10k": "frequencies.Uk10k"
+            "cohort_uk10k": "frequencies.Uk10k.AF"
           }
         },
         {
@@ -483,7 +491,7 @@
           "label": "filter_cohort_1000gp3",
           "type": "numcomparison",
           "search": {
-            "cohort_1000gp3": "frequencies.1000Gp3"
+            "cohort_1000gp3": "frequencies.1000Gp3.AF"
           }
         }
       ]
