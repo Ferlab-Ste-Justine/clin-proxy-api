@@ -5,10 +5,10 @@
   "mappings": {
     "_doc": {
       "properties": {
-        "researchQueries": {
-          "type": "text"
+        "isDefault": {
+          "type": "boolean"
         },
-        "defaultQueries": {
+        "query": {
           "type": "text"
         },
         "title": {
@@ -23,15 +23,6 @@
         "lastUpdatedOn": { "type" : "date" },
         "description": {
           "type": "text"
-        },
-        "patientId": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
         },
         "organizationId": {
           "type": "text",

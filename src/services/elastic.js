@@ -178,10 +178,15 @@ export default class ElasticClient {
         }
     }
 
-    async updateMeta( acl, index = null, uid, data = {} ) {
+    async updateMeta( acl, index = null, uid, data = {}, source = null, filters = [] ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_update_by_query`
-
+            const aclFilters =  generateAclFilters(acl, 'statement')
+            if (!source) {
+                aclFilters.push({match: {_id: uid}})
+                source = 'ctx._source = params.data'
+                console.log(`data=${JSON.stringify(data)} and uid=${uid}`)
+            }
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
             return rp( {
@@ -190,19 +195,16 @@ export default class ElasticClient {
                 json: true,
                 body: {
                     script: {
-                        source: 'ctx._source = params.data',
+                        source: source,
                         lang: 'painless',
                         params: {
-                            data
+                            data,
+                            uid
                         }
                     },
                     query: {
                         bool: {
-                            must: [
-                                { match: { _id: uid } },
-                                { match: { practitionerId: acl.practitioner_id } },
-                                { match: { organizationId: acl.organization_id } }
-                            ]
+                            must: filters.concat( aclFilters )
                         }
                     }
                 }

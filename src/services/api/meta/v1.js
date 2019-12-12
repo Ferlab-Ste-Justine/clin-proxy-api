@@ -79,13 +79,28 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
             lastUpdatedOn: new Date().getTime()
         }
 
-        const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct )
+        console.log("uid="+uid)
 
-        if ( !response.updated ) {
-            return new errors.ResourceNotFoundError()
+        if ( isDefault ) {
+            //  need to set all previous default filter to false ans set only the new one
+            const sourceScript = "if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }"
+            await logService.debug(`removing all previous default SQON in Elastic & updating ${uid}`)
+            const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct, sourceScript )
+
+            if ( !response.updated ) {
+                return new errors.ResourceNotFoundError()
+            }
+            await logService.debug( `Elastic updateStatement removed all previous default SQON and
+            returned ${JSON.stringify(response)}` )
+
+        } else {
+            const response = await elasticService.updateMeta(sessionData.acl.fhir, 'statement', uid, struct)
+
+            if (!response.updated) {
+                return new errors.ResourceNotFoundError()
+            }
+            await logService.debug(`Elastic updateStatement returned '${JSON.stringify(response)}' for ${uid}`)
         }
-
-        await logService.debug( `Elastic updateStatement returned '${response.result}' for ${uid}` )
         return struct
     } catch ( e ) {
         await logService.warning( `Elastic updateStatement ${e.toString()}` )
