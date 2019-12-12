@@ -79,8 +79,6 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
             lastUpdatedOn: new Date().getTime()
         }
 
-        console.log("uid="+uid)
-
         if ( isDefault ) {
             //  need to set all previous default filter to false ans set only the new one
             const sourceScript = "if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }"

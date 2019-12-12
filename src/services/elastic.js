@@ -185,7 +185,6 @@ export default class ElasticClient {
             if (!source) {
                 aclFilters.push({match: {_id: uid}})
                 source = 'ctx._source = params.data'
-                console.log(`data=${JSON.stringify(data)} and uid=${uid}`)
             }
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
