@@ -645,7 +645,7 @@
           "label": "filter_genotype_quality",
           "type": "numcomparison",
           "config": {
-            "metric_ratio": {
+            "metric_genotype_quality": {
               "min": 0,
               "max": 447
             }
