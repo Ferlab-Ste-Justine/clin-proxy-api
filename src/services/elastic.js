@@ -4,10 +4,10 @@ import { flatten, map, isArray } from 'lodash'
 
 const generateAclFilters = ( acl, index = 'patient' ) => {
     const filters = []
+    const practitionerId = acl.practitioner_id
+    const organizationId = acl.organization_id
 
     if ( acl.role === 'practitioner' ) {
-        const practitionerId = acl.practitioner_id
-
         if ( index === 'patient' ) {
             filters.push( { match: { 'practitioners.id': practitionerId } } )
         } else if ( index === 'mutation' ) {
@@ -17,9 +17,6 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         }
 
     } else if ( acl.role === 'genetician' ) {
-        const practitionerId = acl.practitioner_id
-        const organizationId = acl.organization_id
-
         if ( index === 'patient' ) {
             filters.push( { match: { 'organization.id': organizationId } } )
         } else if ( index === 'mutation' ) {
@@ -29,11 +26,10 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         }
 
     } else if ( acl.role === 'administrator' ) {
-        const practitionerId = acl.practitioner_id
-
         if ( index === 'statement' ) {
             filters.push( { match: { practitionerId } } )
         }
+
     }
 
     return filters
