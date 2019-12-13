@@ -17,6 +17,7 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         }
 
     } else if ( acl.role === 'genetician' ) {
+        const practitionerId = acl.practitioner_id
         const organizationId = acl.organization_id
 
         if ( index === 'patient' ) {
@@ -24,7 +25,14 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.organizationId': organizationId } } )
         } else if ( index === 'statement' ) {
-            filters.push( { match: { organizationId: organizationId } } )
+            filters.push( { match: { 'practitioners.id': practitionerId } } )
+        }
+
+    } else if ( acl.role === 'administrator' ) {
+        const practitionerId = acl.practitioner_id
+
+        if ( index === 'statement' ) {
+            filters.push( { match: { 'practitioners.id': practitionerId } } )
         }
     }
 
@@ -181,9 +189,10 @@ export default class ElasticClient {
     async updateMeta( acl, index = null, uid, data = {}, source = null, filters = [] ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_update_by_query`
-            const aclFilters =  generateAclFilters(acl, 'statement')
-            if (!source) {
-                aclFilters.push({match: {_id: uid}})
+            const aclFilters = generateAclFilters( acl, 'statement' )
+
+            if ( !source ) {
+                aclFilters.push( { match: { _id: uid } } )
                 source = 'ctx._source = params.data'
             }
             data.practitionerId = acl.practitioner_id
