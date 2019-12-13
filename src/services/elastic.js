@@ -13,7 +13,7 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.practitionerId': practitionerId } } )
         } else if ( index === 'statement' ) {
-            filters.push( { match: { practitionerId: practitionerId } } )
+            filters.push( { match: { practitionerId } } )
         }
 
     } else if ( acl.role === 'genetician' ) {
@@ -25,14 +25,14 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.organizationId': organizationId } } )
         } else if ( index === 'statement' ) {
-            filters.push( { match: { practitionerId: practitionerId } } )
+            filters.push( { match: { practitionerId } } )
         }
 
     } else if ( acl.role === 'administrator' ) {
         const practitionerId = acl.practitioner_id
 
         if ( index === 'statement' ) {
-            filters.push( { match: { practitionerId: practitionerId } } )
+            filters.push( { match: { practitionerId } } )
         }
     }
 
