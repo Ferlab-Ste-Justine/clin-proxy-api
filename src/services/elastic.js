@@ -25,14 +25,14 @@ const generateAclFilters = ( acl, index = 'patient' ) => {
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.organizationId': organizationId } } )
         } else if ( index === 'statement' ) {
-            filters.push( { match: { 'practitioners.id': practitionerId } } )
+            filters.push( { match: { practitionerId: practitionerId } } )
         }
 
     } else if ( acl.role === 'administrator' ) {
         const practitionerId = acl.practitioner_id
 
         if ( index === 'statement' ) {
-            filters.push( { match: { 'practitioners.id': practitionerId } } )
+            filters.push( { match: { practitionerId: practitionerId } } )
         }
     }
 
@@ -223,6 +223,9 @@ export default class ElasticClient {
     async deleteMeta( acl, index = null, uid = null ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_delete_by_query`
+            const aclFilters = generateAclFilters( acl, 'statement' )
+
+            aclFilters.push( { match: { _id: uid } } )
 
             return rp( {
                 method: 'POST',
@@ -231,11 +234,7 @@ export default class ElasticClient {
                 body: {
                     query: {
                         bool: {
-                            must: [
-                                { match: { _id: uid } },
-                                { match: { practitionerId: acl.practitioner_id } },
-                                { match: { organizationId: acl.organization_id } }
-                            ]
+                            must: aclFilters
                         }
                     }
                 }
