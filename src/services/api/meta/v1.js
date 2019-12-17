@@ -9,13 +9,12 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params || req.body
-        const patient = params.patient || null
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const filters = patient ? [ { match: { patientId: patient } } ] : []
-        const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], filters, [], index, limit )
+        const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], [], [], index, limit )
 
-        if ( response.hits.total < 1 ) {
+        // @TODO implement same logic across other services
+        if ( response.hits.total < 0 ) {
             await logService.info( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
             return new errors.NotFoundError()
         }
@@ -35,18 +34,16 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.body
-        const patientId = params.patient || null
         const title = params.title || ''
         const description = params.description || ''
-        const defaultQueries = params.defaultQueries || {}
-        const researchQueries = params.researchQueries || {}
+        const queries = params.queries || []
+        const isDefault = params.isDefault || false
 
         const struct = {
-            patientId,
             title,
             description,
-            defaultQueries: JSON.stringify( defaultQueries ),
-            researchQueries: JSON.stringify( researchQueries ),
+            queries: JSON.stringify( queries ),
+            isDefault,
             lastUpdatedOn: new Date().getTime()
         }
 
@@ -70,28 +67,39 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.body
         const uid = params.uid
-        const patientId = params.patient || null
         const title = params.title || ''
         const description = params.description || ''
-        const defaultQueries = params.defaultQueries || {}
-        const researchQueries = params.researchQueries || {}
+        const queries = params.queries || []
+        const isDefault = params.isDefault || false
 
         const struct = {
-            patientId,
             title,
             description,
-            defaultQueries: JSON.stringify( defaultQueries ),
-            researchQueries: JSON.stringify( researchQueries ),
+            queries: JSON.stringify( queries ),
+            isDefault,
             lastUpdatedOn: new Date().getTime()
         }
 
-        const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct )
+        if ( isDefault ) {
+            //  need to set all previous default filter to false ans set only the new one
+            const sourceScript = "if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }"
+            await logService.debug(`removing all previous default SQON in Elastic & updating ${uid}`)
+            const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct, sourceScript )
 
-        if ( !response.updated ) {
-            return new errors.ResourceNotFoundError()
+            if ( !response.updated ) {
+                return new errors.ResourceNotFoundError()
+            }
+            await logService.debug( `Elastic updateStatement removed all previous default SQON and
+            returned ${JSON.stringify(response)}` )
+
+        } else {
+            const response = await elasticService.updateMeta(sessionData.acl.fhir, 'statement', uid, struct)
+
+            if (!response.updated) {
+                return new errors.ResourceNotFoundError()
+            }
+            await logService.debug(`Elastic updateStatement returned '${JSON.stringify(response)}' for ${uid}`)
         }
-
-        await logService.debug( `Elastic updateStatement returned '${response.result}' for ${uid}` )
         return struct
     } catch ( e ) {
         await logService.warning( `Elastic updateStatement ${e.toString()}` )
