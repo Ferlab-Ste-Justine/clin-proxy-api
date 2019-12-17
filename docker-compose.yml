@@ -83,7 +83,7 @@ services:
     depends_on:
       - memcached
     ports:
-      - "6000:6000"
+      - "7000:7000"
     deploy:
       replicas: 2
     networks:
