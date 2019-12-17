@@ -36,7 +36,7 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
         const params = req.body
         const title = params.title || ''
         const description = params.description || ''
-        const queries = params.queries || {}
+        const queries = params.queries || []
         const isDefault = params.isDefault || false
 
         const struct = {
@@ -69,7 +69,7 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
         const uid = params.uid
         const title = params.title || ''
         const description = params.description || ''
-        const queries = params.queries || {}
+        const queries = params.queries || []
         const isDefault = params.isDefault || false
 
         const struct = {
