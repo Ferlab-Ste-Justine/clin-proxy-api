@@ -13,6 +13,7 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], [], [], index, limit )
 
+        // @TODO implement same logic across other services
         if ( response.hits.total < 0 ) {
             await logService.info( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
             return new errors.NotFoundError()
