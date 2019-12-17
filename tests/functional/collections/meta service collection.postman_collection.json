@@ -6,17 +6,17 @@
 	},
 	"item": [
 		{
-			"name": "https://localhost:6000/meta/health",
+			"name": "https://localhost:7000/meta/health",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:6000/meta/health",
+					"raw": "https://localhost:7000/meta/health",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
-					"port": "6000",
+					"port": "7000",
 					"path": [
 						"meta",
 						"health"
@@ -60,7 +60,7 @@
 			"response": []
 		},
 		{
-			"name": "https://localhost:6000/meta/statement",
+			"name": "https://localhost:7000/meta/statement",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -81,12 +81,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:6000/meta/statement",
+					"raw": "https://localhost:7000/meta/statement",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
-					"port": "6000",
+					"port": "7000",
 					"path": [
 						"meta",
 						"statement"
@@ -96,17 +96,17 @@
 			"response": []
 		},
 		{
-			"name": "https://localhost:6000/meta/statement",
+			"name": "https://localhost:7000/meta/statement",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:6000/meta/statement",
+					"raw": "https://localhost:7000/meta/statement",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
-					"port": "6000",
+					"port": "7000",
 					"path": [
 						"meta",
 						"statement"
@@ -116,7 +116,7 @@
 			"response": []
 		},
 		{
-			"name": "https://localhost:6000/meta/statement",
+			"name": "https://localhost:7000/meta/statement",
 			"request": {
 				"method": "DELETE",
 				"header": [
@@ -137,12 +137,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:6000/meta/statement",
+					"raw": "https://localhost:7000/meta/statement",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
-					"port": "6000",
+					"port": "7000",
 					"path": [
 						"meta",
 						"statement"
@@ -152,7 +152,7 @@
 			"response": []
 		},
 		{
-			"name": "https://localhost:6000/meta/statement",
+			"name": "https://localhost:7000/meta/statement",
 			"request": {
 				"method": "PUT",
 				"header": [
@@ -173,12 +173,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://localhost:6000/meta/statement",
+					"raw": "https://localhost:7000/meta/statement",
 					"protocol": "https",
 					"host": [
 						"localhost"
 					],
-					"port": "6000",
+					"port": "7000",
 					"path": [
 						"meta",
 						"statement"
