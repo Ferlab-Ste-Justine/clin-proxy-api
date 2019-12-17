@@ -4,28 +4,32 @@ import { flatten, map, isArray } from 'lodash'
 
 const generateAclFilters = ( acl, index = 'patient' ) => {
     const filters = []
+    const practitionerId = acl.practitioner_id
+    const organizationId = acl.organization_id
 
     if ( acl.role === 'practitioner' ) {
-        const practitionerId = acl.practitioner_id
-
         if ( index === 'patient' ) {
             filters.push( { match: { 'practitioners.id': practitionerId } } )
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.practitionerId': practitionerId } } )
         } else if ( index === 'statement' ) {
-            filters.push( { match: { practitionerId: practitionerId } } )
+            filters.push( { match: { practitionerId } } )
         }
 
     } else if ( acl.role === 'genetician' ) {
-        const organizationId = acl.organization_id
-
         if ( index === 'patient' ) {
             filters.push( { match: { 'organization.id': organizationId } } )
         } else if ( index === 'mutation' ) {
             filters.push( { match: { 'donors.organizationId': organizationId } } )
         } else if ( index === 'statement' ) {
-            filters.push( { match: { organizationId: organizationId } } )
+            filters.push( { match: { practitionerId } } )
         }
+
+    } else if ( acl.role === 'administrator' ) {
+        if ( index === 'statement' ) {
+            filters.push( { match: { practitionerId } } )
+        }
+
     }
 
     return filters
@@ -178,10 +182,15 @@ export default class ElasticClient {
         }
     }
 
-    async updateMeta( acl, index = null, uid, data = {} ) {
+    async updateMeta( acl, index = null, uid, data = {}, source = null, filters = [] ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_update_by_query`
+            const aclFilters = generateAclFilters( acl, 'statement' )
 
+            if ( !source ) {
+                aclFilters.push( { match: { _id: uid } } )
+                source = 'ctx._source = params.data'
+            }
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
             return rp( {
@@ -190,19 +199,16 @@ export default class ElasticClient {
                 json: true,
                 body: {
                     script: {
-                        source: 'ctx._source = params.data',
+                        source,
                         lang: 'painless',
                         params: {
-                            data
+                            data,
+                            uid
                         }
                     },
                     query: {
                         bool: {
-                            must: [
-                                { match: { _id: uid } },
-                                { match: { practitionerId: acl.practitioner_id } },
-                                { match: { organizationId: acl.organization_id } }
-                            ]
+                            must: filters.concat( aclFilters )
                         }
                     }
                 }
@@ -213,6 +219,9 @@ export default class ElasticClient {
     async deleteMeta( acl, index = null, uid = null ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_delete_by_query`
+            const aclFilters = generateAclFilters( acl, 'statement' )
+
+            aclFilters.push( { match: { _id: uid } } )
 
             return rp( {
                 method: 'POST',
@@ -221,11 +230,7 @@ export default class ElasticClient {
                 body: {
                     query: {
                         bool: {
-                            must: [
-                                { match: { _id: uid } },
-                                { match: { practitionerId: acl.practitioner_id } },
-                                { match: { organizationId: acl.organization_id } }
-                            ]
+                            must: aclFilters
                         }
                     }
                 }

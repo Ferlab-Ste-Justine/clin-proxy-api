@@ -270,6 +270,12 @@
           "id": "exomiser_score",
           "label": "filter_exomiser_score",
           "type": "numcomparison",
+          "config": {
+            "exomiser_score": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "exomiser_score": {
               "exomiser_score": "donors.exomiserScore"
@@ -367,14 +373,14 @@
           "label": "filter_prediction_polyphen2_hvar",
           "type": "composite",
           "search": {
-            "prediction_polyphen2hvar": {
+            "prediction_polyphen2_hvar": {
               "score": "consequences.predictions.Polyphen2_HVAR_score",
               "quality": "consequences.predictions.Polyphen2_HVAR_pred"
             }
           },
           "facet": [
             {
-              "id": "prediction_polyphen2hvar",
+              "id": "prediction_polyphen2_hvar",
               "terms": {
                 "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
                 "order": {
@@ -450,6 +456,12 @@
           "id": "cohort_rqdm",
           "label": "filter_cohort_rqdm",
           "type": "numcomparison",
+          "config": {
+            "cohort_rqdm": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "cohort_rqdm": "frequencies.interne.AF"
           }
@@ -458,6 +470,12 @@
           "id": "cohort_gnomad_exomes",
           "label": "filter_cohort_gnomad_exomes",
           "type": "numcomparison",
+          "config": {
+            "cohort_gnomad_exomes": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "cohort_gnomad_exomes": "frequencies.gnomAD_exomes.AF"
           }
@@ -466,6 +484,12 @@
           "id": "cohort_gnomad_genomes",
           "label": "filter_cohort_gnomad_genomes",
           "type": "numcomparison",
+          "config": {
+            "cohort_gnomad_genomes": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "cohort_gnomad_genomes": "frequencies.gnomAD_genomes.AF"
           }
@@ -474,6 +498,12 @@
           "id": "cohort_exac",
           "label": "filter_cohort_exac",
           "type": "numcomparison",
+          "config": {
+            "cohort_exac": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "cohort_exac": "frequencies.ExAc.AF"
           }
@@ -482,6 +512,12 @@
           "id": "cohort_uk10k",
           "label": "filter_cohort_uk10k",
           "type": "numcomparison",
+          "config": {
+            "cohort_uk10k": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "cohort_uk10k": "frequencies.Uk10k.AF"
           }
@@ -490,6 +526,12 @@
           "id": "cohort_1000gp3",
           "label": "filter_cohort_1000gp3",
           "type": "numcomparison",
+          "config": {
+            "cohort_1000gp3": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "cohort_1000gp3": "frequencies.1000Gp3.AF"
           }
@@ -538,6 +580,12 @@
           "id": "metric_depth_quality",
           "label": "filter_metric_depth_quality",
           "type": "numcomparison",
+          "config": {
+            "metric_depth_quality": {
+              "min": 0,
+              "max": 100
+            }
+          },
           "search": {
             "metric_depth_quality": {
               "depth_quality": "donors.qd"
@@ -548,6 +596,12 @@
           "id": "metric_allelic_alt_depth",
           "label": "filter_allelic_alt_depth",
           "type": "numcomparison",
+          "config": {
+            "metric_allelic_alt_depth": {
+              "min": 0,
+              "max": 496
+            }
+          },
           "search": {
             "metric_allelic_alt_depth": {
               "allelic_alt_depth": "donors.adAlt"
@@ -558,6 +612,12 @@
           "id": "metric_total_depth",
           "label": "filter_total_depth",
           "type": "numcomparison",
+          "config": {
+            "metric_total_depth": {
+              "min": 0,
+              "max": 502
+            }
+          },
           "search": {
             "metric_total_depth": {
               "total_depth": "donors.adTotal"
@@ -568,6 +628,12 @@
           "id": "metric_ratio",
           "label": "filter_ratio",
           "type": "numcomparison",
+          "config": {
+            "metric_ratio": {
+              "min": 0,
+              "max": 1.0
+            }
+          },
           "search": {
             "metric_ratio": {
               "ratio": "donors.adFreq"
@@ -578,6 +644,12 @@
           "id": "metric_genotype_quality",
           "label": "filter_genotype_quality",
           "type": "numcomparison",
+          "config": {
+            "metric_genotype_quality": {
+              "min": 0,
+              "max": 447
+            }
+          },
           "search": {
             "metric_genotype_quality": {
               "genotype_quality": "donors.gq"
