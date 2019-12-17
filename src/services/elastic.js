@@ -173,6 +173,7 @@ export default class ElasticClient {
 
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
+            console.log(`body = ${JSON.stringify(data)}`)
             return rp( {
                 method: 'POST',
                 uri,
