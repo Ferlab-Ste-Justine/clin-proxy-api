@@ -199,7 +199,7 @@ export default class ElasticClient {
                 json: true,
                 body: {
                     script: {
-                        source: source,
+                        source,
                         lang: 'painless',
                         params: {
                             data,
