@@ -31,10 +31,6 @@ const searchPatients = async ( req, res, cacheService, elasticService, logServic
 
         const response = await elasticService.searchPatients( sessionData.acl.fhir, [], [], [], index, limit )
 
-        if ( response.hits.total < 1 ) {
-            return new errors.NotFoundError()
-        }
-
         await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
@@ -88,10 +84,6 @@ const searchPatientsByAutoComplete = async ( req, res, cacheService, elasticServ
         ]
 
         const response = await elasticService.searchPatients( sessionData.acl.fhir, fields, [], matches, index, limit )
-
-        if ( response.hits.total < 1 ) {
-            return new errors.NotFoundError()
-        }
 
         await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total} matches` )
         return {
