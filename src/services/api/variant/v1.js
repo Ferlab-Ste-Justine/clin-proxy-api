@@ -33,10 +33,6 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
         const translatedQuery = translate( statement, query, 'es', schema )
         const response = await elasticService.searchVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
 
-        if ( response.hits.total < 1 ) {
-            return new errors.NotFoundError()
-        }
-
         const hits = response.hits.hits.map( ( hit ) => {
             return hit._source
         } )
