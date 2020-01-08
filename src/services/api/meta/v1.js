@@ -13,12 +13,6 @@ const searchStatements = async ( req, res, cacheService, elasticService, logServ
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], [], [], index, limit )
 
-        // @TODO implement same logic across other services
-        if ( response.hits.total < 0 ) {
-            await logService.info( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
-            return new errors.NotFoundError()
-        }
-
         await logService.debug( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
@@ -82,23 +76,24 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
 
         if ( isDefault ) {
             //  need to set all previous default filter to false ans set only the new one
-            const sourceScript = "if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }"
-            await logService.debug(`removing all previous default SQON in Elastic & updating ${uid}`)
+            const sourceScript = 'if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }'
+
+            await logService.debug( `removing all previous default SQON in Elastic & updating ${uid}` )
             const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct, sourceScript )
 
             if ( !response.updated ) {
                 return new errors.ResourceNotFoundError()
             }
             await logService.debug( `Elastic updateStatement removed all previous default SQON and
-            returned ${JSON.stringify(response)}` )
+            returned ${JSON.stringify( response )}` )
 
         } else {
-            const response = await elasticService.updateMeta(sessionData.acl.fhir, 'statement', uid, struct)
+            const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct )
 
-            if (!response.updated) {
+            if ( !response.updated ) {
                 return new errors.ResourceNotFoundError()
             }
-            await logService.debug(`Elastic updateStatement returned '${JSON.stringify(response)}' for ${uid}`)
+            await logService.debug( `Elastic updateStatement returned '${JSON.stringify( response )}' for ${uid}` )
         }
         return struct
     } catch ( e ) {
