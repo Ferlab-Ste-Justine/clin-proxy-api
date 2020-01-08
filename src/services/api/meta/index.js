@@ -79,6 +79,7 @@ export default class MetaService extends ApiService {
                     this.logService
                 )
 
+                res.header( 'Cache-Control', 'no-store, no-cache, must-revalidate' )
                 res.status( 200 )
                 res.send( response )
                 next()
