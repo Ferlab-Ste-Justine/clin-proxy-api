@@ -627,9 +627,7 @@
             }
           },
           "search": {
-            "metric_ratio": {
-              "ratio": "donors.adFreq"
-            }
+            "metric_ratio": "donors.adFreq"
           }
         },
         {
