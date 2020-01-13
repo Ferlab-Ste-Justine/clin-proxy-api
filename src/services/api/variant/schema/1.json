@@ -585,9 +585,7 @@
             }
           },
           "search": {
-            "metric_depth_quality": {
-              "depth_quality": "donors.qd"
-            }
+            "metric_depth_quality": "donors.qd"
           }
         },
         {
@@ -601,9 +599,7 @@
             }
           },
           "search": {
-            "metric_allelic_alt_depth": {
-              "allelic_alt_depth": "donors.adAlt"
-            }
+            "metric_allelic_alt_depth": "donors.adAlt"
           }
         },
         {
@@ -617,9 +613,7 @@
             }
           },
           "search": {
-            "metric_total_depth": {
-              "total_depth": "donors.adTotal"
-            }
+            "metric_total_depth": "donors.adTotal"
           }
         },
         {
@@ -649,9 +643,7 @@
             }
           },
           "search": {
-            "metric_genotype_quality": {
-              "genotype_quality": "donors.gq"
-            }
+            "metric_genotype_quality": "donors.gq"
           }
         }
       ]
