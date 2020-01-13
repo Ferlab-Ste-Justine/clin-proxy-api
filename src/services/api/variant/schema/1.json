@@ -431,7 +431,7 @@
         {
           "id": "prediction_revel",
           "label": "filter_prediction_revel",
-          "type": "prediction_revel",
+          "type": "numcomparison",
           "search": {
             "prediction_revel": "consequences.predictions.REVEL_score"
           }
