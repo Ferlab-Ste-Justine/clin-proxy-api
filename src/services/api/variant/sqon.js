@@ -60,6 +60,16 @@ export const denormalize = ( statement = [] ) => {
     return denormalizedStatement
 }
 
+const traverseObjectAndApplyFunc = (o, fn) => {
+    for (let i in o) {
+        fn.apply(this, [i, o[i]]);
+        if (o[i] !== null && typeof(o[i]) == 'object') {
+            o[i] = traverseObjectAndApplyFunc(o[i], fn);
+        }
+    }
+    return o;
+}
+
 export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
     const flattenedSchema = schema.categories.reduce( ( categoryAccumulator, category ) => {
         return Object.assign( categoryAccumulator, ( category.filters ? category.filters.reduce( ( filterAccumulator, filterConfig ) => {
@@ -317,9 +327,25 @@ export const translateToElasticSearch = ( denormalizedQuery, schema ) => {
         return {}
     }
 
-    const translation = mapInstructions( denormalizedQuery.instructions )
+    const postMapInstructions = ( instructions ) => {
+        let mappedInstructions = { bool: instructions }
+        let withNestedShouldCount = traverseObjectAndApplyFunc(mappedInstructions, (key, group) => {
+            if (key === 'bool') {
+                if (group.should) {
+                    group.minimum_should_match = 1
+                }
+            }
 
-    return { query: { bool: translation } }
+            return group;
+        });
+
+        return withNestedShouldCount;
+    }
+
+    const instructions = mapInstructions( denormalizedQuery.instructions );
+    const translation = postMapInstructions( instructions );
+
+    return  { query: translation }
 }
 
 const translate = ( statement, queryKey, dialect = 'es', dialectOptions ) => {
