@@ -2,7 +2,7 @@ import errors from 'restify-errors'
 import { readFileSync } from 'fs'
 
 import translate from './sqon'
-
+import { DIALECT_LANGUAGE_ELASTIC_SEARCH, EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS } from './sqon/dialect/es'
 
 const schema = JSON.parse( readFileSync( `${__dirname}/schema/1.json`, 'utf8' ) )
 
@@ -30,7 +30,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
         const group = params.group || null
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const translatedQuery = translate( statement, query, 'es', schema )
+        const translatedQuery = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH, EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS )
         const response = await elasticService.searchVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
 
         const hits = response.hits.hits.map( ( hit ) => {
