@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "index": "clin-mutation-centric",
-  "path": "/mutations/_search",
+  "path": "/mutations",
   "groups": {
     "impact": {
       "sort": [

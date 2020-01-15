@@ -44,7 +44,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
             return aggs
         }, {} )
 
-        await logService.debug( `Elastic searchVariantsForPatient using ${patient}/${query} [${index},${limit}] found ${response.hits.total} matches` )
+        await logService.debug( `Elastic getVariants using ${patient}/${query} [${index},${limit}] found ${response.hits.total} matches` )
 
         return {
             total: response.hits.total,
@@ -53,12 +53,42 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
             facets
         }
     } catch ( e ) {
-        await logService.warning( `Elastic searchVariantsForPatient ${e.toString()}` )
+        await logService.warning( `Elastic getVariants ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+const countVariants = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const params = req.body
+        const patient = params.patient
+        const statement = params.statement
+        const queries = params.queries
+        const total = {}
+
+        await Promise.all(
+            queries.map( async ( query ) => {
+                const translatedQuery = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH, EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS )
+                const response = await elasticService.countVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema )
+
+                total[ query ] = response.count
+                await logService.debug( `Elastic countVariants resolved query ${patient}/${query} with count ${response.count}` )
+            } )
+        )
+
+        return {
+            total,
+            queries
+        }
+    } catch ( e ) {
+        await logService.warning( `Elastic countVariants ${e.toString()}` )
         return new errors.InternalServerError()
     }
 }
 
 export default {
     getSchema,
-    getVariants
+    getVariants,
+    countVariants
 }

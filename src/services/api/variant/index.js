@@ -87,10 +87,34 @@ export default class VariantService extends ApiService {
         // Register Search Route
         this.instance.post( {
             path: `${this.config.endpoint}/search`,
-            validation: validators.searchVariantsForPatientByQuery
+            validation: validators.searchVariantsForPatient
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getVariants' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register Count Route
+        this.instance.post( {
+            path: `${this.config.endpoint}/count`,
+            validation: validators.countVariantsForPatient
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'countVariants' )(
                     req,
                     res,
                     this.cacheService,
