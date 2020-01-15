@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "index": "clin-mutation-centric",
-  "path": "/mutations/_search",
+  "path": "/mutations",
   "groups": {
     "impact": {
       "sort": [
@@ -544,14 +544,6 @@
           "id": "transmission",
           "label": "filter_transmission",
           "type": "generic",
-          "config": {
-            "transmission": {
-              "operands": [
-                "one",
-                "none"
-              ]
-            }
-          },
           "search": {
             "transmission": "donors.zygosity"
           },

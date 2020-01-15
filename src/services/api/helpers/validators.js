@@ -26,15 +26,24 @@ export default {
             } ).required()
         }
     },
-    searchVariantsForPatientByQuery: {
+    searchVariantsForPatient: {
         schema: {
             body: Joi.object( {
                 patient: Joi.string().required(),
-                statement: Joi.array().required(),
+                statement: Joi.array().min( 1 ).required(),
                 query: Joi.string().min( 1 ).max( 256 ).required(),
                 group: Joi.string(),
                 page: Joi.number().integer().min( 0 ),
                 size: Joi.number().integer().min( 1 ).max( 1000 )
+            } ).required()
+        }
+    },
+    countVariantsForPatient: {
+        schema: {
+            body: Joi.object( {
+                patient: Joi.string().required(),
+                statement: Joi.array().min( 1 ).required(),
+                queries: Joi.array().min( 1 ).required()
             } ).required()
         }
     }

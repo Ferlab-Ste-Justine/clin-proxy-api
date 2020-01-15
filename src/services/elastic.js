@@ -80,7 +80,7 @@ export default class ElasticClient {
     }
 
     async searchVariantsForPatient( patient, request, acl, schema, group, index, limit ) {
-        const uri = `${this.host}${schema.path}`
+        const uri = `${this.host}${schema.path}/_search`
         const schemaFilters = flatten(
             map( schema.categories, 'filters' )
         )
@@ -128,7 +128,27 @@ export default class ElasticClient {
 
         console.debug( JSON.stringify( body ) )
         return rp( {
-            method: 'GET',
+            method: 'POST',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
+    async countVariantsForPatient( patient, request, acl, schema ) {
+        const uri = `${this.host}${schema.path}/_count`
+        const filter = generateAclFilters( acl, 'mutation' )
+
+        filter.push( { match: { 'donors.patientId': patient } } )
+        request.query.bool.filter = filter
+
+        const body = {
+            query: request.query
+        }
+
+        console.debug( JSON.stringify( body ) )
+        return rp( {
+            method: 'POST',
             uri,
             json: true,
             body
@@ -202,7 +222,6 @@ export default class ElasticClient {
 
             if ( !source ) {
                 aclFilters.push( { match: { _id: uid } } )
-                source = 'ctx._source = params.data'
             }
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
@@ -212,7 +231,7 @@ export default class ElasticClient {
                 json: true,
                 body: {
                     script: {
-                        source,
+                        source: ( !source ? 'ctx._source = params.data' : source ),
                         lang: 'painless',
                         params: {
                             data,
