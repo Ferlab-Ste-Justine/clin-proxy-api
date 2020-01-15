@@ -8,7 +8,8 @@ import {
     instructionIsOperator,
     FILTER_TYPE_GENERIC_BOOLEAN, FILTER_TYPE_COMPOSITE, FILTER_TYPE_NUMERICAL_COMPARISON, FILTER_TYPE_SPECIFIC, FILTER_TYPE_GENERIC,
     instructionIsFilter,
-    traverseObjectAndApplyFunc
+    traverseObjectAndApplyFunc,
+    getInstructionType
 } from '../index'
 
 
@@ -126,7 +127,7 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
     }
 }
 
-const translateToElasticSearch = ( query, options, getInstructionType, getFieldNameFromId ) => {
+const translateToElasticSearch = ( query, options, getFieldNameFromId ) => {
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
         const type = getInstructionType( instruction )

@@ -84,7 +84,6 @@ export default class ElasticClient {
         const schemaFilters = flatten(
             map( schema.categories, 'filters' )
         )
-
         const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
             const filters = {}
 
@@ -95,7 +94,6 @@ export default class ElasticClient {
             }
             return Object.assign( accumulator, filters )
         }, {} )
-
 
         const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
         let sort = sortDefinition.sort

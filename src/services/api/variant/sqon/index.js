@@ -187,10 +187,8 @@ const getFieldNameFromFieldIdMappingFunction = ( schema ) => {
     }
 }
 
-const getInstructionType = () => {
-    return ( instruction ) => {
-        return instruction.data.type
-    }
+export const getInstructionType = ( instruction ) => {
+    return instruction.data.type
 }
 
 const translate = ( statement, queryKey, schema, dialect = DIALECT_LANGUAGE_ELASTIC_SEARCH, dialectOptions = EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS ) => {
@@ -213,7 +211,7 @@ const translate = ( statement, queryKey, schema, dialect = DIALECT_LANGUAGE_ELAS
         const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
         const getFieldNameFromFieldId = getFieldNameFromFieldIdMappingFunction( schema )
 
-        return translator.translate( denormalizedQuery, dialectOptions, getInstructionType, getFieldNameFromFieldId )
+        return translator.translate( denormalizedQuery, dialectOptions, getFieldNameFromFieldId )
     }
 
     return null

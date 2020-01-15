@@ -278,7 +278,7 @@
           },
           "search": {
             "exomiser_score": "donors.exomiserScore"
-            }
+          }
         },
         {
           "id": "clinvar_clinsig",
