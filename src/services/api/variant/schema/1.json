@@ -546,14 +546,6 @@
           "id": "transmission",
           "label": "filter_transmission",
           "type": "generic",
-          "config": {
-            "transmission": {
-              "operands": [
-                "one",
-                "none"
-              ]
-            }
-          },
           "search": {
             "transmission": "donors.zygosity"
           },
