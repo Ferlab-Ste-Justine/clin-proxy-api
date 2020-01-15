@@ -277,10 +277,8 @@
             }
           },
           "search": {
-            "exomiser_score": {
-              "exomiser_score": "donors.exomiserScore"
+            "exomiser_score": "donors.exomiserScore"
             }
-          }
         },
         {
           "id": "clinvar_clinsig",
@@ -433,7 +431,7 @@
         {
           "id": "prediction_revel",
           "label": "filter_prediction_revel",
-          "type": "prediction_revel",
+          "type": "numcomparison",
           "search": {
             "prediction_revel": "consequences.predictions.REVEL_score"
           }
@@ -579,9 +577,7 @@
             }
           },
           "search": {
-            "metric_depth_quality": {
-              "depth_quality": "donors.qd"
-            }
+            "metric_depth_quality": "donors.qd"
           }
         },
         {
@@ -595,9 +591,7 @@
             }
           },
           "search": {
-            "metric_allelic_alt_depth": {
-              "allelic_alt_depth": "donors.adAlt"
-            }
+            "metric_allelic_alt_depth": "donors.adAlt"
           }
         },
         {
@@ -611,9 +605,7 @@
             }
           },
           "search": {
-            "metric_total_depth": {
-              "total_depth": "donors.adTotal"
-            }
+            "metric_total_depth": "donors.adTotal"
           }
         },
         {
@@ -627,9 +619,7 @@
             }
           },
           "search": {
-            "metric_ratio": {
-              "ratio": "donors.adFreq"
-            }
+            "metric_ratio": "donors.adFreq"
           }
         },
         {
@@ -643,9 +633,7 @@
             }
           },
           "search": {
-            "metric_genotype_quality": {
-              "genotype_quality": "donors.gq"
-            }
+            "metric_genotype_quality": "donors.gq"
           }
         }
       ]

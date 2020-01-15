@@ -202,6 +202,19 @@ export default class ElasticClient {
         }
     }
 
+    async clearCacheMeta( index = null ) {
+        if ( index !== null ) {
+            const uri = `${this.host}/${index}/_cache/clear?query=true`
+
+            return rp( {
+                method: 'POST',
+                uri,
+                json: true,
+
+            } )
+        }
+    }
+
     async updateMeta( acl, index = null, uid, data = {}, source = null, filters = [] ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_update_by_query`

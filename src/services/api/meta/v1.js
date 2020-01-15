@@ -7,6 +7,7 @@ const getSessionDataFromToken = async ( token, cacheService ) => {
 
 const searchStatements = async ( req, res, cacheService, elasticService, logService ) => {
     try {
+        await elasticService.clearCacheMeta('statement')
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params || req.body
         const limit = params.size || 25
