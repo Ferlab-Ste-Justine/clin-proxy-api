@@ -102,29 +102,22 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
 }
 
 const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
-    const composites = instruction.data.values ? instruction.data.values : [ instruction.data ]
+    const group = instruction.data
+    const isNumericalComparison = !!group.comparator
 
-    return {
-        must: composites.reduce( ( accumulator, group ) => {
-            const isNumericalComparison = !!group.comparator
+    if ( isNumericalComparison ) {
+        return { must: {
+            range: {
+                [( fieldMap.score || fieldMap[ group.id ].score )]: {
+                    [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
+                }
 
-            if ( isNumericalComparison ) {
-                accumulator.push( {
-                    range: {
-                        [ ( fieldMap.score || fieldMap[ group.id ].score ) ]: {
-                            [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
-                        }
-                    }
-                } )
-            } else {
-                accumulator.push( {
-                    match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: group.value }
-                } )
-            }
-
-            return accumulator
-        }, [] )
+            } }
+        }
     }
+    return { must: {
+        match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: group.value }
+    } }
 }
 
 const translateToElasticSearch = ( query, options, getFieldNameFromId ) => {

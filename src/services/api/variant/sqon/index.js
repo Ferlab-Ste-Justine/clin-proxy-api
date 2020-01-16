@@ -68,24 +68,19 @@ export const FILTER_TYPE_GENERIC_BOOLEAN = 'genericbool'
 } */
 export const FILTER_TYPE_COMPOSITE = 'composite'
 // @NOTE Data Structure Example
-/* Ungrouped
+/* Ungrouped Quality
 {
     type: 'composite,
     data: {
-        quality: 'prediction_sift'
         value: 'T'
     }
 } */
-/* Grouped
+/* Ungrouped Numerical Comparison
 {
     type: 'composite,
     data: {
-        values: [
-            {
-                quality: 'prediction_sift'
-                value: 'T'
-            }
-        ]
+        comparator: '<='
+        value: '0'
     }
 } */
 
