@@ -7,7 +7,7 @@ const getSessionDataFromToken = async ( token, cacheService ) => {
 
 const searchStatements = async ( req, res, cacheService, elasticService, logService ) => {
     try {
-        await elasticService.clearCacheMeta('statement')
+        await elasticService.clearCacheMeta( 'statement' )
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params || req.body
         const limit = params.size || 25
@@ -33,7 +33,6 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
         const description = params.description || ''
         const queries = params.queries || []
         const isDefault = params.isDefault || false
-
         const struct = {
             title,
             description,
@@ -41,14 +40,13 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
             isDefault,
             lastUpdatedOn: new Date().getTime()
         }
-
         const response = await elasticService.createMeta( sessionData.acl.fhir, 'statement', struct )
 
         if ( response.result !== 'created' ) {
             return new errors.InvalidContentError()
         }
 
-        struct.id = response._id
+        struct.uid = response._id
         await logService.debug( `Elastic createStatement returned '${response.result}' with ${response._id}` )
         return struct
     } catch ( e ) {
@@ -66,36 +64,22 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
         const description = params.description || ''
         const queries = params.queries || []
         const isDefault = params.isDefault || false
-
         const struct = {
+            uid,
             title,
             description,
             queries: JSON.stringify( queries ),
             isDefault,
             lastUpdatedOn: new Date().getTime()
         }
+        const sourceScript = isDefault ? 'if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }' : null
+        const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct, sourceScript )
 
-        if ( isDefault ) {
-            //  need to set all previous default filter to false ans set only the new one
-            const sourceScript = 'if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }'
-
-            await logService.debug( `removing all previous default SQON in Elastic & updating ${uid}` )
-            const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct, sourceScript )
-
-            if ( !response.updated ) {
-                return new errors.ResourceNotFoundError()
-            }
-            await logService.debug( `Elastic updateStatement removed all previous default SQON and
-            returned ${JSON.stringify( response )}` )
-
-        } else {
-            const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct )
-
-            if ( !response.updated ) {
-                return new errors.ResourceNotFoundError()
-            }
-            await logService.debug( `Elastic updateStatement returned '${JSON.stringify( response )}' for ${uid}` )
+        if ( !response.updated ) {
+            return new errors.ResourceNotFoundError()
         }
+
+        await logService.debug( `Elastic updateStatement returned '${JSON.stringify( response.updated )}' for ${uid}` )
         return struct
     } catch ( e ) {
         await logService.warning( `Elastic updateStatement ${e.toString()}` )
@@ -114,7 +98,7 @@ const deleteStatement = async ( req, res, cacheService, elasticService, logServi
             return new errors.ResourceNotFoundError()
         }
 
-        await logService.debug( `Elastic deleteStatement returned '${response.result}' for ${uid}` )
+        await logService.debug( `Elastic deleteStatement returned '${response.deleted}' for ${uid}` )
         return null
     } catch ( e ) {
         await logService.warning( `Elastic deleteStatement ${e.toString()}` )

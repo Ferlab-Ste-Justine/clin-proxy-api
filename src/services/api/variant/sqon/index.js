@@ -8,7 +8,7 @@ const INSTRUCTION_TYPE_SUBQUERY = 'subquery'
 
 export const FILTER_TYPE_GENERIC = 'generic'
 // @NOTE Data Structure Example
-/* Grouped
+/*
 {
     type: 'generic',
     data: {
@@ -19,7 +19,7 @@ export const FILTER_TYPE_GENERIC = 'generic'
 } */
 export const FILTER_TYPE_SPECIFIC = 'specific'
 // @NOTE Data Structure Example
-/* Grouped
+/*
 {
     type: 'specific',
     data: {
@@ -30,36 +30,26 @@ export const FILTER_TYPE_SPECIFIC = 'specific'
 } */
 export const FILTER_TYPE_NUMERICAL_COMPARISON = 'numcomparison'
 // @NOTE Data Structure Example
-/* Ungrouped
+/* Single or Multiple Comparison
 {
     type: 'numcomparison,
     data: {
         id: 'phylop'
-        comparator: '>',
-        value: '0.5'
-    }
-} */
-/* Grouped
-{
-    type: 'numcomparison,
-    data: {
         values: [
             {
-                id: 'phylop'
-                comparator: '>=',
-                value: 0.1
-            },
-            {
-                id: 'phylop2'
                 comparator: '<',
-                value: 0.1
+                value: 10
+            }
+            {
+                comparator: '>=',
+                value: 0
             }
         ]
     }
 } */
 export const FILTER_TYPE_GENERIC_BOOLEAN = 'genericbool'
 // @NOTE Data Structure Example
-/* Grouped
+/*
 {
     type: 'genericbool,
     data: {
@@ -68,14 +58,14 @@ export const FILTER_TYPE_GENERIC_BOOLEAN = 'genericbool'
 } */
 export const FILTER_TYPE_COMPOSITE = 'composite'
 // @NOTE Data Structure Example
-/* Ungrouped Quality
+/* By Value
 {
     type: 'composite,
     data: {
         value: 'T'
     }
 } */
-/* Ungrouped Numerical Comparison
+/* By Numerical Comparison
 {
     type: 'composite,
     data: {

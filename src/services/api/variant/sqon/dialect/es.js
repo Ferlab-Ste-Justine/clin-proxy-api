@@ -54,7 +54,6 @@ const getVerbFromNumericalComparator = ( comparator ) => {
     }
 }
 
-
 const mapGenericFilterInstruction = ( instruction, fieldMap ) => {
     return {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
@@ -76,10 +75,8 @@ const mapSpecificFilterInstruction = ( instruction, fieldMap ) => {
 }
 
 const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap ) => {
-    const comparisons = instruction.data.values ? instruction.data.values : [ instruction.data ]
-
     return {
-        must: comparisons.reduce( ( accumulator, group ) => {
+        must: instruction.data.values.reduce( ( accumulator, group ) => {
             accumulator.push( {
                 range: {
                     [ fieldMap ]: {
