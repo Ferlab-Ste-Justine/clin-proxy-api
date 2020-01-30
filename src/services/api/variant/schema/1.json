@@ -105,7 +105,7 @@
           "label": "filter_chromosome",
           "type": "generic",
           "search": {
-            "chromosome": "chrom.keyword"
+            "chromosome": "chrom"
           },
           "facet": [
             {
