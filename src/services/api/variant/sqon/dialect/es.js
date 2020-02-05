@@ -58,7 +58,12 @@ const mapGenericFilterInstruction = ( instruction, fieldMap ) => {
     return {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
-                accumulator.push( { match: { [ fieldMap ]: value } } )
+                accumulator.push(
+                    { match: { [ fieldMap ]: {
+                        query: value,
+                        operator: 'and'
+                    } } }
+                )
                 return accumulator
             }, [] )
     }
@@ -68,7 +73,12 @@ const mapSpecificFilterInstruction = ( instruction, fieldMap ) => {
     return {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
-                accumulator.push( { match: { [ fieldMap ]: value } } )
+                accumulator.push(
+                    { match: { [ fieldMap ]: {
+                        query: value,
+                        operator: 'and'
+                    } } }
+                )
                 return accumulator
             }, [] )
     }
@@ -92,7 +102,12 @@ const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap ) => {
 const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
     return {
         must: instruction.data.values.reduce( ( accumulator, group ) => {
-            accumulator.push( { match: { [ fieldMap[ group ] ]: true } } )
+            accumulator.push(
+                { match: { [ fieldMap[ group ] ]: {
+                    query: true,
+                    operator: 'and'
+                } } }
+            )
             return accumulator
         }, [] )
     }
@@ -108,12 +123,15 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
                 [( fieldMap.score || fieldMap[ group.id ].score )]: {
                     [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
                 }
-
             } }
         }
     }
+
     return { must: {
-        match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: group.value }
+        match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: {
+            query: group.value,
+            operator: 'and'
+        } }
     } }
 }
 
