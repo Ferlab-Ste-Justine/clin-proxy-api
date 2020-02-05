@@ -104,8 +104,7 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
         must: instruction.data.values.reduce( ( accumulator, group ) => {
             accumulator.push(
                 { match: { [ fieldMap[ group ] ]: {
-                    query: true,
-                    operator: 'and'
+                    query: true
                 } } }
             )
             return accumulator
