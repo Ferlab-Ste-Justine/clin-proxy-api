@@ -65,12 +65,13 @@ const countVariants = async ( req, res, cacheService, elasticService, logService
         const patient = params.patient
         const statement = params.statement
         const queries = params.queries
+        const group = params.group || null
         const total = {}
 
         await Promise.all(
             queries.map( async ( query ) => {
                 const translatedQuery = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH, EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS )
-                const response = await elasticService.countVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema )
+                const response = await elasticService.countVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group )
 
                 total[ query ] = response.count
                 await logService.debug( `Elastic countVariants resolved query ${patient}/${query} with count ${response.count}` )

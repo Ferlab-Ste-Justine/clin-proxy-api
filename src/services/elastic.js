@@ -133,9 +133,25 @@ export default class ElasticClient {
         } )
     }
 
-    async countVariantsForPatient( patient, request, acl, schema ) {
+    async countVariantsForPatient( patient, request, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
         const filter = generateAclFilters( acl, 'mutation' )
+
+        const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
+        let sort = sortDefinition.sort
+
+        if ( sortDefinition.postprocess ) {
+            const postprocess = new Function( 'context', sortDefinition.postprocess ) /* eslint-disable-line */
+            const context = {
+                sort,
+                acl,
+                patient,
+                index: 0,
+                limit: 0
+            }
+
+            sort = postprocess( context )
+        }
 
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
@@ -149,7 +165,8 @@ export default class ElasticClient {
             method: 'POST',
             uri,
             json: true,
-            body
+            body,
+            sort
         } )
     }
 
@@ -207,7 +224,7 @@ export default class ElasticClient {
             return rp( {
                 method: 'POST',
                 uri,
-                json: true,
+                json: true
 
             } )
         }
