@@ -74,7 +74,7 @@ const countVariants = async ( req, res, cacheService, elasticService, logService
                 const response = await elasticService.countVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group )
 
                 total[ query ] = response.count
-                await logService.debug( `Elastic countVariants resolved query ${patient}/${query} with count ${response.count}` )
+                await logService.debug( `Elastic countVariants resolved query ${patient}/${query} found ${response.count} matches` )
             } )
         )
 
