@@ -1,35 +1,44 @@
 import rp from 'request-promise-native'
 import { flatten, map, isArray } from 'lodash'
 
+import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
 
-const generateAclFilters = ( acl, index = 'patient' ) => {
+
+const generateAclFilters = ( acl, service ) => {
     const filters = []
     const practitionerId = acl.practitioner_id
     const organizationId = acl.organization_id
 
-    if ( acl.role === 'practitioner' ) {
-        if ( index === 'patient' ) {
-            filters.push( { match: { 'practitioners.id': practitionerId } } )
-        } else if ( index === 'mutation' ) {
-            filters.push( { match: { 'donors.practitionerId': practitionerId } } )
-        } else if ( index === 'statement' ) {
-            filters.push( { match: { practitionerId } } )
-        }
+    switch ( acl.role ) {
 
-    } else if ( acl.role === 'genetician' ) {
-        if ( index === 'patient' ) {
-            filters.push( { match: { 'organization.id': organizationId } } )
-        } else if ( index === 'mutation' ) {
-            filters.push( { match: { 'donors.organizationId': organizationId } } )
-        } else if ( index === 'statement' ) {
-            filters.push( { match: { practitionerId } } )
-        }
+        case ROLE_TYPE_USER:
+            if ( service === SERVICE_TYPE_PATIENT ) {
+                filters.push( { match: { 'practitioners.id': practitionerId } } )
+            } else if ( service === SERVICE_TYPE_VARIANT ) {
+                filters.push( { match: { 'donors.practitionerId': practitionerId } } )
+            } else if ( service === SERVICE_TYPE_META ) {
+                filters.push( { match: { practitionerId } } )
+            }
+            break
 
-    } else if ( acl.role === 'administrator' ) {
-        if ( index === 'statement' ) {
-            filters.push( { match: { practitionerId } } )
-        }
+        case ROLE_TYPE_GROUP:
+            if ( service === SERVICE_TYPE_PATIENT ) {
+                filters.push( { match: { 'organization.id': organizationId } } )
+            } else if ( service === SERVICE_TYPE_VARIANT ) {
+                filters.push( { match: { 'donors.organizationId': organizationId } } )
+            } else if ( service === SERVICE_TYPE_META ) {
+                filters.push( { match: { practitionerId } } )
+            }
+            break
 
+        case ROLE_TYPE_ADMIN:
+            if ( service === SERVICE_TYPE_META ) {
+                filters.push( { match: { practitionerId } } )
+            }
+            break
+
+        default:
+            break
     }
 
     return filters
@@ -51,7 +60,7 @@ export default class ElasticClient {
 
     async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
         const uri = `${this.host}/patient/_search`
-        const aclFilters = generateAclFilters( acl, 'patient' )
+        const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,
             size: limit,
@@ -111,7 +120,7 @@ export default class ElasticClient {
             sort = postprocess( context )
         }
 
-        const filter = generateAclFilters( acl, 'mutation' )
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
 
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
@@ -133,9 +142,25 @@ export default class ElasticClient {
         } )
     }
 
-    async countVariantsForPatient( patient, request, acl, schema ) {
+    async countVariantsForPatient( patient, request, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
-        const filter = generateAclFilters( acl, 'mutation' )
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
+
+        const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
+        let sort = sortDefinition.sort
+
+        if ( sortDefinition.postprocess ) {
+            const postprocess = new Function( 'context', sortDefinition.postprocess ) /* eslint-disable-line */
+            const context = {
+                sort,
+                acl,
+                patient,
+                index: 0,
+                limit: 0
+            }
+
+            sort = postprocess( context )
+        }
 
         filter.push( { match: { 'donors.patientId': patient } } )
         request.query.bool.filter = filter
@@ -149,14 +174,15 @@ export default class ElasticClient {
             method: 'POST',
             uri,
             json: true,
-            body
+            body,
+            sort
         } )
     }
 
     async searchMeta( acl, type = null, includes = [], filters = [], shoulds = [], index, limit ) {
         if ( type !== null ) {
             const uri = `${this.host}/${type}/_search`
-            const aclFilters = generateAclFilters( acl, 'statement' )
+            const aclFilters = generateAclFilters( acl, SERVICE_TYPE_META )
             const body = {
                 from: index,
                 size: limit,
@@ -207,7 +233,7 @@ export default class ElasticClient {
             return rp( {
                 method: 'POST',
                 uri,
-                json: true,
+                json: true
 
             } )
         }
@@ -216,7 +242,7 @@ export default class ElasticClient {
     async updateMeta( acl, index = null, uid, data = {}, source = null, filters = [] ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_update_by_query`
-            const aclFilters = generateAclFilters( acl, 'statement' )
+            const aclFilters = generateAclFilters( acl, SERVICE_TYPE_META )
 
             if ( !source ) {
                 aclFilters.push( { match: { _id: uid } } )
@@ -249,7 +275,7 @@ export default class ElasticClient {
     async deleteMeta( acl, index = null, uid = null ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_delete_by_query`
-            const aclFilters = generateAclFilters( acl, 'statement' )
+            const aclFilters = generateAclFilters( acl, SERVICE_TYPE_META )
 
             aclFilters.push( { match: { _id: uid } } )
 
