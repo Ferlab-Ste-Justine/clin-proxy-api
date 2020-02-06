@@ -2,6 +2,8 @@ import rp from 'request-promise-native'
 import { flatten, map, isArray } from 'lodash'
 
 import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
+import { traverseArrayAndApplyFunc, instructionIsFilter, getFieldNameFromFieldIdMappingFunction } from './api/variant/sqon'
+import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH } from './api/variant/sqon/dialect/es'
 
 
 const generateAclFilters = ( acl, service ) => {
@@ -127,33 +129,61 @@ export default class ElasticClient {
         } )
     }
 
-    async getFacetsForPatient( patient, request, acl, schema ) {
+    async getFacetsForPatient( patient, request, denormalizedRequest, acl, schema ) {
         const uri = `${this.host}${schema.path}/_search`
         const schemaFilters = flatten(
             map( schema.categories, 'filters' )
         )
-        const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
+        const aggs = {
+            filtered: { aggs: {} }
+        }
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
+
+        filter.push( { match: { 'donors.patientId': patient } } )
+
+        aggs.filtered.filter = request.query
+        aggs.filtered.aggs = schemaFilters.reduce( ( accumulator, agg ) => {
             const filters = {}
 
-            if ( isArray( filter.facet ) ) {
-                filter.facet.forEach( ( facet ) => {
+            if ( isArray( agg.facet ) ) {
+                agg.facet.forEach( ( facet ) => {
                     filters[ [ facet.id ] ] = { terms: facet.terms }
                 } )
             }
             return Object.assign( accumulator, filters )
         }, {} )
 
-        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
+        const getFieldNameFromFieldId = getFieldNameFromFieldIdMappingFunction( schema )
 
-        filter.push( { match: { 'donors.patientId': patient } } )
-        request.query.bool.filter = filter
+        traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
+            if ( instructionIsFilter( instruction ) ) {
+                const facetId = instruction.data.id
+                const instructionsWithoutFacetId = []
+
+                traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
+                    if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
+                        instructionsWithoutFacetId.push( iinstruction )
+                    }
+                } )
+
+                const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getFieldNameFromFieldId )
+
+                aggs[ [ facetId ] ] = {
+                    filter: translatedFacet.query,
+                    aggs: {
+                        [ facetId ]: aggs.filtered.aggs[ facetId ]
+                    }
+                }
+            }
+        } )
 
         const body = {
-            query: request.query,
+            size: 0,
+            query: { bool: { filter } },
             aggs
         }
 
-        console.debug( JSON.stringify( body ) )
+        console.log( JSON.stringify( body ) )
         return rp( {
             method: 'POST',
             uri,

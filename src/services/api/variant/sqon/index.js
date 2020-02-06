@@ -116,6 +116,10 @@ export const findAllOperatorInstructions = ( instructions ) => {
     return filter( instructions, { type: INSTRUCTION_TYPE_OPERATOR } )
 }
 
+export const findAllFilterInstructions = ( instructions ) => {
+    return filter( instructions, { type: INSTRUCTION_TYPE_FILTER } )
+}
+
 export const hasSubqueries = ( query ) => {
     const nested = findAllSubqueryInstructions( query.instructions )
 
@@ -159,6 +163,16 @@ export const traverseObjectAndApplyFunc = ( o, fn ) => {
     return o
 }
 
+export const traverseArrayAndApplyFunc = ( a, fn ) => {
+    for ( let i = 0; i < a.length; i++ ) {
+        fn.apply( this, [ i, a[ i ] ] )
+        if ( isArray( a[ i ] ) && a[ i ].length > 0 ) {
+            a[ i ] = traverseArrayAndApplyFunc( a[ i ], fn )
+        }
+    }
+    return a
+}
+
 const flattenSchema = ( schema ) => {
     return schema.categories.reduce( ( categoryAccumulator, category ) => {
         return Object.assign( categoryAccumulator, ( category.filters ? category.filters.reduce( ( filterAccumulator, filterConfig ) => {
@@ -167,7 +181,7 @@ const flattenSchema = ( schema ) => {
     }, {} )
 }
 
-const getFieldNameFromFieldIdMappingFunction = ( schema ) => {
+export const getFieldNameFromFieldIdMappingFunction = ( schema ) => {
     const flattenedSchema = flattenSchema( schema )
 
     return ( id ) => {

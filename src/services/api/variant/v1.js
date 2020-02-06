@@ -1,7 +1,7 @@
 import errors from 'restify-errors'
 import { readFileSync } from 'fs'
 
-import translate from './sqon'
+import translate, { denormalize, getQueryByKey } from './sqon'
 import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from './sqon/dialect/es'
 import { DIALECT_LANGUAGE_GRAPHQL } from './sqon/dialect/gql'
 
@@ -82,10 +82,11 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
         const dialect = params.dialect || DIALECT_LANGUAGE_ELASTIC_SEARCH
         const facets = params.facets || []
         const schema = schemas[ dialect ]
+        const denormalizedStatement = denormalize( statement )
+        const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
         const translatedQuery = translate( statement, query, schema, dialect )
-
         let response = {}
-        let totalFromResponse = 0
+        let responseFacetKeys = []
         let facetsFromResponse = {}
 
         switch ( dialect ) {
@@ -94,14 +95,27 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, facets )
-                totalFromResponse = response.hits.total
-                facetsFromResponse = Object.keys( response.aggregations ).reduce( ( aggs, category ) => {
-                    aggs[ category ] = response.aggregations[ category ].buckets.reduce( ( accumulator, bucket ) => {
-                        return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
-                    }, [] )
-                    return aggs
-                }, {} )
+                response = await elasticService.getFacetsForPatient( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
+                if ( response.aggregations.filtered ) {
+                    delete response.aggregations.filtered.meta
+                    delete response.aggregations.filtered.doc_count
+                    facetsFromResponse = Object.keys( response.aggregations.filtered ).reduce( ( aggs, category ) => {
+                        aggs[ category ] = response.aggregations.filtered[ category ].buckets.reduce( ( accumulator, bucket ) => {
+                            return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                        }, [] )
+                        return aggs
+                    }, {} )
+                    delete response.aggregations.filtered
+                }
+
+                responseFacetKeys = Object.keys( response.aggregations )
+                if ( responseFacetKeys.length > 0 ) {
+                    responseFacetKeys.forEach( ( category ) => {
+                        facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
+                            return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                        }, [] )
+                    } )
+                }
                 break
         }
 
@@ -110,7 +124,6 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
         return {
             query,
             dialect,
-            total: totalFromResponse,
             facets: facetsFromResponse
         }
     } catch ( e ) {
