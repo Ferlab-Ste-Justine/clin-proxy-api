@@ -1,5 +1,6 @@
 {
   "version": "1.0",
+  "dialect": "es",
   "index": "clin-mutation-centric",
   "path": "/mutations",
   "groups": {

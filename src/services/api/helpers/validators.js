@@ -1,5 +1,8 @@
 import Joi from '@hapi/joi'
 
+import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from '../variant/sqon/dialect/es'
+import { DIALECT_LANGUAGE_GRAPHQL } from '../variant/sqon/dialect/gql'
+
 export default {
     login: {
         schema: {
@@ -32,9 +35,20 @@ export default {
                 patient: Joi.string().required(),
                 statement: Joi.array().min( 1 ).required(),
                 query: Joi.string().min( 1 ).max( 256 ).required(),
+                dialect: Joi.string().valid( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ] ),
                 group: Joi.string(),
                 page: Joi.number().integer().min( 0 ),
-                size: Joi.number().integer().min( 1 ).max( 1000 )
+                size: Joi.number().integer().min( 1 ).max( 1000 ),
+            } ).required()
+        }
+    },
+    searchFacetsForPatient: {
+        schema: {
+            body: Joi.object( {
+                patient: Joi.string().required(),
+                statement: Joi.array().min( 1 ).required(),
+                query: Joi.string().min( 1 ).max( 256 ).required(),
+                dialect: Joi.string().valid( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ] )
             } ).required()
         }
     },
@@ -43,7 +57,8 @@ export default {
             body: Joi.object( {
                 patient: Joi.string().required(),
                 statement: Joi.array().min( 1 ).required(),
-                queries: Joi.array().min( 1 ).required()
+                queries: Joi.array().min( 1 ).required(),
+                dialect: Joi.string().valid( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ] )
             } ).required()
         }
     }

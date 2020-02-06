@@ -108,6 +108,30 @@ export default class VariantService extends ApiService {
 
         } ) )
 
+        // Register Facet Route
+        this.instance.post( {
+            path: `${this.config.endpoint}/facet`,
+            validation: validators.searchFacetsForPatient
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getFacets' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
         // Register Count Route
         this.instance.post( {
             path: `${this.config.endpoint}/count`,

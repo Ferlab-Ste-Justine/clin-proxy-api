@@ -1,6 +1,11 @@
 import { isArray, filter, find } from 'lodash'
 
-import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH, EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS } from './dialect/es'
+import {
+    elasticSearchTranslator,
+    DIALECT_LANGUAGE_ELASTIC_SEARCH,
+    EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS
+} from './dialect/es'
+import { graphQlSearchTranslator, DIALECT_LANGUAGE_GRAPHQL, EMPTY_GRAPHQL_DIALECT_OPTIONS } from './dialect/gql'
 
 const INSTRUCTION_TYPE_OPERATOR = 'operator'
 const INSTRUCTION_TYPE_FILTER = 'filter'
@@ -176,13 +181,18 @@ export const getInstructionType = ( instruction ) => {
     return instruction.data.type
 }
 
-const translate = ( statement, queryKey, schema, dialect = DIALECT_LANGUAGE_ELASTIC_SEARCH, dialectOptions = EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS ) => {
+const translate = ( statement, queryKey, schema, dialect, dialectOptions ) => {
 
     let translator = null
+    let options = null
 
     // @NOTE Determine correct translator
     if ( dialect === DIALECT_LANGUAGE_ELASTIC_SEARCH ) {
         translator = elasticSearchTranslator
+        options = dialectOptions ? dialectOptions : EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS
+    } else if ( dialect === DIALECT_LANGUAGE_GRAPHQL ) {
+        translator = graphQlSearchTranslator
+        options = dialectOptions ? dialectOptions : EMPTY_GRAPHQL_DIALECT_OPTIONS
     }
 
     if ( translator ) {
@@ -196,7 +206,7 @@ const translate = ( statement, queryKey, schema, dialect = DIALECT_LANGUAGE_ELAS
         const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
         const getFieldNameFromFieldId = getFieldNameFromFieldIdMappingFunction( schema )
 
-        return translator.translate( denormalizedQuery, dialectOptions, getFieldNameFromFieldId )
+        return translator.translate( denormalizedQuery, options, getFieldNameFromFieldId )
     }
 
     return null
