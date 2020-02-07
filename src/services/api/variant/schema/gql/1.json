@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "dialect": "gql",
+  "index": "",
+  "path": "",
+  "groups": {
+    "impact": {
+      "sort": [],
+      "postprocess": ""
+    }
+  },
+  "defaultGroup": "impact",
+  "categories": [
+    {
+      "id": "variant",
+      "label": "category_variant",
+      "filters": [
+        {
+          "id": "variant_type",
+          "label": "filter_variant_type",
+          "type": "generic",
+          "search": {},
+          "facet": []
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+

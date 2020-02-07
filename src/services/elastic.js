@@ -2,6 +2,8 @@ import rp from 'request-promise-native'
 import { flatten, map, isArray } from 'lodash'
 
 import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
+import { traverseArrayAndApplyFunc, instructionIsFilter, getFieldNameFromFieldIdMappingFunction } from './api/variant/sqon'
+import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH } from './api/variant/sqon/dialect/es'
 
 
 const generateAclFilters = ( acl, service ) => {
@@ -90,20 +92,6 @@ export default class ElasticClient {
 
     async searchVariantsForPatient( patient, request, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}/_search`
-        const schemaFilters = flatten(
-            map( schema.categories, 'filters' )
-        )
-        const aggs = schemaFilters.reduce( ( accumulator, filter ) => {
-            const filters = {}
-
-            if ( isArray( filter.facet ) ) {
-                filter.facet.forEach( ( facet ) => {
-                    filters[ [ facet.id ] ] = { terms: facet.terms }
-                } )
-            }
-            return Object.assign( accumulator, filters )
-        }, {} )
-
         const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
         let sort = sortDefinition.sort
 
@@ -129,11 +117,73 @@ export default class ElasticClient {
             from: index,
             size: limit,
             query: request.query,
-            aggs,
             sort
         }
 
         console.debug( JSON.stringify( body ) )
+        return rp( {
+            method: 'POST',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
+    async getFacetsForPatient( patient, request, denormalizedRequest, acl, schema ) {
+        const uri = `${this.host}${schema.path}/_search`
+        const schemaFilters = flatten(
+            map( schema.categories, 'filters' )
+        )
+        const aggs = {
+            filtered: { aggs: {} }
+        }
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
+
+        filter.push( { match: { 'donors.patientId': patient } } )
+
+        aggs.filtered.filter = request.query
+        aggs.filtered.aggs = schemaFilters.reduce( ( accumulator, agg ) => {
+            const filters = {}
+
+            if ( isArray( agg.facet ) ) {
+                agg.facet.forEach( ( facet ) => {
+                    filters[ [ facet.id ] ] = { terms: facet.terms }
+                } )
+            }
+            return Object.assign( accumulator, filters )
+        }, {} )
+
+        const getFieldNameFromFieldId = getFieldNameFromFieldIdMappingFunction( schema )
+
+        traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
+            if ( instructionIsFilter( instruction ) ) {
+                const facetId = instruction.data.id
+                const instructionsWithoutFacetId = []
+
+                traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
+                    if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
+                        instructionsWithoutFacetId.push( iinstruction )
+                    }
+                } )
+
+                const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getFieldNameFromFieldId )
+
+                aggs[ [ facetId ] ] = {
+                    filter: translatedFacet.query,
+                    aggs: {
+                        [ facetId ]: aggs.filtered.aggs[ facetId ]
+                    }
+                }
+            }
+        } )
+
+        const body = {
+            size: 0,
+            query: { bool: { filter } },
+            aggs
+        }
+
+        console.log( JSON.stringify( body ) )
         return rp( {
             method: 'POST',
             uri,
