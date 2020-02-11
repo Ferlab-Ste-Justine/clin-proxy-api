@@ -1,9 +1,9 @@
 import rp from 'request-promise-native'
-import { flatten, map, isArray } from 'lodash'
+import { flatten, map, isArray, isString, cloneDeep } from 'lodash'
 
 import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
 import { traverseArrayAndApplyFunc, instructionIsFilter, getFieldNameFromFieldIdMappingFunction } from './api/variant/sqon'
-import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH } from './api/variant/sqon/dialect/es'
+import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
 
 
 const generateAclFilters = ( acl, service ) => {
@@ -158,21 +158,48 @@ export default class ElasticClient {
         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
             if ( instructionIsFilter( instruction ) ) {
                 const facetId = instruction.data.id
-                const instructionsWithoutFacetId = []
+                const facetFields = getFieldNameFromFieldId( facetId )
+                let instructionsWithoutFacetId = []
 
-                traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
-                    if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
-                        instructionsWithoutFacetId.push( iinstruction )
+                if ( isString( facetFields ) ) {
+                    traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
+                        if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
+                            instructionsWithoutFacetId.push( iinstruction )
+                        }
+                    } )
+
+                    const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getFieldNameFromFieldId )
+
+                    aggs[ [ facetId ] ] = {
+                        filter: translatedFacet.query,
+                        aggs: {
+                            [ facetId ]: aggs.filtered.aggs[ facetId ]
+                        }
                     }
-                } )
+                } else {
+                    Object.keys( facetFields ).forEach( ( facetField ) => {
+                        instructionsWithoutFacetId = []
+                        traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
+                            if ( !isArray( iinstruction ) ) {
+                                if ( !instructionIsFilter( iinstruction ) ) {
+                                    instructionsWithoutFacetId.push( iinstruction )
+                                } else {
+                                    const fiinstruction = cloneDeep( iinstruction )
 
-                const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getFieldNameFromFieldId )
+                                    fiinstruction.data.values = []
+                                    instructionsWithoutFacetId.push( fiinstruction )
+                                }
+                            }
+                        } )
+                        const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getFieldNameFromFieldId )
 
-                aggs[ [ facetId ] ] = {
-                    filter: translatedFacet.query,
-                    aggs: {
-                        [ facetId ]: aggs.filtered.aggs[ facetId ]
-                    }
+                        aggs[ [ facetField ] ] = {
+                            filter: translatedFacet.query,
+                            aggs: {
+                                [ facetField ]: aggs.filtered.aggs[ facetField ]
+                            }
+                        }
+                    } )
                 }
             }
         } )

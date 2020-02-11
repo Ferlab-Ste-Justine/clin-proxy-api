@@ -101,7 +101,7 @@ const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap ) => {
 
 const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
     return {
-        must: instruction.data.values.reduce( ( accumulator, group ) => {
+        should: instruction.data.values.reduce( ( accumulator, group ) => {
             accumulator.push(
                 { match: { [ fieldMap[ group ] ]: {
                     query: true
