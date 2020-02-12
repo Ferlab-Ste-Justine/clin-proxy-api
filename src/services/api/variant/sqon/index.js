@@ -181,13 +181,23 @@ const flattenSchema = ( schema ) => {
     }, {} )
 }
 
-export const getFieldNameFromFieldIdMappingFunction = ( schema ) => {
+export const getFieldSearchNameFromFieldIdMappingFunction = ( schema ) => {
     const flattenedSchema = flattenSchema( schema )
 
     return ( id ) => {
         const schemaFilter = find( flattenedSchema, { id } )
 
-        return schemaFilter.search[ [ id ] ] || schemaFilter.search
+        return schemaFilter.search ? schemaFilter.search[ [ id ] ] || schemaFilter.search : null
+    }
+}
+
+export const getFieldFacetNameFromFieldIdMappingFunction = ( schema ) => {
+    const flattenedSchema = flattenSchema( schema )
+
+    return ( id ) => {
+        const schemaFilter = find( flattenedSchema, { id } )
+
+        return schemaFilter.facet ? schemaFilter.facet[ [ id ] ] || schemaFilter.facet : null
     }
 }
 
@@ -218,9 +228,10 @@ const translate = ( statement, queryKey, schema, dialect, dialectOptions ) => {
 
         const denormalizedStatement = denormalize( statement )
         const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
-        const getFieldNameFromFieldId = getFieldNameFromFieldIdMappingFunction( schema )
+        const getFieldSearchNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
+        const getFieldFacetNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
 
-        return translator.translate( denormalizedQuery, options, getFieldNameFromFieldId )
+        return translator.translate( denormalizedQuery, options, getFieldSearchNameFromFieldId, getFieldFacetNameFromFieldId )
     }
 
     return null

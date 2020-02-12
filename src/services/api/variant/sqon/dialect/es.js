@@ -134,11 +134,11 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
     } }
 }
 
-const translateToElasticSearch = ( query, options, getFieldNameFromId ) => {
+const translateToElasticSearch = ( query, options, getFieldSearchNameFromId ) => {
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
         const type = getInstructionType( instruction )
-        const fieldMap = getFieldNameFromId( fieldId )
+        const fieldMap = getFieldSearchNameFromId( fieldId )
 
         switch ( type ) {
             default:
