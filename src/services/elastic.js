@@ -129,7 +129,7 @@ export default class ElasticClient {
         } )
     }
 
-    async getFacetsForPatient( patient, request, denormalizedRequest, acl, schema ) {
+    async getFacetsForVariant( patient, request, denormalizedRequest, acl, schema ) {
         const uri = `${this.host}${schema.path}/_search`
         const schemaFilters = flatten(
             map( schema.categories, 'filters' )
@@ -178,14 +178,7 @@ export default class ElasticClient {
                     }
                 } else {
                     Object.keys( facetFields ).forEach( ( facetField ) => {
-
                         instructionsWithoutFacetId = []
-
-                        console.log( '-----' )
-                        console.log( `+ facetId ${ JSON.stringify( facetId )}` )
-                        console.log( `+ facetFields ${ JSON.stringify( facetFields )}` )
-                        console.log( '-----' )
-
                         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
                             if ( !isArray( iinstruction ) ) {
                                 if ( !instructionIsFilter( iinstruction ) ) {
@@ -219,7 +212,7 @@ export default class ElasticClient {
             aggs
         }
 
-        console.log( JSON.stringify( body ) )
+        console.debug( JSON.stringify( body ) )
         return rp( {
             method: 'POST',
             uri,
