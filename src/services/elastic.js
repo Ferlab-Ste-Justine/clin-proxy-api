@@ -200,7 +200,7 @@ export default class ElasticClient {
                                     }
                                 }
                             } )
-                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getFieldNameFromFieldId )
+                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId )
 
                             aggs[ [ facetField ] ] = {
                                 filter: translatedFacet.query,
