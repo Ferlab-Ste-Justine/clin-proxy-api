@@ -178,7 +178,14 @@ export default class ElasticClient {
                     }
                 } else {
                     Object.keys( facetFields ).forEach( ( facetField ) => {
+
                         instructionsWithoutFacetId = []
+
+                        console.log( '-----' )
+                        console.log( `+ facetId ${ JSON.stringify( facetId )}` )
+                        console.log( `+ facetFields ${ JSON.stringify( facetFields )}` )
+                        console.log( '-----' )
+
                         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
                             if ( !isArray( iinstruction ) ) {
                                 if ( !instructionIsFilter( iinstruction ) ) {
@@ -186,7 +193,9 @@ export default class ElasticClient {
                                 } else {
                                     const fiinstruction = cloneDeep( iinstruction )
 
-                                    fiinstruction.data.values = []
+                                    if ( iinstruction.data.id === facetId ) {
+                                        fiinstruction.data.values = []
+                                    }
                                     instructionsWithoutFacetId.push( fiinstruction )
                                 }
                             }
