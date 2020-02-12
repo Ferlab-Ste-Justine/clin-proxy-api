@@ -1,9 +1,14 @@
 import rp from 'request-promise-native'
-import { flatten, map, isArray } from 'lodash'
+import { flatten, map, isArray, isString, cloneDeep } from 'lodash'
 
 import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
-import { traverseArrayAndApplyFunc, instructionIsFilter, getFieldNameFromFieldIdMappingFunction } from './api/variant/sqon'
-import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH } from './api/variant/sqon/dialect/es'
+import {
+    traverseArrayAndApplyFunc,
+    instructionIsFilter,
+    getFieldSearchNameFromFieldIdMappingFunction,
+    getFieldFacetNameFromFieldIdMappingFunction
+} from './api/variant/sqon'
+import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
 
 
 const generateAclFilters = ( acl, service ) => {
@@ -129,11 +134,13 @@ export default class ElasticClient {
         } )
     }
 
-    async getFacetsForPatient( patient, request, denormalizedRequest, acl, schema ) {
+    async getFacetsForVariant( patient, request, denormalizedRequest, acl, schema ) {
         const uri = `${this.host}${schema.path}/_search`
         const schemaFilters = flatten(
             map( schema.categories, 'filters' )
-        )
+        ).filter( ( filter ) => {
+            return isArray( filter.facet )
+        } )
         const aggs = {
             filtered: { aggs: {} }
         }
@@ -143,35 +150,65 @@ export default class ElasticClient {
 
         aggs.filtered.filter = request.query
         aggs.filtered.aggs = schemaFilters.reduce( ( accumulator, agg ) => {
-            const filters = {}
-
-            if ( isArray( agg.facet ) ) {
-                agg.facet.forEach( ( facet ) => {
-                    filters[ [ facet.id ] ] = { terms: facet.terms }
-                } )
-            }
-            return Object.assign( accumulator, filters )
+            agg.facet.forEach( ( facet ) => {
+                accumulator[ [ facet.id ] ] = { terms: facet.terms }
+            } )
+            return accumulator
         }, {} )
 
-        const getFieldNameFromFieldId = getFieldNameFromFieldIdMappingFunction( schema )
+        const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
+        const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
 
         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
             if ( instructionIsFilter( instruction ) ) {
                 const facetId = instruction.data.id
-                const instructionsWithoutFacetId = []
+                const facetFields = getFacetFieldNameFromFieldId( facetId )
 
-                traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
-                    if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
-                        instructionsWithoutFacetId.push( iinstruction )
-                    }
-                } )
+                if ( facetFields ) {
+                    const searchFields = getSearchFieldNameFromFieldId( facetId )
+                    let instructionsWithoutFacetId = []
 
-                const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getFieldNameFromFieldId )
+                    if ( isString( searchFields ) ) {
+                        traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
+                            if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
+                                instructionsWithoutFacetId.push( iinstruction )
+                            }
+                        } )
 
-                aggs[ [ facetId ] ] = {
-                    filter: translatedFacet.query,
-                    aggs: {
-                        [ facetId ]: aggs.filtered.aggs[ facetId ]
+                        const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId )
+
+                        aggs[ [ facetId ] ] = {
+                            filter: translatedFacet.query,
+                            aggs: {
+                                [ facetId ]: aggs.filtered.aggs[ facetId ]
+                            }
+                        }
+                    } else {
+                        Object.keys( searchFields ).forEach( ( facetField ) => {
+                            instructionsWithoutFacetId = []
+                            traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
+                                if ( !isArray( iinstruction ) ) {
+                                    if ( !instructionIsFilter( iinstruction ) ) {
+                                        instructionsWithoutFacetId.push( iinstruction )
+                                    } else {
+                                        const fiinstruction = cloneDeep( iinstruction )
+
+                                        if ( iinstruction.data.id === facetId ) {
+                                            fiinstruction.data.values = []
+                                        }
+                                        instructionsWithoutFacetId.push( fiinstruction )
+                                    }
+                                }
+                            } )
+                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId )
+
+                            aggs[ [ facetField ] ] = {
+                                filter: translatedFacet.query,
+                                aggs: {
+                                    [ facetField ]: aggs.filtered.aggs[ facetField ]
+                                }
+                            }
+                        } )
                     }
                 }
             }
@@ -183,7 +220,7 @@ export default class ElasticClient {
             aggs
         }
 
-        console.log( JSON.stringify( body ) )
+        console.debug( JSON.stringify( body ) )
         return rp( {
             method: 'POST',
             uri,

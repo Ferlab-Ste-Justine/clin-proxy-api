@@ -95,7 +95,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForPatient( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
+                response = await elasticService.getFacetsForVariant( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
                 if ( response.aggregations.filtered ) {
                     delete response.aggregations.filtered.meta
                     delete response.aggregations.filtered.doc_count
