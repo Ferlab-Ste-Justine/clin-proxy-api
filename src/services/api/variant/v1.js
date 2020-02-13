@@ -103,8 +103,8 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                     facetsFromResponse = Object.keys( response.aggregations.filtered ).reduce( ( aggs, category ) => {
                         const filtererdCategoryData = response.aggregations.filtered[ category ]
 
-                        if ( filtererdCategoryData.value ) {
-                            aggs[ category ] = [{ value: filtererdCategoryData.value }]
+                        if ( filtererdCategoryData.value !== undefined ) {
+                            aggs[ category ] = [ { value: filtererdCategoryData.value } ]
                         } else {
                             aggs[ category ] = filtererdCategoryData.buckets.reduce( ( accumulator, bucket ) => {
                                 return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
@@ -120,8 +120,8 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                     responseFacetKeys.forEach( ( category ) => {
                         const unfilteredCategoryData = response.aggregations[ category ][ category ]
 
-                        if ( unfilteredCategoryData.value ) {
-                            facetsFromResponse[ category ] = [{ value: unfilteredCategoryData.value }]
+                        if ( unfilteredCategoryData.value !== undefined ) {
+                            facetsFromResponse[ category ] = [ { value: unfilteredCategoryData.value } ]
                         } else {
                             facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
                                 return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
