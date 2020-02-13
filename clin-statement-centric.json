@@ -1,13 +1,11 @@
 {
   "settings": {
-    "number_of_shards": 4
+    "number_of_shards": 2,
+    "number_of_replicas": 2
   },
   "mappings": {
     "_doc": {
       "properties": {
-        "isDefault": {
-          "type": "boolean"
-        },
         "queries": {
           "type": "text"
         },
