@@ -35,12 +35,14 @@
           "facet": [
             {
               "id": "variant_type",
-              "terms": {
-                "field": "type.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
+              "query": {
+                "terms": {
+                  "field": "type.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
               }
             }
           ]
@@ -55,12 +57,14 @@
           "facet": [
             {
               "id": "consequence",
-              "terms": {
-                "field": "consequences.consequence.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
+              "query": {
+                "terms": {
+                  "field": "consequences.consequence.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
               }
             }
           ]
@@ -78,25 +82,31 @@
             {
               "id": "extdb_pubmed",
               "label": "filter_extdb_pubmed",
-              "terms": {
-                "field": "availableDbExt.pubmed",
-                "size": 1
+              "query": {
+                "terms": {
+                  "field": "availableDbExt.pubmed",
+                  "size": 1
+                }
               }
             },
             {
               "id": "extdb_clinvar",
               "label": "filter_extdb_clinvar",
-              "terms": {
-                "field": "availableDbExt.clinvar",
-                "size": 1
+              "query": {
+                "terms": {
+                  "field": "availableDbExt.clinvar",
+                  "size": 1
+                }
               }
             },
             {
               "id": "extdb_dbsnp",
               "label": "filter_extdb_dbsnp",
-              "terms": {
-                "field": "availableDbExt.dbSNP",
-                "size": 1
+              "query": {
+                "terms": {
+                  "field": "availableDbExt.dbSNP",
+                  "size": 1
+                }
               }
             }
           ]
@@ -111,12 +121,14 @@
           "facet": [
             {
               "id": "chromosome",
-              "terms": {
-                "field": "chrom.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 24
+              "query": {
+                "terms": {
+                  "field": "chrom.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 24
+                }
               }
             }
           ]
@@ -137,12 +149,14 @@
           "facet": [
             {
               "id": "gene_type",
-              "terms": {
-                "field": "genes.biotype.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
+              "query": {
+                "terms": {
+                  "field": "genes.biotype.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
               }
             }
           ]
@@ -161,33 +175,41 @@
             {
               "id": "refExt_hpo",
               "label": "filter_refExt_hpo",
-              "terms": {
-                "field": "availableDbExt.hpo",
-                "size": 1
+              "query": {
+                "terms": {
+                  "field": "availableDbExt.hpo",
+                  "size": 1
+                }
               }
             },
             {
               "id": "refExt_orphanet",
               "label": "filter_refExt_orphanet",
-              "terms": {
-                "field": "availableDbExt.orphanet",
-                "size": 1
+              "query": {
+                "terms": {
+                  "field": "availableDbExt.orphanet",
+                  "size": 1
+                }
               }
             },
             {
               "id": "refExt_radboudumc",
               "label": "filter_refExt_radboudumc",
-              "terms": {
-                "field": "availableDbExt.radboudumc",
-                "size": 1
+              "query": {
+                "terms": {
+                  "field": "availableDbExt.radboudumc",
+                  "size": 1
+                }
               }
             },
             {
               "id": "refExt_omim",
               "label": "filter_refExt_omim",
-              "terms": {
-                "field": "availableDbExt.omim",
-                "size": 1
+              "query": {
+                "terms": {
+                  "field": "availableDbExt.omim",
+                  "size": 1
+                }
               }
             }
           ]
@@ -211,12 +233,14 @@
           "facet": [
             {
               "id": "gene_hpo",
-              "terms": {
-                "field": "genes.hpo.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 9999
+              "query": {
+                "terms": {
+                  "field": "genes.hpo.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 9999
+                }
               }
             }
           ]
@@ -231,12 +255,14 @@
           "facet": [
             {
               "id": "genegroup_radboud",
-              "terms": {
-                "field": "genes.radboudumc.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
+              "query": {
+                "terms": {
+                  "field": "genes.radboudumc.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
               }
             }
           ]
@@ -251,12 +277,14 @@
           "facet": [
             {
               "id": "genegroup_orphanet",
-              "terms": {
-                "field": "genes.orphanet.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
+              "query": {
+                "terms": {
+                  "field": "genes.orphanet.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
               }
             }
           ]
@@ -291,12 +319,14 @@
           "facet": [
             {
               "id": "clinvar_clinsig",
-              "terms": {
-                "field": "clinvar.clinvar_clinsig.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
+              "query": {
+                "terms": {
+                  "field": "clinvar.clinvar_clinsig.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
               }
             }
           ]
@@ -311,12 +341,14 @@
           "facet": [
             {
               "id": "impact",
-              "terms": {
-                "field": "consequences.impact.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 999
+              "query": {
+                "terms": {
+                  "field": "consequences.impact.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
               }
             }
           ]
@@ -334,12 +366,30 @@
           "facet": [
             {
               "id": "prediction_fathmm",
-              "terms": {
-                "field": "consequences.predictions.FATHMM.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 9
+              "query": {
+                "terms": {
+                  "field": "consequences.predictions.FATHMM.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 9
+                }
+              }
+            },
+            {
+              "id": "prediction_fathmm_min",
+              "query": {
+                "min": {
+                  "field": "consequences.predictions.SIFT_score"
+                }
+              }
+            },
+            {
+              "id": "prediction_fathmm_max",
+              "query": {
+                "max": {
+                  "field": "consequences.predictions.SIFT_score"
+                }
               }
             }
           ]
@@ -357,12 +407,14 @@
           "facet": [
             {
               "id": "prediction_sift",
-              "terms": {
-                "field": "consequences.predictions.SIFT.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 9
+              "query": {
+                "terms": {
+                  "field": "consequences.predictions.SIFT.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 9
+                }
               }
             }
           ]
@@ -380,12 +432,14 @@
           "facet": [
             {
               "id": "prediction_polyphen2_hvar",
-              "terms": {
-                "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 9
+              "query": {
+                "terms": {
+                  "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 9
+                }
               }
             }
           ]
@@ -403,12 +457,14 @@
           "facet": [
             {
               "id": "prediction_lrt",
-              "terms": {
-                "field": "consequences.predictions.LRT_pred.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 9
+              "query": {
+                "terms": {
+                  "field": "consequences.predictions.LRT_pred.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 9
+                }
               }
             }
           ]
@@ -551,12 +607,14 @@
           "facet": [
             {
               "id": "transmission",
-              "terms": {
-                "field": "donors.zygosity.keyword",
-                "order": {
-                  "_count": "desc"
-                },
-                "size": 9
+              "query": {
+                "terms": {
+                  "field": "donors.zygosity.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 9
+                }
               }
             }
           ]

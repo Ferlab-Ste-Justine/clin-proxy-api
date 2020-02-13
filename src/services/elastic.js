@@ -136,7 +136,7 @@ export default class ElasticClient {
 
     async getFacetsForVariant( patient, request, denormalizedRequest, acl, schema ) {
         const uri = `${this.host}${schema.path}/_search`
-        const schemaFilters = flatten(
+        const schemaFacets = flatten(
             map( schema.categories, 'filters' )
         ).filter( ( filter ) => {
             return isArray( filter.facet )
@@ -149,9 +149,9 @@ export default class ElasticClient {
         filter.push( { match: { 'donors.patientId': patient } } )
 
         aggs.filtered.filter = request.query
-        aggs.filtered.aggs = schemaFilters.reduce( ( accumulator, agg ) => {
+        aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
-                accumulator[ [ facet.id ] ] = { terms: facet.terms }
+                accumulator[ [ facet.id ] ] = facet.query
             } )
             return accumulator
         }, {} )

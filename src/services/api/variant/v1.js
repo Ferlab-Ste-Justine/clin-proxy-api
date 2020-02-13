@@ -96,6 +96,10 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 response = await elasticService.getFacetsForVariant( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
+
+                console.log( `+++++ ${ JSON.stringify( response )}` )
+
+
                 if ( response.aggregations.filtered ) {
                     delete response.aggregations.filtered.meta
                     delete response.aggregations.filtered.doc_count
