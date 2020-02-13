@@ -6,7 +6,7 @@ import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
-// import validators from '../helpers/validators'
+// import validators from '../helpers/validators' @TODO
 import restifyAsyncWrap from '../helpers/async'
 
 
@@ -66,12 +66,12 @@ export default class MetaService extends ApiService {
             ]
         } ) )
 
-        // Register searchStatements
+        // Register getStatements
         this.instance.get( {
             path: `${this.config.endpoint}/statement`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'searchStatements' )(
+                const response = await getFunctionForApiVersion( req.version, 'getStatements' )(
                     req,
                     res,
                     this.cacheService,
@@ -142,6 +142,99 @@ export default class MetaService extends ApiService {
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 await getFunctionForApiVersion( req.version, 'deleteStatement' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( 204 )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+
+        // Register getProfile
+        this.instance.get( {
+            path: `${this.config.endpoint}/profile`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getProfile' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.header( 'Cache-Control', 'no-store, no-cache, must-revalidate' )
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register createProfile
+        this.instance.post( {
+            path: `${this.config.endpoint}/profile`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'createProfile' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 201 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register updateProfile
+        this.instance.put( {
+            path: `${this.config.endpoint}/profile`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'updateProfile' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register deleteProfile
+        this.instance.del( {
+            path: `${this.config.endpoint}/profile`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                await getFunctionForApiVersion( req.version, 'deleteProfile' )(
                     req,
                     res,
                     this.cacheService,

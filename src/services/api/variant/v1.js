@@ -96,17 +96,20 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 response = await elasticService.getFacetsForVariant( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
-
-                console.log( `+++++ ${ JSON.stringify( response )}` )
-
-
                 if ( response.aggregations.filtered ) {
                     delete response.aggregations.filtered.meta
                     delete response.aggregations.filtered.doc_count
+
                     facetsFromResponse = Object.keys( response.aggregations.filtered ).reduce( ( aggs, category ) => {
-                        aggs[ category ] = response.aggregations.filtered[ category ].buckets.reduce( ( accumulator, bucket ) => {
-                            return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
-                        }, [] )
+                        const filtererdCategoryData = response.aggregations.filtered[ category ]
+
+                        if ( filtererdCategoryData.value ) {
+                            aggs[ category ] = [{ value: filtererdCategoryData.value }]
+                        } else {
+                            aggs[ category ] = filtererdCategoryData.buckets.reduce( ( accumulator, bucket ) => {
+                                return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                            }, [] )
+                        }
                         return aggs
                     }, {} )
                     delete response.aggregations.filtered
@@ -115,9 +118,15 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 responseFacetKeys = Object.keys( response.aggregations )
                 if ( responseFacetKeys.length > 0 ) {
                     responseFacetKeys.forEach( ( category ) => {
-                        facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
-                            return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
-                        }, [] )
+                        const unfilteredCategoryData = response.aggregations[ category ][ category ]
+
+                        if ( unfilteredCategoryData.value ) {
+                            facetsFromResponse[ category ] = [{ value: unfilteredCategoryData.value }]
+                        } else {
+                            facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
+                                return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                            }, [] )
+                        }
                     } )
                 }
                 break

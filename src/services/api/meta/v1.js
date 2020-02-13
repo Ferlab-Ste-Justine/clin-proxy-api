@@ -1,26 +1,28 @@
 import errors from 'restify-errors'
 
 
+const META_TYPE_STATEMENT = 'statement'
+const META_TYPE_PROFILE = 'profile'
+
 const getSessionDataFromToken = async ( token, cacheService ) => {
     return await cacheService.read( token.uid )
 }
 
-const searchStatements = async ( req, res, cacheService, elasticService, logService ) => {
+const getStatements = async ( req, res, cacheService, elasticService, logService ) => {
     try {
-        await elasticService.clearCacheMeta( 'statement' )
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params || req.body
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const response = await elasticService.searchMeta( sessionData.acl.fhir, 'statement', [], [], [], index, limit )
+        const response = await elasticService.searchMeta( sessionData.acl.fhir, META_TYPE_STATEMENT, [], [], [], index, limit )
 
-        await logService.debug( `Elastic searchStatements [${index},${limit}] returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic getStatements [${index},${limit}] returns ${response.hits.total} matches` )
         return {
             total: response.hits.total,
             hits: response.hits.hits
         }
     } catch ( e ) {
-        await logService.warning( `Elastic searchStatements ${e.toString()}` )
+        await logService.warning( `Elastic getStatements ${e.toString()}` )
         return new errors.InternalServerError()
     }
 }
@@ -40,7 +42,7 @@ const createStatement = async ( req, res, cacheService, elasticService, logServi
             isDefault,
             lastUpdatedOn: new Date().getTime()
         }
-        const response = await elasticService.createMeta( sessionData.acl.fhir, 'statement', struct )
+        const response = await elasticService.createMeta( sessionData.acl.fhir, META_TYPE_STATEMENT, struct )
 
         if ( response.result !== 'created' ) {
             return new errors.InvalidContentError()
@@ -63,17 +65,14 @@ const updateStatement = async ( req, res, cacheService, elasticService, logServi
         const title = params.title || ''
         const description = params.description || ''
         const queries = params.queries || []
-        const isDefault = params.isDefault || false
         const struct = {
             uid,
             title,
             description,
             queries: JSON.stringify( queries ),
-            isDefault,
             lastUpdatedOn: new Date().getTime()
         }
-        const sourceScript = isDefault ? 'if (ctx._id == params.uid) { ctx._source = params.data } else { ctx._source.isDefault = false }' : null
-        const response = await elasticService.updateMeta( sessionData.acl.fhir, 'statement', uid, struct, sourceScript )
+        const response = await elasticService.updateMeta( sessionData.acl.fhir, META_TYPE_STATEMENT, uid, struct )
 
         if ( !response.updated ) {
             return new errors.ResourceNotFoundError()
@@ -92,7 +91,7 @@ const deleteStatement = async ( req, res, cacheService, elasticService, logServi
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.body
         const uid = params.uid
-        const response = await elasticService.deleteMeta( sessionData.acl.fhir, 'statement', uid )
+        const response = await elasticService.deleteMeta( sessionData.acl.fhir, META_TYPE_STATEMENT, uid )
 
         if ( !response.deleted ) {
             return new errors.ResourceNotFoundError()
@@ -106,9 +105,105 @@ const deleteStatement = async ( req, res, cacheService, elasticService, logServi
     }
 }
 
+const getProfile = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const response = await elasticService.searchMeta( sessionData.acl.fhir, META_TYPE_PROFILE, [], [], [], 0, 1 )
+
+        await logService.debug( `Elastic getProfile returns ${response.hits.total} matches` )
+        return {
+            total: response.hits.total,
+            hits: response.hits.hits
+        }
+    } catch ( e ) {
+        await logService.warning( `Elastic getProfile ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+const createProfile = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const params = req.body
+        const defaultStatement = params.defaultStatement || ''
+        const patientTableConfig = params.patientTableConfig || {}
+        const variantTableConfig = params.variantTableConfig || {}
+        const struct = {
+            defaultStatement,
+            patientTableConfig: JSON.stringify( patientTableConfig ),
+            variantTableConfig: JSON.stringify( variantTableConfig ),
+            lastUpdatedOn: new Date().getTime()
+        }
+        const response = await elasticService.createMeta( sessionData.acl.fhir, META_TYPE_PROFILE, struct )
+
+        if ( response.result !== 'created' ) {
+            return new errors.InvalidContentError()
+        }
+
+        struct.uid = response._id
+        await logService.debug( `Elastic createProfile returned '${response.result}' with ${response._id}` )
+        return struct
+    } catch ( e ) {
+        await logService.warning( `Elastic createProfile ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+const updateProfile = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const params = req.body
+        const uid = params.uid
+        const defaultStatement = params.defaultStatement || ''
+        const patientTableConfig = params.patientTableConfig || {}
+        const variantTableConfig = params.variantTableConfig || {}
+        const struct = {
+            uid,
+            defaultStatement,
+            patientTableConfig: JSON.stringify( patientTableConfig ),
+            variantTableConfig: JSON.stringify( variantTableConfig ),
+            lastUpdatedOn: new Date().getTime()
+        }
+        const response = await elasticService.updateMeta( sessionData.acl.fhir, META_TYPE_PROFILE, uid, struct )
+
+        if ( !response.updated ) {
+            return new errors.ResourceNotFoundError()
+        }
+
+        await logService.debug( `Elastic updateProfile returned '${JSON.stringify( response.updated )}' for ${uid}` )
+        return struct
+    } catch ( e ) {
+        await logService.warning( `Elastic updateProfile ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+const deleteProfile = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const params = req.body
+        const uid = params.uid
+        const response = await elasticService.deleteMeta( sessionData.acl.fhir, META_TYPE_PROFILE, uid )
+
+        if ( !response.deleted ) {
+            return new errors.ResourceNotFoundError()
+        }
+
+        await logService.debug( `Elastic deleteProfile returned '${response.deleted}' for ${uid}` )
+        return null
+    } catch ( e ) {
+        await logService.warning( `Elastic deleteProfile ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
 export default {
-    searchStatements,
+    getStatements,
     createStatement,
     updateStatement,
-    deleteStatement
+    deleteStatement,
+    getProfile,
+    createProfile,
+    updateProfile,
+    deleteProfile,
 }

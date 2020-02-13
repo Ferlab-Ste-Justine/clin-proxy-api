@@ -1,0 +1,40 @@
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 2
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "defaultStatement": {
+          "type": "text"
+        },
+        "patientTableConfig": {
+          "type": "text"
+        },
+        "variantTableConfig": {
+          "type": "text"
+        },
+        "lastUpdatedOn": { "type" : "date" },
+        "organizationId": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "practitionerId": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        }
+      }
+    }
+  }
+}
