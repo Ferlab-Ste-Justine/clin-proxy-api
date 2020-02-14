@@ -6,7 +6,7 @@
   "mappings": {
     "_doc": {
       "properties": {
-        "queries": {
+        "uid": {
           "type": "text"
         },
         "title": {
@@ -18,10 +18,13 @@
             }
           }
         },
-        "lastUpdatedOn": { "type" : "date" },
         "description": {
           "type": "text"
         },
+        "queries": {
+          "type": "text"
+        },
+        "lastUpdatedOn": { "type" : "date" },
         "organizationId": {
           "type": "text",
           "fields": {
