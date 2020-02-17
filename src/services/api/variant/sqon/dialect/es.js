@@ -113,43 +113,39 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
 }
 
 const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
-    const isTermComparison = instruction.data.values.filter( ( value ) => {
-        return value.comparator !== undefined
-    } ).length < 1
+    const termComparisons = []
+    const numericalComparisons = []
+    const query = {}
 
-    console.log( `++++++ isTermComparison ${ JSON.stringify( isTermComparison )}` )
-    console.log( `+ instruction.data.values ${ JSON.stringify( instruction.data.values )}` )
+    instruction.data.values.forEach( ( composition ) => {
+        const isTermComparison = composition.comparator === undefined
 
-
-    // Term Comparison
-    if ( isTermComparison ) {
-        return {
-            should: instruction.data.values.reduce(
-                ( accumulator, value ) => {
-                    accumulator.push(
-                        { match: { [ fieldMap ]: {
-                            query: value,
-                            operator: 'and'
-                        } } }
-                    )
-                    return accumulator
-                }, [] )
-        }
-    // Numerical Comparison
-    }
-    return {
-        must: instruction.data.values.reduce( ( accumulator, group ) => {
-            accumulator.push( {
-                range: {
-                    [ fieldMap ]: {
-                        [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
+        if ( isTermComparison ) {
+            termComparisons.push(
+                { match: { [ ( fieldMap.quality || fieldMap[ composition.id ].quality ) ]: {
+                    query: composition.value,
+                    operator: 'and'
+                } } }
+            )
+        } else {
+            termComparisons.push(
+                { range: {
+                    [ ( fieldMap.score || fieldMap[ composition.id ].score ) ]: {
+                        [ getVerbFromNumericalComparator( composition.comparator ) ]: composition.value
                     }
-                }
-            } )
-            return accumulator
-        }, [] )
+                } }
+            )
+        }
+    } )
+
+    if ( termComparisons.length > 0 ) {
+        query.should = termComparisons
+    }
+    if ( numericalComparisons.length > 0 ) {
+        query.must = numericalComparisons
     }
 
+    return query
 }
 
 const translateToElasticSearch = ( query, options, getFieldSearchNameFromId ) => {
