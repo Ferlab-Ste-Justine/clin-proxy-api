@@ -113,25 +113,43 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
 }
 
 const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
-    const group = instruction.data
-    const isNumericalComparison = !!group.comparator
+    const isTermComparison = instruction.data.values.filter( ( value ) => {
+        return value.comparator !== undefined
+    } ).length < 1
 
-    if ( isNumericalComparison ) {
-        return { must: {
-            range: {
-                [( fieldMap.score || fieldMap[ group.id ].score )]: {
-                    [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
-                }
-            } }
+    console.log( `++++++ isTermComparison ${ JSON.stringify( isTermComparison )}` )
+    console.log( `+ instruction.data.values ${ JSON.stringify( instruction.data.values )}` )
+
+
+    // Term Comparison
+    if ( isTermComparison ) {
+        return {
+            should: instruction.data.values.reduce(
+                ( accumulator, value ) => {
+                    accumulator.push(
+                        { match: { [ fieldMap ]: {
+                            query: value,
+                            operator: 'and'
+                        } } }
+                    )
+                    return accumulator
+                }, [] )
         }
+    // Numerical Comparison
+    }
+    return {
+        must: instruction.data.values.reduce( ( accumulator, group ) => {
+            accumulator.push( {
+                range: {
+                    [ fieldMap ]: {
+                        [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
+                    }
+                }
+            } )
+            return accumulator
+        }, [] )
     }
 
-    return { must: {
-        match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: {
-            query: group.value,
-            operator: 'and'
-        } }
-    } }
 }
 
 const translateToElasticSearch = ( query, options, getFieldSearchNameFromId ) => {
