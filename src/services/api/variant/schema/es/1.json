@@ -166,19 +166,19 @@
           ]
         },
         {
-          "id": "refExt",
-          "label": "filter_refExt",
+          "id": "extref",
+          "label": "filter_extref",
           "type": "genericbool",
           "search": {
-            "refExt_hpo": "availableDbExt.hpo",
-            "refExt_orphanet": "availableDbExt.orphanet",
-            "refExt_radboudumc": "availableDbExt.radboudumc",
-            "refExt_omim": "availableDbExt.omim"
+            "extref_hpo": "availableDbExt.hpo",
+            "extref_orphanet": "availableDbExt.orphanet",
+            "extref_radboudumc": "availableDbExt.radboudumc",
+            "extref_omim": "availableDbExt.omim"
           },
           "facet": [
             {
-              "id": "refExt_hpo",
-              "label": "filter_refExt_hpo",
+              "id": "extref_hpo",
+              "label": "filter_extref_hpo",
               "query": {
                 "terms": {
                   "field": "availableDbExt.hpo",
@@ -187,8 +187,8 @@
               }
             },
             {
-              "id": "refExt_orphanet",
-              "label": "filter_refExt_orphanet",
+              "id": "extref_orphanet",
+              "label": "filter_extref_orphanet",
               "query": {
                 "terms": {
                   "field": "availableDbExt.orphanet",
@@ -197,8 +197,8 @@
               }
             },
             {
-              "id": "refExt_radboudumc",
-              "label": "filter_refExt_radboudumc",
+              "id": "extref_radboudumc",
+              "label": "filter_extref_radboudumc",
               "query": {
                 "terms": {
                   "field": "availableDbExt.radboudumc",
@@ -207,8 +207,8 @@
               }
             },
             {
-              "id": "refExt_omim",
-              "label": "filter_refExt_omim",
+              "id": "extref_omim",
+              "label": "filter_extref_omim",
               "query": {
                 "terms": {
                   "field": "availableDbExt.omim",
