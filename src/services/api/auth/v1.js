@@ -23,7 +23,7 @@ const generateSignedToken = (
         expiry: currentTimeInSeconds + accessTokenExpiresInSeconds,
         version: packageVersion,
         scope
-    }, jwtSecret, { expiresIn: `${( accessTokenExpiresInSeconds + refreshTokenExpiresInSeconds )}s` } )
+    }, jwtSecret, { expiresIn: `${refreshTokenExpiresInSeconds}s` } )
 }
 
 const generateCacheData = (
@@ -135,42 +135,48 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
         const decodedJwt = jwt.decode( jwtCookie, config.jwt.secret )
         const cacheKey = decodedJwt.uid
         const currentCachedData = await cacheService.read( cacheKey )
-        const refreshToken = currentCachedData.auth.refresh_token
-        const keycloakResponse = await keycloakService.refresh( refreshToken )
-        const jsonReponse = JSON.parse( keycloakResponse )
-        const newAccessToken = jsonReponse.access_token
-        const newAccessTokenExpiresInSeconds = jsonReponse.expires_in
-        const newRefreshToken = jsonReponse.refresh_token
-        const newRefreshTokenExpiresInSeconds = jsonReponse.refresh_expires_in
-        const newIdToken = jsonReponse.id_token
-        const newCacheData = generateCacheData(
-            newAccessToken,
-            newAccessTokenExpiresInSeconds,
-            newRefreshToken,
-            newRefreshTokenExpiresInSeconds,
-            newIdToken,
-            currentCachedData.acl,
-            currentCachedData.user,
-        )
-        const newToken = generateSignedToken(
-            config.jwt.secret,
-            cacheKey,
-            config.packageVersion,
-            newRefreshTokenExpiresInSeconds,
-            newAccessTokenExpiresInSeconds,
-            jsonReponse.scope,
-        )
 
-        await cacheService.update( cacheKey, newCacheData, newRefreshTokenExpiresInSeconds )
+        if ( currentCachedData ) {
+            const refreshToken = currentCachedData.auth.refresh_token
+            const keycloakResponse = await keycloakService.refresh( refreshToken )
+            const jsonReponse = JSON.parse( keycloakResponse )
+            const newAccessToken = jsonReponse.access_token
+            const newAccessTokenExpiresInSeconds = jsonReponse.expires_in
+            const newRefreshToken = jsonReponse.refresh_token
+            const newRefreshTokenExpiresInSeconds = jsonReponse.refresh_expires_in
+            const newIdToken = jsonReponse.id_token
+            const newCacheData = generateCacheData(
+                newAccessToken,
+                newAccessTokenExpiresInSeconds,
+                newRefreshToken,
+                newRefreshTokenExpiresInSeconds,
+                newIdToken,
+                currentCachedData.acl,
+                currentCachedData.user,
+            )
+            const newToken = generateSignedToken(
+                config.jwt.secret,
+                cacheKey,
+                config.packageVersion,
+                newRefreshTokenExpiresInSeconds,
+                newAccessTokenExpiresInSeconds,
+                jsonReponse.scope,
+            )
 
-        await logService.debug( `Refreshed token for ${currentCachedData.user.username} using ${cacheKey}` )
-        return {
-            user: currentCachedData.user,
-            token: {
-                value: newToken,
-                expiry: newAccessTokenExpiresInSeconds
+            await cacheService.update( cacheKey, newCacheData, newRefreshTokenExpiresInSeconds )
+
+            await logService.debug( `Refreshed token for ${currentCachedData.user.username} using ${cacheKey}` )
+            return {
+                user: currentCachedData.user,
+                token: {
+                    value: newToken,
+                    expiry: newAccessTokenExpiresInSeconds
+                }
             }
         }
+        await logService.warning( `Token Refresh data expired using ${cacheKey}` )
+        return new errors.ForbiddenError() // @NOTE 440 might be better
+
     } catch ( e ) {
         await logService.warning( `Token Refresh ${e.toString()}` )
         return new errors.InternalServerError()
