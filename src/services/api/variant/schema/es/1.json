@@ -20,7 +20,7 @@
           }
         }
       ],
-      "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { match: { 'donors.patientId': context.patient } }; return context.sort"
+      "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { term: { 'donors.patientId': context.patient } }; return context.sort"
     }
   },
   "defaultGroup": "impact",
@@ -34,7 +34,7 @@
           "label": "filter_variant_type",
           "type": "generic",
           "search": {
-            "variant_type": "type"
+            "variant_type": "type.keyword"
           },
           "facet": [
             {
@@ -56,7 +56,7 @@
           "label": "filter_consequence",
           "type": "generic",
           "search": {
-            "consequence": "consequences.consequence"
+            "consequence": "consequences.consequence.keyword"
           },
           "facet": [
             {
@@ -120,7 +120,7 @@
           "label": "filter_chromosome",
           "type": "generic",
           "search": {
-            "chromosome": "chrom"
+            "chromosome": "chrom.keyword"
           },
           "facet": [
             {
@@ -148,7 +148,7 @@
           "label": "filter_gene_type",
           "type": "generic",
           "search": {
-            "gene_type": "genes.biotype"
+            "gene_type": "genes.biotype.keyword"
           },
           "facet": [
             {
@@ -232,7 +232,7 @@
             }
           },
           "search": {
-            "gene_hpo": "genes.hpo"
+            "gene_hpo": "genes.hpo.keyword"
           },
           "facet": [
             {
@@ -254,7 +254,7 @@
           "label": "filter_genegroup_radboud",
           "type": "generic",
           "search": {
-            "genegroup_radboud": "genes.radboudumc"
+            "genegroup_radboud": "genes.radboudumc.keyword"
           },
           "facet": [
             {
@@ -276,7 +276,7 @@
           "label": "filter_genegroup_orphanet",
           "type": "generic",
           "search": {
-            "genegroup_orphanet": "genes.orphanet"
+            "genegroup_orphanet": "genes.orphanet.keyword"
           },
           "facet": [
             {
@@ -304,7 +304,7 @@
           "label": "filter_exomiser_score",
           "type": "numcomparison",
           "search": {
-            "exomiser_score": "donors.exomiserScore"
+            "exomiser_score": "donors.exomiserScore.keyword"
           },
           "facet": [
             {
@@ -330,7 +330,7 @@
           "label": "filter_clinvar_clinsig",
           "type": "generic",
           "search": {
-            "clinvar_clinsig": "clinvar.clinvar_clinsig"
+            "clinvar_clinsig": "clinvar.clinvar_clinsig.keyword"
           },
           "facet": [
             {
@@ -352,7 +352,7 @@
           "label": "filter_impacts",
           "type": "generic",
           "search": {
-            "impact": "consequences.impact"
+            "impact": "consequences.impact.keyword"
           },
           "facet": [
             {
@@ -376,7 +376,7 @@
           "search": {
             "prediction_fathmm": {
               "score": "consequences.predictions.FATHMM_score",
-              "quality": "consequences.predictions.FATHMM"
+              "quality": "consequences.predictions.FATHMM.keyword"
             }
           },
           "facet": [
@@ -417,7 +417,7 @@
           "search": {
             "prediction_sift": {
               "score": "consequences.predictions.SIFT_score",
-              "quality": "consequences.predictions.SIFT"
+              "quality": "consequences.predictions.SIFT.keyword"
             }
           },
           "facet": [
@@ -458,7 +458,7 @@
           "search": {
             "prediction_polyphen2_hvar": {
               "score": "consequences.predictions.Polyphen2_HVAR_score",
-              "quality": "consequences.predictions.Polyphen2_HVAR_pred"
+              "quality": "consequences.predictions.Polyphen2_HVAR_pred.keyword"
             }
           },
           "facet": [
@@ -499,7 +499,7 @@
           "search": {
             "prediction_lrt": {
               "score": "consequences.predictions.LRT_score",
-              "quality": "consequences.predictions.LRT_pred"
+              "quality": "consequences.predictions.LRT_pred.keyword"
             }
           },
           "facet": [
@@ -792,7 +792,7 @@
           "label": "filter_transmission",
           "type": "generic",
           "search": {
-            "transmission": "donors.zygosity"
+            "transmission": "donors.zygosity.keyword"
           },
           "facet": [
             {

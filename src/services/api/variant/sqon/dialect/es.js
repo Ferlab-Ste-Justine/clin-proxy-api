@@ -59,10 +59,7 @@ const mapGenericFilterInstruction = ( instruction, fieldMap ) => {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
                 accumulator.push(
-                    { match: { [ fieldMap ]: {
-                        query: value,
-                        operator: 'and'
-                    } } }
+                    { term: { [ fieldMap ]: value } }
                 )
                 return accumulator
             }, [] )
@@ -74,10 +71,7 @@ const mapSpecificFilterInstruction = ( instruction, fieldMap ) => {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
                 accumulator.push(
-                    { match: { [ fieldMap ]: {
-                        query: value,
-                        operator: 'and'
-                    } } }
+                    { term: { [ fieldMap ]: value } }
                 )
                 return accumulator
             }, [] )
@@ -103,9 +97,7 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
     return {
         should: instruction.data.values.reduce( ( accumulator, group ) => {
             accumulator.push(
-                { match: { [ fieldMap[ group ] ]: {
-                    query: true
-                } } }
+                { term: { [ fieldMap[ group ] ]: true } }
             )
             return accumulator
         }, [] )
@@ -127,10 +119,7 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
     }
 
     return { must: {
-        match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: {
-            query: group.value,
-            operator: 'and'
-        } }
+        term: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: group.value }
     } }
 }
 
