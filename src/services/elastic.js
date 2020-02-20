@@ -98,6 +98,7 @@ export default class ElasticClient {
     async searchVariantsForPatient( patient, request, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}/_search`
         const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
         let sort = sortDefinition.sort
 
         if ( sortDefinition.postprocess ) {
@@ -113,10 +114,11 @@ export default class ElasticClient {
             sort = postprocess( context )
         }
 
-        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
+        if ( filter.length > 0 ) {
+            request.query.bool.filter.bool.must.push( filter )
+        }
 
-        filter.push( { term: { [ schema.fields.patient ]: patient } } )
-        request.query.bool.filter = filter
+        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const body = {
             from: index,
@@ -141,14 +143,18 @@ export default class ElasticClient {
         ).filter( ( filter ) => {
             return isArray( filter.facet )
         } )
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
         const aggs = {
             filtered: { aggs: {} }
         }
-        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
 
-        filter.push( { term: { [ schema.fields.patient ]: patient } } )
+        if ( filter.length > 0 ) {
+            request.query.bool.filter.bool.must.push( filter )
+        }
 
-        aggs.filtered.filter = request.query
+        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
+
+        aggs.filtered.filter = request.query.bool.filter
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
                 accumulator[ [ facet.id ] ] = facet.query
@@ -214,9 +220,11 @@ export default class ElasticClient {
             }
         } )
 
+        request.query.bool.filter.bool.must.push( filter )
+
         const body = {
             size: 0,
-            query: { bool: { filter } },
+            query: request.query,
             aggs
         }
 
@@ -232,7 +240,6 @@ export default class ElasticClient {
     async countVariantsForPatient( patient, request, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
         const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
-
         const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
         let sort = sortDefinition.sort
 
@@ -249,8 +256,11 @@ export default class ElasticClient {
             sort = postprocess( context )
         }
 
-        filter.push( { term: { [ schema.fields.patient ]: patient } } )
-        request.query.bool.filter = filter
+        if ( filter.length > 0 ) {
+            request.query.bool.filter.bool.must.push( filter )
+        }
+
+        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const body = {
             query: request.query

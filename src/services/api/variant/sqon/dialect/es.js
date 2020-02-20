@@ -207,10 +207,10 @@ const translateToElasticSearch = ( query, options, getFieldSearchNameFromId ) =>
     const instructions = mapInstructions( query.instructions )
     const translation = postMapInstructions( instructions )
 
-    return { query: translation }
+    return { query: { bool: { filter: { bool: { must: [ translation ] } } } } }
 }
 
 export const elasticSearchTranslator = {
     translate: translateToElasticSearch,
-    emptyTranslation: { query: { bool: {} } }
+    emptyTranslation: { query: { bool: { filter: { bool: { must: [] } } } } }
 }
