@@ -11,7 +11,7 @@ import {
 import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
 
 
-const generateAclFilters = ( acl, service ) => {
+const generateAclFilters = ( acl, service, schema = null ) => {
     const filters = []
     const practitionerId = acl.practitioner_id
     const organizationId = acl.organization_id
@@ -22,7 +22,7 @@ const generateAclFilters = ( acl, service ) => {
             if ( service === SERVICE_TYPE_PATIENT ) {
                 filters.push( { match: { 'practitioners.id': practitionerId } } )
             } else if ( service === SERVICE_TYPE_VARIANT ) {
-                filters.push( { match: { 'donors.practitionerId': practitionerId } } )
+                filters.push( { match: { [ schema.fields.practitioner ]: practitionerId } } )
             } else if ( service === SERVICE_TYPE_META ) {
                 filters.push( { match: { practitionerId } } )
             }
@@ -32,7 +32,7 @@ const generateAclFilters = ( acl, service ) => {
             if ( service === SERVICE_TYPE_PATIENT ) {
                 filters.push( { match: { 'organization.id': organizationId } } )
             } else if ( service === SERVICE_TYPE_VARIANT ) {
-                filters.push( { match: { 'donors.organizationId': organizationId } } )
+                filters.push( { match: { [ schema.fields.organization ]: organizationId } } )
             } else if ( service === SERVICE_TYPE_META ) {
                 filters.push( { match: { practitionerId } } )
             }
@@ -113,9 +113,9 @@ export default class ElasticClient {
             sort = postprocess( context )
         }
 
-        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
 
-        filter.push( { match: { 'donors.patientId': patient } } )
+        filter.push( { term: { [ schema.fields.patient ]: patient } } )
         request.query.bool.filter = filter
 
         const body = {
@@ -144,9 +144,9 @@ export default class ElasticClient {
         const aggs = {
             filtered: { aggs: {} }
         }
-        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
 
-        filter.push( { match: { 'donors.patientId': patient } } )
+        filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
         aggs.filtered.filter = request.query
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
@@ -231,7 +231,7 @@ export default class ElasticClient {
 
     async countVariantsForPatient( patient, request, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
-        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
+        const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
 
         const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
         let sort = sortDefinition.sort
@@ -249,7 +249,7 @@ export default class ElasticClient {
             sort = postprocess( context )
         }
 
-        filter.push( { match: { 'donors.patientId': patient } } )
+        filter.push( { term: { [ schema.fields.patient ]: patient } } )
         request.query.bool.filter = filter
 
         const body = {
@@ -313,19 +313,6 @@ export default class ElasticClient {
         }
     }
 
-    async clearCacheMeta( index = null ) {
-        if ( index !== null ) {
-            const uri = `${this.host}/${index}/_cache/clear?query=true`
-
-            return rp( {
-                method: 'POST',
-                uri,
-                json: true
-
-            } )
-        }
-    }
-
     async updateMeta( acl, index = null, uid, data = {}, source = null, filters = [] ) {
         if ( index !== null && uid !== null ) {
             const uri = `${this.host}/${index}/_doc/_update_by_query`
@@ -377,6 +364,19 @@ export default class ElasticClient {
                         }
                     }
                 }
+            } )
+        }
+    }
+
+    async clearCacheMeta( index = null ) {
+        if ( index !== null ) {
+            const uri = `${this.host}/${index}/_cache/clear?query=true`
+
+            return rp( {
+                method: 'POST',
+                uri,
+                json: true
+
             } )
         }
     }

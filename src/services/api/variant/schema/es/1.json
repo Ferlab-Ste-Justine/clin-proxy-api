@@ -3,6 +3,11 @@
   "dialect": "es",
   "index": "clin-mutation-centric",
   "path": "/mutations",
+  "fields": {
+    "patient": "donors.patientId.keyword",
+    "practitioner": "donors.practitionerId",
+    "organization": "donors.organizationId"
+  },
   "groups": {
     "impact": {
       "sort": [
