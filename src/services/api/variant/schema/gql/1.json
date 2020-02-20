@@ -3,13 +3,18 @@
   "dialect": "gql",
   "index": "",
   "path": "",
+  "fields": {
+    "patient": "",
+    "practitioner": "",
+    "organization": ""
+  },
   "groups": {
-    "impact": {
+    "score": {
       "sort": [],
       "postprocess": ""
     }
   },
-  "defaultGroup": "impact",
+  "defaultGroup": "score",
   "categories": [
     {
       "id": "variant",
@@ -19,6 +24,7 @@
           "id": "variant_type",
           "label": "filter_variant_type",
           "type": "generic",
+          "config": {},
           "search": {},
           "facet": []
         }

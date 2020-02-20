@@ -22,7 +22,7 @@ const generateAclFilters = ( acl, service, schema = null ) => {
             if ( service === SERVICE_TYPE_PATIENT ) {
                 filters.push( { match: { 'practitioners.id': practitionerId } } )
             } else if ( service === SERVICE_TYPE_VARIANT ) {
-                filters.push( { match: { [ schema.fields.practitioner ]: practitionerId } } )
+                filters.push( { term: { [ schema.fields.practitioner ]: practitionerId } } )
             } else if ( service === SERVICE_TYPE_META ) {
                 filters.push( { match: { practitionerId } } )
             }
@@ -32,7 +32,7 @@ const generateAclFilters = ( acl, service, schema = null ) => {
             if ( service === SERVICE_TYPE_PATIENT ) {
                 filters.push( { match: { 'organization.id': organizationId } } )
             } else if ( service === SERVICE_TYPE_VARIANT ) {
-                filters.push( { match: { [ schema.fields.organization ]: organizationId } } )
+                filters.push( { term: { [ schema.fields.organization ]: organizationId } } )
             } else if ( service === SERVICE_TYPE_META ) {
                 filters.push( { match: { practitionerId } } )
             }

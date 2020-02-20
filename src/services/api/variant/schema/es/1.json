@@ -5,8 +5,8 @@
   "path": "/mutations",
   "fields": {
     "patient": "donors.patientId.keyword",
-    "practitioner": "donors.practitionerId",
-    "organization": "donors.organizationId"
+    "practitioner": "donors.practitionerId.keyword",
+    "organization": "donors.organizationId.keyword"
   },
   "groups": {
     "impact": {
@@ -25,7 +25,7 @@
           }
         }
       ],
-      "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { term: { 'donors.patientId': context.patient } }; return context.sort"
+      "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { term: { 'donors.patientId.keyword': context.patient } }; return context.sort"
     }
   },
   "defaultGroup": "impact",
