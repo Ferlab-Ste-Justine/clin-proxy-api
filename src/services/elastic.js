@@ -148,12 +148,6 @@ export default class ElasticClient {
             filtered: { aggs: {} }
         }
 
-        if ( filter.length > 0 ) {
-            request.query.bool.filter.bool.must.push( filter )
-        }
-
-        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
-
         aggs.filtered.filter = request.query.bool.filter
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
@@ -161,6 +155,12 @@ export default class ElasticClient {
             } )
             return accumulator
         }, {} )
+
+        if ( filter.length > 0 ) {
+            request.query.bool.filter.bool.must.push( filter )
+        }
+
+        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
         const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
@@ -219,8 +219,6 @@ export default class ElasticClient {
                 }
             }
         } )
-
-        request.query.bool.filter.bool.must.push( filter )
 
         const body = {
             size: 0,
