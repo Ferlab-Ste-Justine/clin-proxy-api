@@ -113,25 +113,39 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
 }
 
 const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
-    const group = instruction.data
-    const isNumericalComparison = !!group.comparator
+    const termComparisons = []
+    const numericalComparisons = []
+    const query = {}
 
-    if ( isNumericalComparison ) {
-        return { must: {
-            range: {
-                [( fieldMap.score || fieldMap[ group.id ].score )]: {
-                    [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
-                }
-            } }
+    instruction.data.values.forEach( ( composition ) => {
+        const isTermComparison = composition.comparator === undefined
+
+        if ( isTermComparison ) {
+            termComparisons.push(
+                { match: { [ ( fieldMap.quality || fieldMap[ composition.id ].quality ) ]: {
+                    query: composition.value,
+                    operator: 'and'
+                } } }
+            )
+        } else {
+            termComparisons.push(
+                { range: {
+                    [ ( fieldMap.score || fieldMap[ composition.id ].score ) ]: {
+                        [ getVerbFromNumericalComparator( composition.comparator ) ]: composition.value
+                    }
+                } }
+            )
         }
+    } )
+
+    if ( termComparisons.length > 0 ) {
+        query.should = termComparisons
+    }
+    if ( numericalComparisons.length > 0 ) {
+        query.must = numericalComparisons
     }
 
-    return { must: {
-        match: { [ ( fieldMap.quality || fieldMap[ group.id ].quality ) ]: {
-            query: group.value,
-            operator: 'and'
-        } }
-    } }
+    return query
 }
 
 const translateToElasticSearch = ( query, options, getFieldSearchNameFromId ) => {
