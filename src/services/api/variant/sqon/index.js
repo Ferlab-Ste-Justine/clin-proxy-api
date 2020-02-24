@@ -67,15 +67,18 @@ export const FILTER_TYPE_COMPOSITE = 'composite'
 {
     type: 'composite,
     data: {
-        value: 'T'
+        values: [
+            { value: 'T' }
+        ]
     }
 } */
 /* By Numerical Comparison
 {
     type: 'composite,
     data: {
-        comparator: '<='
-        value: '0'
+        values: [
+            { comparator: '<=', value: 0 }
+        ]
     }
 } */
 
