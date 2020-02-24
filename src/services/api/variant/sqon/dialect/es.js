@@ -81,15 +81,9 @@ const mapSpecificFilterInstruction = ( instruction, fieldMap ) => {
 const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap ) => {
     return {
         must: instruction.data.values.reduce( ( accumulator, group ) => {
-            accumulator.push( {
-                range: {
-                    [ fieldMap ]: {
-                        [ getVerbFromNumericalComparator( group.comparator ) ]: group.value
-                    }
-                }
-            } )
+            accumulator.range[ fieldMap ][ getVerbFromNumericalComparator( group.comparator ) ] = group.value
             return accumulator
-        }, [] )
+        }, { range: { [ fieldMap ]: {} } } )
     }
 }
 
@@ -106,7 +100,7 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
 
 const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
     const termComparisons = []
-    const numericalComparisons = []
+    const numericalComparisons = {}
     const query = {}
 
     instruction.data.values.forEach( ( composition ) => {
@@ -117,13 +111,10 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
                 { term: { [ ( fieldMap.quality || fieldMap[ composition.id ].quality ) ]: composition.value } }
             )
         } else {
-            termComparisons.push(
-                { range: {
-                    [ ( fieldMap.score || fieldMap[ composition.id ].score ) ]: {
-                        [ getVerbFromNumericalComparator( composition.comparator ) ]: composition.value
-                    }
-                } }
-            )
+            if ( !numericalComparisons.range ) {
+                numericalComparisons.range = { [ ( fieldMap.score || fieldMap[ composition.id ].score ) ]: {} }
+            }
+            numericalComparisons.range[ ( fieldMap.score || fieldMap[ composition.id ].score ) ][ getVerbFromNumericalComparator( composition.comparator ) ] = composition.value
         }
     } )
 
@@ -133,6 +124,9 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
     if ( numericalComparisons.length > 0 ) {
         query.must = numericalComparisons
     }
+
+    console.log( `+ termComparisons ${ JSON.stringify( termComparisons )}` )
+    console.log( `+ numericalComparisons ${ JSON.stringify( numericalComparisons )}` )
 
     return query
 }
