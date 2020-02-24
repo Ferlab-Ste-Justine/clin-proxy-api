@@ -144,8 +144,12 @@ export default class ElasticClient {
             return isArray( filter.facet )
         } )
         const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
+
         const aggs = {
-            filtered: { aggs: {} }
+            filtered: {
+                aggs: {},
+                filter: { bool: { must: [] } }
+            }
         }
 
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
@@ -155,7 +159,13 @@ export default class ElasticClient {
             return accumulator
         }, {} )
 
-        /* aggs.filtered.filter = request.query.bool.filter */
+        aggs.filtered.filter.bool.must = request.query.bool.filter
+
+        if ( filter.length > 0 ) {
+            aggs.filtered.filter.bool.must.push( filter )
+        }
+
+        aggs.filtered.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
         const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
@@ -215,15 +225,21 @@ export default class ElasticClient {
             }
         } )
 
-        if ( filter.length > 0 ) {
-            request.query.bool.filter.push( filter )
+        const query = {
+            bool: {
+                filter: []
+            }
         }
 
-        request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
+        if ( filter.length > 0 ) {
+            query.bool.filter.push( filter )
+        }
+
+        query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const body = {
             size: 0,
-            query: request.query,
+            query,
             aggs
         }
 
@@ -234,8 +250,6 @@ export default class ElasticClient {
             json: true,
             body
         } )
-        */
-        return {}
     }
 
     async countVariantsForPatient( patient, request, acl, schema, group ) {
