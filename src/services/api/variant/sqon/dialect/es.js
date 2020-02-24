@@ -59,10 +59,7 @@ const mapGenericFilterInstruction = ( instruction, fieldMap ) => {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
                 accumulator.push(
-                    { match: { [ fieldMap ]: {
-                        query: value,
-                        operator: 'and'
-                    } } }
+                    { term: { [ fieldMap ]: value } }
                 )
                 return accumulator
             }, [] )
@@ -74,10 +71,7 @@ const mapSpecificFilterInstruction = ( instruction, fieldMap ) => {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
                 accumulator.push(
-                    { match: { [ fieldMap ]: {
-                        query: value,
-                        operator: 'and'
-                    } } }
+                    { term: { [ fieldMap ]: value } }
                 )
                 return accumulator
             }, [] )
@@ -103,9 +97,7 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
     return {
         should: instruction.data.values.reduce( ( accumulator, group ) => {
             accumulator.push(
-                { match: { [ fieldMap[ group ] ]: {
-                    query: true
-                } } }
+                { term: { [ fieldMap[ group ] ]: true } }
             )
             return accumulator
         }, [] )
@@ -122,10 +114,7 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
 
         if ( isTermComparison ) {
             termComparisons.push(
-                { match: { [ ( fieldMap.quality || fieldMap[ composition.id ].quality ) ]: {
-                    query: composition.value,
-                    operator: 'and'
-                } } }
+                { term: { [ ( fieldMap.quality || fieldMap[ composition.id ].quality ) ]: composition.value } }
             )
         } else {
             termComparisons.push(
@@ -232,10 +221,10 @@ const translateToElasticSearch = ( query, options, getFieldSearchNameFromId ) =>
     const instructions = mapInstructions( query.instructions )
     const translation = postMapInstructions( instructions )
 
-    return { query: translation }
+    return { query: { bool: { filter: [ translation ] } } }
 }
 
 export const elasticSearchTranslator = {
     translate: translateToElasticSearch,
-    emptyTranslation: { query: { bool: {} } }
+    emptyTranslation: { query: { bool: { filter: [] } } }
 }
