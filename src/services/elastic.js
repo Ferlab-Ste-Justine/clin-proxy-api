@@ -115,10 +115,10 @@ export default class ElasticClient {
         }
 
         if ( filter.length > 0 ) {
-            request.query.bool.filter.bool.must.push( filter )
+            request.query.bool.filter.push( filter )
         }
 
-        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
+        request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const body = {
             from: index,
@@ -148,7 +148,6 @@ export default class ElasticClient {
             filtered: { aggs: {} }
         }
 
-        aggs.filtered.filter = request.query.bool.filter
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
                 accumulator[ [ facet.id ] ] = facet.query
@@ -156,11 +155,7 @@ export default class ElasticClient {
             return accumulator
         }, {} )
 
-        if ( filter.length > 0 ) {
-            request.query.bool.filter.bool.must.push( filter )
-        }
-
-        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
+        /* aggs.filtered.filter = request.query.bool.filter */
 
         const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
         const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
@@ -220,6 +215,12 @@ export default class ElasticClient {
             }
         } )
 
+        if ( filter.length > 0 ) {
+            request.query.bool.filter.push( filter )
+        }
+
+        request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
+
         const body = {
             size: 0,
             query: request.query,
@@ -233,6 +234,8 @@ export default class ElasticClient {
             json: true,
             body
         } )
+        */
+        return {}
     }
 
     async countVariantsForPatient( patient, request, acl, schema, group ) {
@@ -255,10 +258,10 @@ export default class ElasticClient {
         }
 
         if ( filter.length > 0 ) {
-            request.query.bool.filter.bool.must.push( filter )
+            request.query.bool.filter.push( filter )
         }
 
-        request.query.bool.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
+        request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const body = {
             query: request.query
