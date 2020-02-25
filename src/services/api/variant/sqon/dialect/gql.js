@@ -58,23 +58,23 @@ const getVerbFromNumericalComparator = ( comparator ) => {
     }
 }
 
-const mapGenericFilterInstruction = ( instruction, fieldMap ) => {
+const mapGenericFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
     return {}
 }
 
-const mapSpecificFilterInstruction = ( instruction, fieldMap ) => {
+const mapSpecificFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
     return {}
 }
 
-const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap ) => {
+const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
     return {}
 }
 
-const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
+const mapGenericBooleanFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
     return {}
 }
 
-const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
+const mapCompositeFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
     const group = instruction.data
     const isNumericalComparison = !!group.comparator
 
@@ -86,24 +86,26 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
 }
 
 
-const translateToGraphQl = ( query, options, getFieldNameFromId ) => {
+const translateToGraphQl = ( query, options, getFieldSearchNameFromId, getFieldFacetNameFromId, getFieldSubtypeFromId ) => {
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
         const type = getInstructionType( instruction )
-        const fieldMap = getFieldNameFromId( fieldId )
+        const fieldMap = getFieldSearchNameFromId( fieldId )
+        const facetMap = getFieldFacetNameFromId( fieldId )
+        const subtypeMap = getFieldSubtypeFromId( fieldId )
 
         switch ( type ) {
             default:
             case FILTER_TYPE_GENERIC:
-                return mapGenericFilterInstruction( instruction, fieldMap )
+                return mapGenericFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
             case FILTER_TYPE_SPECIFIC:
-                return mapSpecificFilterInstruction( instruction, fieldMap )
+                return mapSpecificFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
             case FILTER_TYPE_NUMERICAL_COMPARISON:
-                return mapNumericalComparisonFilterInstruction( instruction, fieldMap )
+                return mapNumericalComparisonFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
             case FILTER_TYPE_GENERIC_BOOLEAN:
-                return mapGenericBooleanFilterInstruction( instruction, fieldMap )
+                return mapGenericBooleanFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
             case FILTER_TYPE_COMPOSITE:
-                return mapCompositeFilterInstruction( instruction, fieldMap )
+                return mapCompositeFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
         }
     }
 

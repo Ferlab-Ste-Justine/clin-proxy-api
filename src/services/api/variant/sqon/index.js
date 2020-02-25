@@ -204,6 +204,16 @@ export const getFieldFacetNameFromFieldIdMappingFunction = ( schema ) => {
     }
 }
 
+export const getFieldSubtypeFromFieldIdMappingFunction = ( schema ) => {
+    const flattenedSchema = flattenSchema( schema )
+
+    return ( id ) => {
+        const schemaFilter = find( flattenedSchema, { id } )
+
+        return schemaFilter.subtype ? schemaFilter.subtype[ [ id ] ] || schemaFilter.subtype : null
+    }
+}
+
 export const getInstructionType = ( instruction ) => {
     return instruction.data.type
 }
@@ -233,8 +243,9 @@ const translate = ( statement, queryKey, schema, dialect, dialectOptions ) => {
         const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
         const getFieldSearchNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
         const getFieldFacetNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
+        const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
 
-        return translator.translate( denormalizedQuery, options, getFieldSearchNameFromFieldId, getFieldFacetNameFromFieldId )
+        return translator.translate( denormalizedQuery, options, getFieldSearchNameFromFieldId, getFieldFacetNameFromFieldId, getFieldSubtypeFromFieldId )
     }
 
     return null

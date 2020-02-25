@@ -24,6 +24,12 @@
           "id": "variant_type",
           "label": "filter_variant_type",
           "type": "generic",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "pathname"
+            }
+          },
           "config": {},
           "search": {},
           "facet": []

@@ -848,6 +848,12 @@
           "id": "transmission",
           "label": "filter_transmission",
           "type": "generic",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors"
+            }
+          },
           "search": {
             "transmission": "donors.zygosity.keyword"
           },
