@@ -247,7 +247,7 @@ export default class ElasticClient {
 
         query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
-        let stringifiedQuery = JSON.stringify( request.query )
+        let stringifiedQuery = JSON.stringify( query )
 
         stringifiedQuery = stringifiedQuery.replace( '%patientId.keyword%', patient )
 
