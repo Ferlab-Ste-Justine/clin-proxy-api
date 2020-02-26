@@ -100,12 +100,12 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                     delete response.aggregations.filtered.meta
                     delete response.aggregations.filtered.doc_count
                     facetsFromResponse = Object.keys( response.aggregations.filtered ).reduce( ( aggs, category ) => {
-                        const filtererdCategoryData = response.aggregations.filtered[ category ]
+                        const filteredCategoryData = response.aggregations.filtered[ category ]
 
-                        if ( filtererdCategoryData.value !== undefined ) {
-                            aggs[ category ] = [ { value: Number( filtererdCategoryData.value ) } ]
+                        if ( filteredCategoryData.value !== undefined ) {
+                            aggs[ category ] = [ { value: Number( filteredCategoryData.value ) } ]
                         } else {
-                            aggs[ category ] = filtererdCategoryData.buckets.reduce( ( accumulator, bucket ) => {
+                            aggs[ category ] = filteredCategoryData.buckets.reduce( ( accumulator, bucket ) => {
                                 return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
                             }, [] )
                         }

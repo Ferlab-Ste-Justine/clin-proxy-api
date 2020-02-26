@@ -121,14 +121,19 @@ export default class ElasticClient {
 
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
+        let stringifiedQuery = JSON.stringify( request.query )
+
+        stringifiedQuery = stringifiedQuery.replace( '%patientId.keyword%', patient )
+
         const body = {
             from: index,
             size: limit,
-            query: request.query,
+            query: JSON.parse( stringifiedQuery ),
             sort
         }
 
         console.debug( JSON.stringify( body ) )
+
         return rp( {
             method: 'POST',
             uri,
@@ -242,13 +247,18 @@ export default class ElasticClient {
 
         query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
+        let stringifiedQuery = JSON.stringify( request.query )
+
+        stringifiedQuery = stringifiedQuery.replace( '%patientId.keyword%', patient )
+
         const body = {
             size: 0,
-            query,
+            query: JSON.parse( stringifiedQuery ),
             aggs
         }
 
         console.debug( JSON.stringify( body ) )
+
         return rp( {
             method: 'POST',
             uri,
@@ -282,11 +292,16 @@ export default class ElasticClient {
 
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
+        let stringifiedQuery = JSON.stringify( request.query )
+
+        stringifiedQuery = stringifiedQuery.replace( '%patientId.keyword%', patient )
+
         const body = {
-            query: request.query
+            query: JSON.parse( stringifiedQuery )
         }
 
         console.debug( JSON.stringify( body ) )
+
         return rp( {
             method: 'POST',
             uri,

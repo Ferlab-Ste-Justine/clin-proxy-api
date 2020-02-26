@@ -61,10 +61,20 @@ const filterSubtypeIsNested = ( subtypeMap ) => {
 }
 
 const mutateMappedInstructionIntoNestedSubtype = ( mappedInstruction, subtypeMap ) => {
+    const filters = []
+
+    if ( subtypeMap.config.field ) {
+        filters.push( { term: { [ `${subtypeMap.config.path}.${subtypeMap.config.field}` ]: `%${subtypeMap.config.field}%` } } )
+    }
+
     return { must: [ {
         nested: {
             path: subtypeMap.config.path,
-            query: { bool: { filter: [ { bool: mappedInstruction } ] } }
+            query: {
+                bool: {
+                    filter: filters.concat( [ { bool: mappedInstruction } ] )
+                }
+            }
         }
     } ] }
 }

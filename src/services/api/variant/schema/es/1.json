@@ -855,7 +855,8 @@
           "subtype": {
             "type": "nested",
             "config": {
-              "path": "donors"
+              "path": "donors",
+              "field": "patientId.keyword"
             }
           },
           "search": {
