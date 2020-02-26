@@ -12,6 +12,12 @@ import {
 import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
 
 
+const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
+    return JSON.parse(
+        JSON.stringify( query ).split( placeholder ).join( placeholderValue )
+    )
+}
+
 const generateAclFilters = ( acl, service, schema = null ) => {
     const filters = []
     const practitionerId = acl.practitioner_id
@@ -121,14 +127,10 @@ export default class ElasticClient {
 
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
-        let stringifiedQuery = JSON.stringify( request.query )
-
-        stringifiedQuery = stringifiedQuery.replace( '%patientId.keyword%', patient )
-
         const body = {
             from: index,
             size: limit,
-            query: JSON.parse( stringifiedQuery ),
+            query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient ),
             sort
         }
 
@@ -247,14 +249,10 @@ export default class ElasticClient {
 
         query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
-        let stringifiedAggs = JSON.stringify( aggs )
-
-        stringifiedAggs = stringifiedAggs.replace( '%patientId.keyword%', aggs )
-
         const body = {
             size: 0,
-            query,
-            aggs: JSON.parse( stringifiedAggs )
+            query: replacePlaceholderInJSON( query, '%patientId.keyword%', patient ),
+            aggs: replacePlaceholderInJSON( aggs, '%patientId.keyword%', patient )
         }
 
         console.debug( JSON.stringify( body ) )
@@ -292,12 +290,8 @@ export default class ElasticClient {
 
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
-        let stringifiedQuery = JSON.stringify( request.query )
-
-        stringifiedQuery = stringifiedQuery.replace( '%patientId.keyword%', patient )
-
         const body = {
-            query: JSON.parse( stringifiedQuery )
+            query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient )
         }
 
         console.debug( JSON.stringify( body ) )

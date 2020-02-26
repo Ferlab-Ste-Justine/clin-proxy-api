@@ -10,7 +10,6 @@ import {
     instructionIsFilter,
     traverseObjectAndApplyFunc,
     getInstructionType
-
 } from '../index'
 
 
