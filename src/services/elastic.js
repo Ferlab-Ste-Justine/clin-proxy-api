@@ -102,7 +102,7 @@ export default class ElasticClient {
         let sort = sortDefinition.sort
 
         if ( sortDefinition.postprocess ) {
-            const postprocess = new Function( 'context', sortDefinition.postprocess ) /* eslint-disable-line */
+            const postprocess = new Function( 'context', sortDefinition.postprocess )
             const context = {
                 sort,
                 acl,

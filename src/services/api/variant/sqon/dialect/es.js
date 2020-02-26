@@ -10,11 +10,13 @@ import {
     instructionIsFilter,
     traverseObjectAndApplyFunc,
     getInstructionType
+
 } from '../index'
 
 
 export const DIALECT_LANGUAGE_ELASTIC_SEARCH = 'es'
 export const EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS = {}
+const FILTER_SUBTYPE_NESTED = 'nested'
 
 const getVerbFromOperator = ( operator ) => {
     switch ( operator ) {
@@ -54,10 +56,20 @@ const getVerbFromNumericalComparator = ( comparator ) => {
     }
 }
 
-const mapGenericFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
+const filterSubtypeIsNested = ( subtypeMap ) => {
+    return subtypeMap && subtypeMap.type === FILTER_SUBTYPE_NESTED
+}
 
-    console.log( `+ mapGenericFilterInstruction ${ JSON.stringify( subtypeMap )}` )
+const mutateMappedInstructionIntoNestedSubtype = ( mappedInstruction, subtypeMap ) => {
+    return { must: [ {
+        nested: {
+            path: subtypeMap.config.path,
+            query: { bool: { filter: [ { bool: mappedInstruction } ] } }
+        }
+    } ] }
+}
 
+const mapGenericFilterInstruction = ( instruction, fieldMap ) => {
     return {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
@@ -69,7 +81,7 @@ const mapGenericFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMa
     }
 }
 
-const mapSpecificFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
+const mapSpecificFilterInstruction = ( instruction, fieldMap ) => {
     return {
         [ getVerbFromOperand( instruction.data.operand ) ]: instruction.data.values.reduce(
             ( accumulator, value ) => {
@@ -81,7 +93,7 @@ const mapSpecificFilterInstruction = ( instruction, fieldMap, facetMap, subtypeM
     }
 }
 
-const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
+const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap ) => {
     return {
         must: instruction.data.values.reduce( ( accumulator, group ) => {
             accumulator.range[ fieldMap ][ getVerbFromNumericalComparator( group.comparator ) ] = group.value
@@ -90,7 +102,7 @@ const mapNumericalComparisonFilterInstruction = ( instruction, fieldMap, facetMa
     }
 }
 
-const mapGenericBooleanFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
+const mapGenericBooleanFilterInstruction = ( instruction, fieldMap ) => {
     return {
         should: instruction.data.values.reduce( ( accumulator, group ) => {
             accumulator.push(
@@ -101,7 +113,7 @@ const mapGenericBooleanFilterInstruction = ( instruction, fieldMap, facetMap, su
     }
 }
 
-const mapCompositeFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
+const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
     const termComparisons = []
     const numericalComparisons = {}
     const query = {}
@@ -128,9 +140,6 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap, facetMap, subtype
         query.must = numericalComparisons
     }
 
-    console.log( `+ termComparisons ${ JSON.stringify( termComparisons )}` )
-    console.log( `+ numericalComparisons ${ JSON.stringify( numericalComparisons )}` )
-
     return query
 }
 
@@ -139,22 +148,34 @@ const translateToElasticSearch = ( query, options, getFieldSearchNameFromId, get
     const mapPartFromFilter = ( instruction, fieldId ) => {
         const type = getInstructionType( instruction )
         const fieldMap = getFieldSearchNameFromId( fieldId )
-        const facetMap = getFieldFacetNameFromId( fieldId )
         const subtypeMap = getFieldSubtypeFromId( fieldId )
+
+        let translatedInstruction = null
 
         switch ( type ) {
             default:
             case FILTER_TYPE_GENERIC:
-                return mapGenericFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
+                translatedInstruction = mapGenericFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_SPECIFIC:
-                return mapSpecificFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
+                translatedInstruction = mapSpecificFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_NUMERICAL_COMPARISON:
-                return mapNumericalComparisonFilterInstruction( instruction, facetMap, fieldMap, subtypeMap )
+                translatedInstruction = mapNumericalComparisonFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_GENERIC_BOOLEAN:
-                return mapGenericBooleanFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
+                translatedInstruction = mapGenericBooleanFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_COMPOSITE:
-                return mapCompositeFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
+                translatedInstruction = mapCompositeFilterInstruction( instruction, fieldMap )
+                break
         }
+
+        if ( filterSubtypeIsNested( subtypeMap ) ) {
+            translatedInstruction = mutateMappedInstructionIntoNestedSubtype( translatedInstruction, subtypeMap )
+        }
+
+        return translatedInstruction
     }
 
     const mapPartFromComposite = ( instruction, bools ) => {
