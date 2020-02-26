@@ -6,10 +6,17 @@ import {
     traverseArrayAndApplyFunc,
     instructionIsFilter,
     getFieldSearchNameFromFieldIdMappingFunction,
-    getFieldFacetNameFromFieldIdMappingFunction
+    getFieldFacetNameFromFieldIdMappingFunction,
+    getFieldSubtypeFromFieldIdMappingFunction
 } from './api/variant/sqon'
 import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
 
+
+const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
+    return JSON.parse(
+        JSON.stringify( query ).split( placeholder ).join( placeholderValue )
+    )
+}
 
 const generateAclFilters = ( acl, service, schema = null ) => {
     const filters = []
@@ -102,7 +109,7 @@ export default class ElasticClient {
         let sort = sortDefinition.sort
 
         if ( sortDefinition.postprocess ) {
-            const postprocess = new Function( 'context', sortDefinition.postprocess ) /* eslint-disable-line */
+            const postprocess = new Function( 'context', sortDefinition.postprocess )
             const context = {
                 sort,
                 acl,
@@ -123,11 +130,12 @@ export default class ElasticClient {
         const body = {
             from: index,
             size: limit,
-            query: request.query,
+            query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient ),
             sort
         }
 
         console.debug( JSON.stringify( body ) )
+
         return rp( {
             method: 'POST',
             uri,
@@ -169,6 +177,7 @@ export default class ElasticClient {
 
         const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
         const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
+        const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
 
         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
             if ( instructionIsFilter( instruction ) ) {
@@ -186,14 +195,17 @@ export default class ElasticClient {
                             }
                         } )
 
-                        const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId )
+                        const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
 
-                        aggs[ [ facetId ] ] = {
-                            filter: translatedFacet.query,
-                            aggs: {
-                                [ facetId ]: aggs.filtered.aggs[ facetId ]
+                        facetFields.forEach( ( facetField ) => {
+                            aggs[ [ facetField.id ] ] = {
+                                filter: translatedFacet.query,
+                                aggs: {
+                                    [ facetField.id ]: aggs.filtered.aggs[ facetField.id ]
+                                }
                             }
-                        }
+                        } )
+
                     } else {
                         Object.keys( searchFields ).forEach( ( facetField ) => {
                             instructionsWithoutFacetId = []
@@ -211,7 +223,7 @@ export default class ElasticClient {
                                     }
                                 }
                             } )
-                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId )
+                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
 
                             aggs[ [ facetField ] ] = {
                                 filter: translatedFacet.query,
@@ -239,11 +251,12 @@ export default class ElasticClient {
 
         const body = {
             size: 0,
-            query,
-            aggs
+            query: replacePlaceholderInJSON( query, '%patientId.keyword%', patient ),
+            aggs: replacePlaceholderInJSON( aggs, '%patientId.keyword%', patient )
         }
 
         console.debug( JSON.stringify( body ) )
+
         return rp( {
             method: 'POST',
             uri,
@@ -278,10 +291,11 @@ export default class ElasticClient {
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
         const body = {
-            query: request.query
+            query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient )
         }
 
         console.debug( JSON.stringify( body ) )
+
         return rp( {
             method: 'POST',
             uri,

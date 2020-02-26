@@ -15,6 +15,7 @@ import {
 
 export const DIALECT_LANGUAGE_ELASTIC_SEARCH = 'es'
 export const EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS = {}
+const FILTER_SUBTYPE_NESTED = 'nested'
 
 const getVerbFromOperator = ( operator ) => {
     switch ( operator ) {
@@ -52,6 +53,29 @@ const getVerbFromNumericalComparator = ( comparator ) => {
         case COMPARATOR_TYPE_LOWER_THAN_OR_EQUAL:
             return 'lte'
     }
+}
+
+const filterSubtypeIsNested = ( subtypeMap ) => {
+    return subtypeMap && subtypeMap.type === FILTER_SUBTYPE_NESTED
+}
+
+const mutateMappedInstructionIntoNestedSubtype = ( mappedInstruction, subtypeMap ) => {
+    const filters = []
+
+    if ( subtypeMap.config.field ) {
+        filters.push( { term: { [ `${subtypeMap.config.path}.${subtypeMap.config.field}` ]: `%${subtypeMap.config.field}%` } } )
+    }
+
+    return { must: [ {
+        nested: {
+            path: subtypeMap.config.path,
+            query: {
+                bool: {
+                    filter: filters.concat( [ { bool: mappedInstruction } ] )
+                }
+            }
+        }
+    } ] }
 }
 
 const mapGenericFilterInstruction = ( instruction, fieldMap ) => {
@@ -125,31 +149,42 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
         query.must = numericalComparisons
     }
 
-    console.log( `+ termComparisons ${ JSON.stringify( termComparisons )}` )
-    console.log( `+ numericalComparisons ${ JSON.stringify( numericalComparisons )}` )
-
     return query
 }
 
-const translateToElasticSearch = ( query, options, getFieldSearchNameFromId ) => {
+const translateToElasticSearch = ( query, options, getFieldSearchNameFromId, getFieldFacetNameFromId, getFieldSubtypeFromId ) => {
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
         const type = getInstructionType( instruction )
         const fieldMap = getFieldSearchNameFromId( fieldId )
+        const subtypeMap = getFieldSubtypeFromId( fieldId )
+
+        let translatedInstruction = null
 
         switch ( type ) {
             default:
             case FILTER_TYPE_GENERIC:
-                return mapGenericFilterInstruction( instruction, fieldMap )
+                translatedInstruction = mapGenericFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_SPECIFIC:
-                return mapSpecificFilterInstruction( instruction, fieldMap )
+                translatedInstruction = mapSpecificFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_NUMERICAL_COMPARISON:
-                return mapNumericalComparisonFilterInstruction( instruction, fieldMap )
+                translatedInstruction = mapNumericalComparisonFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_GENERIC_BOOLEAN:
-                return mapGenericBooleanFilterInstruction( instruction, fieldMap )
+                translatedInstruction = mapGenericBooleanFilterInstruction( instruction, fieldMap )
+                break
             case FILTER_TYPE_COMPOSITE:
-                return mapCompositeFilterInstruction( instruction, fieldMap )
+                translatedInstruction = mapCompositeFilterInstruction( instruction, fieldMap )
+                break
         }
+
+        if ( filterSubtypeIsNested( subtypeMap ) ) {
+            translatedInstruction = mutateMappedInstructionIntoNestedSubtype( translatedInstruction, subtypeMap )
+        }
+
+        return translatedInstruction
     }
 
     const mapPartFromComposite = ( instruction, bools ) => {

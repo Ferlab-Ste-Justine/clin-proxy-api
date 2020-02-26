@@ -558,6 +558,10 @@
           "id": "prediction_dann",
           "label": "filter_prediction_dann",
           "type": "numcomparison",
+          "config": {
+            "min": "prediction_dann_min",
+            "max": "prediction_dann_max"
+          },
           "search": {
             "prediction_dann": "consequences.predictions.DANN_score"
           }
@@ -848,6 +852,13 @@
           "id": "transmission",
           "label": "filter_transmission",
           "type": "generic",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
           "search": {
             "transmission": "donors.zygosity.keyword"
           },
