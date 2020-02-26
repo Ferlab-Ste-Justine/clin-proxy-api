@@ -6,7 +6,8 @@ import {
     traverseArrayAndApplyFunc,
     instructionIsFilter,
     getFieldSearchNameFromFieldIdMappingFunction,
-    getFieldFacetNameFromFieldIdMappingFunction
+    getFieldFacetNameFromFieldIdMappingFunction,
+    getFieldSubtypeFromFieldIdMappingFunction
 } from './api/variant/sqon'
 import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
 
@@ -169,6 +170,7 @@ export default class ElasticClient {
 
         const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
         const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
+        const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
 
         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
             if ( instructionIsFilter( instruction ) ) {
@@ -186,14 +188,17 @@ export default class ElasticClient {
                             }
                         } )
 
-                        const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId )
+                        const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
 
-                        aggs[ [ facetId ] ] = {
-                            filter: translatedFacet.query,
-                            aggs: {
-                                [ facetId ]: aggs.filtered.aggs[ facetId ]
+                        facetFields.forEach( ( facetField ) => {
+                            aggs[ [ facetField.id ] ] = {
+                                filter: translatedFacet.query,
+                                aggs: {
+                                    [ facetField.id ]: aggs.filtered.aggs[ facetField.id ]
+                                }
                             }
-                        }
+                        } )
+
                     } else {
                         Object.keys( searchFields ).forEach( ( facetField ) => {
                             instructionsWithoutFacetId = []
@@ -211,7 +216,7 @@ export default class ElasticClient {
                                     }
                                 }
                             } )
-                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId )
+                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
 
                             aggs[ [ facetField ] ] = {
                                 filter: translatedFacet.query,
