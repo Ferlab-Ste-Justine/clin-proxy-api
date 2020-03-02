@@ -120,12 +120,12 @@ export default class ElasticClient {
 
             sort = postprocess( context )
         }
-
         if ( filter.length > 0 ) {
             request.query.bool.filter.push( filter )
         }
 
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
+        // console.debug(`+++ search request.body:${JSON.stringify( request.query )}`  )
 
         const body = {
             from: index,
@@ -134,7 +134,7 @@ export default class ElasticClient {
             sort
         }
 
-        console.debug( JSON.stringify( body ) )
+        console.debug( `search body: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -255,7 +255,7 @@ export default class ElasticClient {
             aggs: replacePlaceholderInJSON( aggs, '%patientId.keyword%', patient )
         }
 
-        console.debug( JSON.stringify( body ) )
+        console.debug( `facet body: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -294,7 +294,7 @@ export default class ElasticClient {
             query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient )
         }
 
-        console.debug( JSON.stringify( body ) )
+        console.debug( `count body: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',

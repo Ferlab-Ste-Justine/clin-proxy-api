@@ -234,11 +234,12 @@ const translate = ( statement, queryKey, schema, dialect, dialectOptions ) => {
 
     if ( translator ) {
         const isValid = validateStatement( isArray( statement ) ? statement : [ statement ] )
-
         if ( !isValid ) {
-            return translator.emptyTranslation
+            // TODO -- Find better approach;
+            //  Right now I don't use the .emptyTranslation because it does not stay 'empty' --  data is push to it and its 'state' (closure) change
+            // return translator.emptyTranslation
+            return { query: { bool: { filter: [] } } }
         }
-
         const denormalizedStatement = denormalize( statement )
         const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
         const getFieldSearchNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
