@@ -1,4 +1,4 @@
-import { isArray, filter, find } from 'lodash'
+import { isArray, filter, find, cloneDeep } from 'lodash'
 
 import {
     elasticSearchTranslator,
@@ -236,9 +236,8 @@ const translate = ( statement, queryKey, schema, dialect, dialectOptions ) => {
         const isValid = validateStatement( isArray( statement ) ? statement : [ statement ] )
 
         if ( !isValid ) {
-            return translator.emptyTranslation
+            return cloneDeep( translator.emptyTranslation )
         }
-
         const denormalizedStatement = denormalize( statement )
         const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
         const getFieldSearchNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )

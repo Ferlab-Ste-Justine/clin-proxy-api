@@ -849,35 +849,6 @@
       "label": "category_zygosity",
       "filters": [
         {
-          "id": "zygosity",
-          "label": "filter_zygosity",
-          "type": "generic",
-          "subtype": {
-            "type": "nested",
-            "config": {
-              "path": "donors",
-              "field": "patientId.keyword"
-            }
-          },
-          "search": {
-            "zygosity": "donors.zygosity.keyword"
-          },
-          "facet": [
-            {
-              "id": "zygosity",
-              "query": {
-                "terms": {
-                  "field": "donors.zygosity.keyword",
-                  "order": {
-                    "_count": "desc"
-                  },
-                  "size": 9
-                }
-              }
-            }
-          ]
-        },
-        {
           "id": "transmission",
           "label": "filter_transmission",
           "type": "generic",
@@ -897,6 +868,35 @@
               "query": {
                 "terms": {
                   "field": "donors.transmission.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 9
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "zygosity",
+          "label": "filter_zygosity",
+          "type": "generic",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
+          "search": {
+            "zygosity": "donors.zygosity.keyword"
+          },
+          "facet": [
+            {
+              "id": "zygosity",
+              "query": {
+                "terms": {
+                  "field": "donors.zygosity.keyword",
                   "order": {
                     "_count": "desc"
                   },
