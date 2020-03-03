@@ -162,7 +162,13 @@ export default class VariantService extends ApiService {
             validation: validators.searchVariantById
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'getVariantById' )( this.logService )
+                const response = await getFunctionForApiVersion( req.version, 'getVariantById' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
 
                 res.status( 200 )
                 res.send( response )
