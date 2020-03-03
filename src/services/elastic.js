@@ -306,7 +306,7 @@ export default class ElasticClient {
     }
 
     async searchVariants( acl, includes = [], filters = [], index, limit ) {
-        const uri = `${this.host}/variant/_search`
+        const uri = `${this.host}/mutations/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,

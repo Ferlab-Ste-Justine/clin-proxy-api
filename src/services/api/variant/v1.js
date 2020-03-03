@@ -207,5 +207,5 @@ export default {
     getVariants,
     getFacets,
     countVariants,
-    getVariantById,
+    getVariantById
 }
