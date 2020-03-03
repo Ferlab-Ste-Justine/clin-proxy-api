@@ -53,7 +53,10 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
                 response = await elasticService.searchVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
                 totalFromResponse = response.hits.total
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {
-                    return hit._source
+                    const result = hit._source
+
+                    result.id = hit._id
+                    return result
                 } )
                 break
         }
@@ -195,7 +198,11 @@ const getVariantById = async ( req, res, cacheService, elasticService, logServic
         }
 
         await logService.debug( `Elastic getVariantById for ${req.params.vid}` )
-        return response.hits.hits[ 0 ]._source
+
+        const result = response.hits.hits[ 0 ]._source
+
+        result.id = response.hits.hits[ 0 ]._id
+        return result
     } catch ( e ) {
         await logService.warning( `Elastic getVariantById ${e.toString()}` )
         return new errors.InternalServerError()
