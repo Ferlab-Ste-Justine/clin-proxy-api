@@ -38,7 +38,7 @@ export default {
                 dialect: Joi.string().valid( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ] ),
                 group: Joi.string(),
                 page: Joi.number().integer().min( 0 ),
-                size: Joi.number().integer().min( 1 ).max( 1000 ),
+                size: Joi.number().integer().min( 1 ).max( 1000 )
             } ).required()
         }
     },
@@ -59,6 +59,13 @@ export default {
                 statement: Joi.array().min( 1 ).required(),
                 queries: Joi.array().min( 1 ).required(),
                 dialect: Joi.string().valid( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ] )
+            } ).required()
+        }
+    },
+    searchVariantById: {
+        schema: {
+            params: Joi.object( {
+                vid: Joi.string().alphanum().min( 1 ).max( 256 ).required()
             } ).required()
         }
     }

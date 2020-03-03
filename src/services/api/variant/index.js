@@ -156,6 +156,30 @@ export default class VariantService extends ApiService {
 
         } ) )
 
+        // Register Variant Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/:vid`,
+            validation: validators.searchVariantById
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getVariantById' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
         super.start()
     }
 
