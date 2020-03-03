@@ -134,7 +134,7 @@ export default class ElasticClient {
             sort
         }
 
-        console.debug( `search body: ${JSON.stringify( body )}` )
+        console.debug( `searchVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -255,7 +255,7 @@ export default class ElasticClient {
             aggs: replacePlaceholderInJSON( aggs, '%patientId.keyword%', patient )
         }
 
-        console.debug( `facet body: ${JSON.stringify( body )}` )
+        console.debug( `getFacetsForVariant: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -294,7 +294,7 @@ export default class ElasticClient {
             query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient )
         }
 
-        console.debug( `count body: ${JSON.stringify( body )}` )
+        console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',

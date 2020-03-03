@@ -308,12 +308,19 @@
           "id": "exomiser_score",
           "label": "filter_exomiser_score",
           "type": "numcomparison",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
           "config": {
             "min": "exomiser_score_min",
             "max": "exomiser_score_max"
           },
           "search": {
-            "exomiser_score": "donors.exomiserScore.keyword"
+            "exomiser_score": "donors.exomiserScore"
           },
           "facet": [
             {
@@ -916,6 +923,13 @@
           "id": "metric_depth_quality",
           "label": "filter_metric_depth_quality",
           "type": "numcomparison",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
           "config": {
             "min": "metric_depth_quality_min",
             "max": "metric_depth_quality_max"
@@ -946,6 +960,13 @@
           "id": "metric_allelic_alt_depth",
           "label": "filter_allelic_alt_depth",
           "type": "numcomparison",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
           "config": {
             "min": "metric_allelic_alt_depth_min",
             "max": "metric_allelic_alt_depth_max"
@@ -976,6 +997,13 @@
           "id": "metric_total_depth",
           "label": "filter_total_depth",
           "type": "numcomparison",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
           "config": {
             "min": "metric_total_depth_min",
             "max": "metric_total_depth_max"
@@ -1006,6 +1034,13 @@
           "id": "metric_ratio",
           "label": "filter_ratio",
           "type": "numcomparison",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
           "config": {
             "min": "metric_ratio_min",
             "max": "metric_ratio_max"
@@ -1036,6 +1071,13 @@
           "id": "metric_genotype_quality",
           "label": "filter_genotype_quality",
           "type": "numcomparison",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "donors",
+              "field": "patientId.keyword"
+            }
+          },
           "config": {
             "min": "metric_genotype_quality_min",
             "max": "metric_genotype_quality_max"
