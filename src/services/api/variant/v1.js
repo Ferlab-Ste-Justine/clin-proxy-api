@@ -185,9 +185,27 @@ const countVariants = async ( req, res, cacheService, elasticService, logService
     }
 }
 
+const getVariantById = async ( req, res, cacheService, elasticService, logService ) => {
+    try {
+        const sessionData = await getSessionDataFromToken( req.token, cacheService )
+        const response = await elasticService.searchVariants( sessionData.acl.fhir, [], [ { ids: { values: [ req.params.vid ] } } ], 0, 1 )
+
+        if ( response.hits.total < 1 ) {
+            return new errors.NotFoundError()
+        }
+
+        await logService.debug( `Elastic getVariantById for ${req.params.vid}` )
+        return response.hits.hits[ 0 ]._source
+    } catch ( e ) {
+        await logService.warning( `Elastic getVariantById ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
 export default {
     getSchema,
     getVariants,
     getFacets,
-    countVariants
+    countVariants,
+    getVariantById,
 }

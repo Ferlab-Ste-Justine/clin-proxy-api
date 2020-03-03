@@ -305,6 +305,31 @@ export default class ElasticClient {
         } )
     }
 
+    async searchVariants( acl, includes = [], filters = [], index, limit ) {
+        const uri = `${this.host}/variant/_search`
+        const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
+        const body = {
+            from: index,
+            size: limit,
+            query: {
+                bool: {
+                    filter: filters.concat( aclFilters )
+                }
+            }
+        }
+
+        if ( includes.length > 0 ) {
+            body._source = { includes }
+        }
+
+        return rp( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
     async searchMeta( acl, type = null, includes = [], filters = [], shoulds = [], index, limit ) {
         if ( type !== null ) {
             const uri = `${this.host}/${type}/_search`
