@@ -210,6 +210,10 @@ export const getFieldSubtypeFromFieldIdMappingFunction = ( schema ) => {
     return ( id ) => {
         const schemaFilter = find( flattenedSchema, { id } )
 
+        if ( !schemaFilter ) {
+            return null
+        }
+
         return schemaFilter.subtype ? schemaFilter.subtype[ [ id ] ] || schemaFilter.subtype : null
     }
 }

@@ -15,7 +15,7 @@ import {
 
 export const DIALECT_LANGUAGE_ELASTIC_SEARCH = 'es'
 export const EMPTY_ELASTIC_SEARCH_DIALECT_OPTIONS = {}
-const FILTER_SUBTYPE_NESTED = 'nested'
+export const FILTER_SUBTYPE_NESTED = 'nested'
 
 const getVerbFromOperator = ( operator ) => {
     switch ( operator ) {

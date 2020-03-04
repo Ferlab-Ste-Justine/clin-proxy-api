@@ -9,7 +9,7 @@ import {
     getFieldFacetNameFromFieldIdMappingFunction,
     getFieldSubtypeFromFieldIdMappingFunction
 } from './api/variant/sqon'
-import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
+import { elasticSearchTranslator, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
 
 
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
@@ -152,7 +152,9 @@ export default class ElasticClient {
             return isArray( filter.facet )
         } )
         const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
-
+        const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
+        const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
+        const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
         const aggs = {
             filtered: {
                 aggs: {},
@@ -160,9 +162,19 @@ export default class ElasticClient {
             }
         }
 
+        const facetsWithSubtypes = {
+            [ FILTER_SUBTYPE_NESTED ]: {}
+        }
+
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
-                accumulator[ [ facet.id ] ] = facet.query
+                const facetSubtype = getFieldSubtypeFromFieldId( facet.id )
+
+                if ( !facetSubtype ) {
+                    accumulator[ [ facet.id ] ] = facet.query
+                } else {
+                    facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ][ [ facet.id ] ] = facetSubtype
+                }
             } )
             return accumulator
         }, {} )
@@ -175,9 +187,37 @@ export default class ElasticClient {
 
         aggs.filtered.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
 
-        const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
-        const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
-        const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
+        if ( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] !== {} ) {
+            Object.keys( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] ).forEach( ( nestedFacetId ) => {
+                const nestedFacetConfig = facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ][ nestedFacetId ].config
+                const nestedFacetFields = getFacetFieldNameFromFieldId( nestedFacetId )
+
+                if ( !aggs[ [ `nested_${nestedFacetConfig.path}` ] ] ) {
+                    aggs[ [ `nested_${nestedFacetConfig.path}` ] ] = {
+                        nested: { path: nestedFacetConfig.path },
+                        aggs: {
+                            filtered: {
+                                filter: {
+                                    bool: {
+                                        filter: [ {
+                                            term: { [ `${nestedFacetConfig.path}.${nestedFacetConfig.field}` ]: `%${nestedFacetConfig.field}%` }
+                                        } ]
+                                    }
+                                },
+                                aggs: {}
+                            }
+                        }
+                    }
+                }
+
+                console.log( `+ nestedFacetField for ${nestedFacetId} ${ JSON.stringify( nestedFacetFields )}` )
+                nestedFacetFields.forEach( ( nestedFacetField ) => {
+                    aggs[ [ `nested_${nestedFacetConfig.path}` ] ].aggs.filtered.aggs[ nestedFacetField.id ] = nestedFacetField.query
+                } )
+
+
+            } )
+        }
 
         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
             if ( instructionIsFilter( instruction ) ) {
