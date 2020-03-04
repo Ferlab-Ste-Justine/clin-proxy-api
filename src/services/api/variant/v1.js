@@ -120,17 +120,29 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 responseFacetKeys = Object.keys( response.aggregations )
                 if ( responseFacetKeys.length > 0 ) {
                     responseFacetKeys.forEach( ( category ) => {
-                        const unfilteredCategoryData = response.aggregations[ category ]
+                        const isNestedSubtype = category.indexOf( 'nested_' ) !== -1
 
-                        if ( unfilteredCategoryData[ category ].value !== undefined ) {
-                            facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ category ].value ) } ]
-                        } else if ( response.aggregations[ category ][ category ] !== undefined ) {
-                            facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
-                                return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
-                            }, [] )
+                        if ( !isNestedSubtype ) {
+                            const unfilteredCategoryData = response.aggregations[ category ]
+
+                            if ( unfilteredCategoryData[ category ].value !== undefined ) {
+                                facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ category ].value ) } ]
+                            } else if ( response.aggregations[ category ][ category ] !== undefined ) {
+                                facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
+                                    return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                                }, [] )
+                            }
                         }
+
                     } )
                 }
+
+
+                // DO NESTED FILTERED
+
+                // DO NESTED UNFILTERED
+
+
                 break
         }
 

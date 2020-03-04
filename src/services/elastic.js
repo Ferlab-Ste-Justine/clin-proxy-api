@@ -210,12 +210,9 @@ export default class ElasticClient {
                     }
                 }
 
-                console.log( `+ nestedFacetField for ${nestedFacetId} ${ JSON.stringify( nestedFacetFields )}` )
                 nestedFacetFields.forEach( ( nestedFacetField ) => {
                     aggs[ [ `nested_${nestedFacetConfig.path}` ] ].aggs.filtered.aggs[ nestedFacetField.id ] = nestedFacetField.query
                 } )
-
-
             } )
         }
 
@@ -226,8 +223,19 @@ export default class ElasticClient {
 
                 if ( facetFields ) {
                     const searchFields = getSearchFieldNameFromFieldId( facetId )
-                    let instructionsWithoutFacetId = []
+                    // let instructionsWithoutFacetId = []
 
+                    if ( isString( searchFields ) ) {
+                        console.log( `isSTRING ${ JSON.stringify( searchFields )}` )
+                    } else {
+                        console.log( `notSTRING ${ JSON.stringify( searchFields )}` )
+                    }
+
+
+                }
+
+
+                /*
                     if ( isString( searchFields ) ) {
                         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
                             if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
@@ -273,7 +281,9 @@ export default class ElasticClient {
                             }
                         } )
                     }
+
                 }
+                                 */
             }
         } )
 
