@@ -199,9 +199,14 @@ export default class ElasticClient {
                             filtered: {
                                 filter: {
                                     bool: {
-                                        filter: [ {
+
+                                        // @TODO
+                                        filter: request.query.bool.filter
+                                        /*
+                                        .concat( [ {
                                             term: { [ `${nestedFacetConfig.path}.${nestedFacetConfig.field}` ]: `%${nestedFacetConfig.field}%` }
-                                        } ]
+                                        } ] )
+                                         */
                                     }
                                 },
                                 aggs: {}

@@ -89,7 +89,6 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
         const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
         const translatedQuery = translate( statement, query, schema, dialect )
         let response = {}
-        let responseFacetKeys = []
         let facetsFromResponse = {}
 
         switch ( dialect ) {
@@ -132,25 +131,25 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                     }
                 } )
 
-                responseFacetKeys = Object.keys( response.aggregations )
-                if ( responseFacetKeys.length > 0 ) {
-                    responseFacetKeys.forEach( ( category ) => {
-                        // const isNestedSubtype = category.indexOf( 'nested_' ) !== -1
+                Object.keys( response.aggregations ).forEach( ( category ) => {
+                    // const isNestedSubtype = category.indexOf( 'nested_' ) !== -1
 
-                        // if ( !isNestedSubtype ) {
-                        const unfilteredCategoryData = response.aggregations[ category ]
+                    // if ( !isNestedSubtype ) {
+                    const unfilteredCategoryData = response.aggregations[ category ]
 
-                        if ( unfilteredCategoryData[ category ].value !== undefined ) {
-                            facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ category ].value ) } ]
-                        } else if ( response.aggregations[ category ][ category ] !== undefined ) {
-                            facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
-                                return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
-                            }, [] )
-                        }
-                        // }
+                    // console.log( `+ unfilteredCategoryData ${category} ${ JSON.stringify( unfilteredCategoryData )}` )
 
-                    } )
-                }
+
+                    if ( unfilteredCategoryData[ category ].value !== undefined ) {
+                        facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ category ].value ) } ]
+                    } else if ( response.aggregations[ category ][ category ] !== undefined ) {
+                        facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
+                            return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                        }, [] )
+                    }
+                    // }
+
+                } )
 
 
                 // DO NESTED FILTERED
