@@ -99,6 +99,8 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 response = await elasticService.getFacetsForVariant( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
+
+                // Filtered Non-Nested
                 if ( response.aggregations.filtered ) {
                     delete response.aggregations.filtered.meta
                     delete response.aggregations.filtered.doc_count
@@ -117,22 +119,35 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                     delete response.aggregations.filtered
                 }
 
+                // Filtered Nested
+                Object.keys( response.aggregations ).forEach( ( category ) => {
+                    if ( category.indexOf( 'nested_' ) !== -1 ) {
+                        delete response.aggregations[ category ].filtered.doc_count
+                        Object.keys( response.aggregations[ category ].filtered ).forEach( ( nestedId ) => {
+                            facetsFromResponse[ nestedId ] = response.aggregations[ category ].filtered[ nestedId ].buckets.reduce( ( acc, nestedBucket ) => {
+                                return [ ...acc, { value: nestedBucket.key, count: nestedBucket.doc_count } ]
+                            }, [] )
+                        } )
+                        delete response.aggregations[ category ]
+                    }
+                } )
+
                 responseFacetKeys = Object.keys( response.aggregations )
                 if ( responseFacetKeys.length > 0 ) {
                     responseFacetKeys.forEach( ( category ) => {
-                        const isNestedSubtype = category.indexOf( 'nested_' ) !== -1
+                        // const isNestedSubtype = category.indexOf( 'nested_' ) !== -1
 
-                        if ( !isNestedSubtype ) {
-                            const unfilteredCategoryData = response.aggregations[ category ]
+                        // if ( !isNestedSubtype ) {
+                        const unfilteredCategoryData = response.aggregations[ category ]
 
-                            if ( unfilteredCategoryData[ category ].value !== undefined ) {
-                                facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ category ].value ) } ]
-                            } else if ( response.aggregations[ category ][ category ] !== undefined ) {
-                                facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
-                                    return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
-                                }, [] )
-                            }
+                        if ( unfilteredCategoryData[ category ].value !== undefined ) {
+                            facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ category ].value ) } ]
+                        } else if ( response.aggregations[ category ][ category ] !== undefined ) {
+                            facetsFromResponse[ category ] = response.aggregations[ category ][ category ].buckets.reduce( ( accumulator, bucket ) => {
+                                return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                            }, [] )
                         }
+                        // }
 
                     } )
                 }

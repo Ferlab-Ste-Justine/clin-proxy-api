@@ -222,68 +222,37 @@ export default class ElasticClient {
                 const facetFields = getFacetFieldNameFromFieldId( facetId )
 
                 if ( facetFields ) {
-                    const searchFields = getSearchFieldNameFromFieldId( facetId )
-                    // let instructionsWithoutFacetId = []
+                    let searchFields = getSearchFieldNameFromFieldId( facetId )
 
-                    if ( isString( searchFields ) ) {
-                        console.log( `isSTRING ${ JSON.stringify( searchFields )}` )
-                    } else {
-                        console.log( `notSTRING ${ JSON.stringify( searchFields )}` )
-                    }
+                    searchFields = isString( searchFields ) ? { [ facetId ]: searchFields } : searchFields
 
+                    Object.keys( searchFields ).forEach( ( facetField ) => {
+                        let instructionsWithoutFacetId = []
 
-                }
-
-
-                /*
-                    if ( isString( searchFields ) ) {
                         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
-                            if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
-                                instructionsWithoutFacetId.push( iinstruction )
+                            if ( !isArray( iinstruction ) ) {
+                                if ( !instructionIsFilter( iinstruction ) ) {
+                                    instructionsWithoutFacetId.push( iinstruction )
+                                } else {
+                                    const fiinstruction = cloneDeep( iinstruction )
+
+                                    if ( iinstruction.data.id === facetId ) {
+                                        fiinstruction.data.values = []
+                                    }
+                                    instructionsWithoutFacetId.push( fiinstruction )
+                                }
                             }
                         } )
-
                         const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
 
-                        facetFields.forEach( ( facetField ) => {
-                            aggs[ [ facetField.id ] ] = {
-                                filter: translatedFacet.query,
-                                aggs: {
-                                    [ facetField.id ]: aggs.filtered.aggs[ facetField.id ]
-                                }
+                        aggs[ [ facetField ] ] = {
+                            filter: translatedFacet.query,
+                            aggs: {
+                                [ facetField ]: aggs.filtered.aggs[ facetField ]
                             }
-                        } )
-
-                    } else {
-                        Object.keys( searchFields ).forEach( ( facetField ) => {
-                            instructionsWithoutFacetId = []
-                            traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
-                                if ( !isArray( iinstruction ) ) {
-                                    if ( !instructionIsFilter( iinstruction ) ) {
-                                        instructionsWithoutFacetId.push( iinstruction )
-                                    } else {
-                                        const fiinstruction = cloneDeep( iinstruction )
-
-                                        if ( iinstruction.data.id === facetId ) {
-                                            fiinstruction.data.values = []
-                                        }
-                                        instructionsWithoutFacetId.push( fiinstruction )
-                                    }
-                                }
-                            } )
-                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
-
-                            aggs[ [ facetField ] ] = {
-                                filter: translatedFacet.query,
-                                aggs: {
-                                    [ facetField ]: aggs.filtered.aggs[ facetField ]
-                                }
-                            }
-                        } )
-                    }
-
+                        }
+                    } )
                 }
-                                 */
             }
         } )
 
