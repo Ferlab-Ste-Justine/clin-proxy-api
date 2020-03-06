@@ -158,13 +158,14 @@ export default class ElasticClient {
         const aggs = {
             filtered: {
                 aggs: {},
-                filter: { bool: { must: [] } }
+                filter: { bool: { } }
             }
         }
 
         const facetsWithSubtypes = {
             [ FILTER_SUBTYPE_NESTED ]: {}
         }
+        const facetFilteredExcept = {}
 
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
@@ -179,14 +180,6 @@ export default class ElasticClient {
             return accumulator
         }, {} )
 
-        aggs.filtered.filter.bool.must = request.query.bool.filter
-
-        if ( filter.length > 0 ) {
-            aggs.filtered.filter.bool.must.push( filter )
-        }
-
-        aggs.filtered.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
-
         if ( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] !== {} ) {
             Object.keys( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] ).forEach( ( nestedFacetId ) => {
                 const nestedFacetConfig = facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ][ nestedFacetId ].config
@@ -199,14 +192,7 @@ export default class ElasticClient {
                             filtered: {
                                 filter: {
                                     bool: {
-
-                                        // @TODO
-                                        filter: request.query.bool.filter
-                                        /*
-                                        .concat( [ {
-                                            term: { [ `${nestedFacetConfig.path}.${nestedFacetConfig.field}` ]: `%${nestedFacetConfig.field}%` }
-                                        } ] )
-                                         */
+                                        filter: { term: { [ schema.fields.patient ]: patient } }
                                     }
                                 },
                                 aggs: {}
@@ -217,6 +203,10 @@ export default class ElasticClient {
 
                 nestedFacetFields.forEach( ( nestedFacetField ) => {
                     aggs[ [ `nested_${nestedFacetConfig.path}` ] ].aggs.filtered.aggs[ nestedFacetField.id ] = nestedFacetField.query
+                    if ( !facetFilteredExcept[ [ nestedFacetField.id ] ] ) {
+                        facetFilteredExcept[ [ nestedFacetField.id ] ] = { [ `nested_${nestedFacetConfig.path}` ]: aggs[ [ `nested_${nestedFacetConfig.path}` ] ] }
+                        facetFilteredExcept[ [ nestedFacetField.id ] ][ `nested_${nestedFacetConfig.path}` ].aggs.filtered.aggs = {}
+                    }
                 } )
             } )
         }
@@ -232,6 +222,7 @@ export default class ElasticClient {
                     searchFields = isString( searchFields ) ? { [ facetId ]: searchFields } : searchFields
 
                     Object.keys( searchFields ).forEach( ( facetField ) => {
+                        let filteredExceptAggs = { [ facetField ]: aggs.filtered.aggs[ facetField ] }
                         let instructionsWithoutFacetId = []
 
                         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
@@ -249,11 +240,28 @@ export default class ElasticClient {
                             }
                         } )
                         const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
+                        const isNestedAgg = !aggs.filtered.aggs[ facetField ]
+
+                        if ( isNestedAgg ) {
+                            filteredExceptAggs = facetFilteredExcept[ facetField ]
+                        }
+
+                        if ( isNestedAgg ) {
+                            filteredExceptAggs = cloneDeep( facetFilteredExcept[ facetField ] )
+                            filteredExceptAggs[ [ Object.keys( facetFilteredExcept[ facetField ] )[ 0 ] ] ].aggs.filtered.aggs = facetFields.reduce( ( fieldAcc, facetFieldData ) => {
+                                fieldAcc[ [ facetFieldData.id ] ] = facetFieldData.query
+                                console.log( `+ facetFieldData ${JSON.stringify( facetFieldData )}` )
+                                return fieldAcc
+                            }, {} )
+                        }
 
                         aggs[ [ facetField ] ] = {
-                            filter: translatedFacet.query,
+                            global: {},
                             aggs: {
-                                [ facetField ]: aggs.filtered.aggs[ facetField ]
+                                [ `filtered_except_${facetField}` ]: {
+                                    filter: translatedFacet.query,
+                                    aggs: filteredExceptAggs
+                                }
                             }
                         }
                     } )
@@ -263,7 +271,7 @@ export default class ElasticClient {
 
         const query = {
             bool: {
-                filter: []
+                filter: request.query.bool.filter
             }
         }
 

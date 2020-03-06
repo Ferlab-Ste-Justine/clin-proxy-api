@@ -154,6 +154,9 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
 
                 // DO NESTED FILTERED
 
+
+
+
                 // DO NESTED UNFILTERED
 
 
