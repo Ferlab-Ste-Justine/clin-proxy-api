@@ -250,7 +250,6 @@ export default class ElasticClient {
                             filteredExceptAggs = cloneDeep( facetFilteredExcept[ facetField ] )
                             filteredExceptAggs[ [ Object.keys( facetFilteredExcept[ facetField ] )[ 0 ] ] ].aggs.filtered.aggs = facetFields.reduce( ( fieldAcc, facetFieldData ) => {
                                 fieldAcc[ [ facetFieldData.id ] ] = facetFieldData.query
-                                console.log( `+ facetFieldData ${JSON.stringify( facetFieldData )}` )
                                 return fieldAcc
                             }, {} )
                         }
