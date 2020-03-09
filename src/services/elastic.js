@@ -237,17 +237,22 @@ export default class ElasticClient {
                                 }
                             }
                         } )
+
                         const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
-                        const isNestedAgg = !aggs.filtered.aggs[ facetField ]
+                        const normalizedNestedFields = Object.keys( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] ).filter( ( key ) => key.replace( '_min', '' ).replace( '_max', '' ) === facetField )
+                        const isNestedAgg = normalizedNestedFields.length > 0
 
                         if ( isNestedAgg ) {
-                            filteredExceptAggs = cloneDeep( facetFilteredExcept[ facetField ] )
 
+                            normalizedNestedFields.forEach( ( normalizedNestedField ) => {
+                                filteredExceptAggs = cloneDeep( facetFilteredExcept[ normalizedNestedField ] )
+                                const normalizedNestedPath = Object.keys( filteredExceptAggs )[ 0 ]
 
-                            filteredExceptAggs[ [ Object.keys( facetFilteredExcept[ facetField ] )[ 0 ] ] ].aggs.filtered.aggs = facetFields.reduce( ( fieldAcc, facetFieldData ) => {
-                                fieldAcc[ [ facetFieldData.id ] ] = facetFieldData.query
-                                return fieldAcc
-                            }, {} )
+                                filteredExceptAggs[ normalizedNestedPath ].aggs.filtered.aggs = facetFields.reduce( ( fieldAcc, facetFieldData ) => {
+                                    fieldAcc[ [ facetFieldData.id ] ] = facetFieldData.query
+                                    return fieldAcc
+                                }, {} )
+                            } )
                         }
 
                         aggs[ [ facetField ] ] = {

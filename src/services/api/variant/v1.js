@@ -113,6 +113,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                                 return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
                             }, [] )
                         }
+
                         return aggs
                     }, {} )
                     delete response.aggregations.filtered
@@ -123,15 +124,17 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                     if ( category.indexOf( 'nested_' ) !== -1 ) {
                         const filteredCategoryData = response.aggregations[ category ]
 
-                        delete response.aggregations[ category ].filtered.doc_count
+                        delete filteredCategoryData.filtered.doc_count
 
                         Object.keys( filteredCategoryData.filtered ).forEach( ( nestedId ) => {
-                            if ( filteredCategoryData.filtered[ nestedId ].buckets ) {
+                            if ( filteredCategoryData.filtered[ nestedId ].value !== undefined ) {
+                                facetsFromResponse[ nestedId ] = [ { value: Number( filteredCategoryData.filtered[ nestedId ].value ) } ]
+
+                            } else {
+
                                 facetsFromResponse[ nestedId ] = filteredCategoryData.filtered[ nestedId ].buckets.reduce( ( acc, nestedBucket ) => {
                                     return [ ...acc, { value: nestedBucket.key, count: nestedBucket.doc_count } ]
                                 }, [] )
-                            } else {
-                                facetsFromResponse[ nestedId ] = [ { value: Number( filteredCategoryData.filtered[ nestedId ].value ) } ]
                             }
                         } )
 
@@ -145,6 +148,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                     const filterExceptSelfKey = `filtered_except_${category}`
                     const isNestedSubtype = !unfilteredCategoryData[ filterExceptSelfKey ][ category ]
 
+                    // Unfiltered Not-Nested
                     if ( !isNestedSubtype ) {
                         if ( unfilteredCategoryData[ filterExceptSelfKey ][ category ].value !== undefined ) {
                             facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ filterExceptSelfKey ][ category ].value ) } ]
@@ -154,11 +158,17 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                             }, [] )
                         }
                     } else {
-                        // @TODO Make this dynamic.
+                        // Unfiltered Nested
+                        // @TODO Currently hardcoded to nested_donors; should take value from JSON schema!
                         const nestedPath = 'nested_donors'
 
-                        if ( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ].value !== undefined ) {
-                            facetsFromResponse[ category ] = [ { value: Number( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ].value ) } ]
+                        delete unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered.doc_count
+
+                        if ( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ] === undefined ) {
+                            Object.keys( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered ).forEach( ( filterKey ) => {
+                                facetsFromResponse[ filterKey ] = [ { value: unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ filterKey ].value } ]
+                            } )
+
                         } else {
                             facetsFromResponse[ category ] = unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ].buckets.reduce( ( accumulator, bucket ) => {
                                 return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
