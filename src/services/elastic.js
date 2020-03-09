@@ -204,7 +204,6 @@ export default class ElasticClient {
                     aggs[ [ `nested_${nestedFacetConfig.path}` ] ].aggs.filtered.aggs[ nestedFacetField.id ] = nestedFacetField.query
                     if ( !facetFilteredExcept[ [ nestedFacetField.id ] ] ) {
                         facetFilteredExcept[ [ nestedFacetField.id ] ] = { [ `nested_${nestedFacetConfig.path}` ]: aggs[ [ `nested_${nestedFacetConfig.path}` ] ] }
-                        facetFilteredExcept[ [ nestedFacetField.id ] ][ `nested_${nestedFacetConfig.path}` ].aggs.filtered.aggs = {}
                     }
                 } )
             } )
