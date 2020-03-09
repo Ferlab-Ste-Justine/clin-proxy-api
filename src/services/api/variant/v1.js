@@ -121,12 +121,20 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 // Filtered Nested
                 Object.keys( response.aggregations ).forEach( ( category ) => {
                     if ( category.indexOf( 'nested_' ) !== -1 ) {
+                        const filteredCategoryData = response.aggregations[ category ]
+
                         delete response.aggregations[ category ].filtered.doc_count
-                        Object.keys( response.aggregations[ category ].filtered ).forEach( ( nestedId ) => {
-                            facetsFromResponse[ nestedId ] = response.aggregations[ category ].filtered[ nestedId ].buckets.reduce( ( acc, nestedBucket ) => {
-                                return [ ...acc, { value: nestedBucket.key, count: nestedBucket.doc_count } ]
-                            }, [] )
+
+                        Object.keys( filteredCategoryData.filtered ).forEach( ( nestedId ) => {
+                            if ( filteredCategoryData.filtered[ nestedId ].buckets ) {
+                                facetsFromResponse[ nestedId ] = filteredCategoryData.filtered[ nestedId ].buckets.reduce( ( acc, nestedBucket ) => {
+                                    return [ ...acc, { value: nestedBucket.key, count: nestedBucket.doc_count } ]
+                                }, [] )
+                            } else {
+                                facetsFromResponse[ nestedId ] = [ { value: Number( filteredCategoryData.filtered[ nestedId ].value ) } ]
+                            }
                         } )
+
                         delete response.aggregations[ category ]
                     }
                 } )
@@ -146,6 +154,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                             }, [] )
                         }
                     } else {
+                        // @TODO Make this dynamic.
                         const nestedPath = 'nested_donors'
 
                         if ( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ].value !== undefined ) {
@@ -156,9 +165,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                             }, [] )
                         }
                     }
-
                 } )
-
                 break
         }
 

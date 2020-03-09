@@ -188,7 +188,8 @@ export const getFieldSearchNameFromFieldIdMappingFunction = ( schema ) => {
     const flattenedSchema = flattenSchema( schema )
 
     return ( id ) => {
-        const schemaFilter = find( flattenedSchema, { id } )
+        const normalizedId = id.replace( '_min', '' ).replace( '_max', '' )
+        const schemaFilter = find( flattenedSchema, { id: normalizedId } )
 
         return schemaFilter.search ? schemaFilter.search[ [ id ] ] || schemaFilter.search : null
     }
@@ -198,7 +199,8 @@ export const getFieldFacetNameFromFieldIdMappingFunction = ( schema ) => {
     const flattenedSchema = flattenSchema( schema )
 
     return ( id ) => {
-        const schemaFilter = find( flattenedSchema, { id } )
+        const normalizedId = id.replace( '_min', '' ).replace( '_max', '' )
+        const schemaFilter = find( flattenedSchema, { id: normalizedId } )
 
         return schemaFilter.facet ? schemaFilter.facet[ [ id ] ] || schemaFilter.facet : null
     }
@@ -208,7 +210,8 @@ export const getFieldSubtypeFromFieldIdMappingFunction = ( schema ) => {
     const flattenedSchema = flattenSchema( schema )
 
     return ( id ) => {
-        const schemaFilter = find( flattenedSchema, { id } )
+        const normalizedId = id.replace( '_min', '' ).replace( '_max', '' )
+        const schemaFilter = find( flattenedSchema, { id: normalizedId } )
 
         if ( !schemaFilter ) {
             return null

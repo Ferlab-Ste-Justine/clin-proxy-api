@@ -125,7 +125,6 @@ export default class ElasticClient {
         }
 
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
-        // console.debug(`+++ search request.body:${JSON.stringify( request.query )}`  )
 
         const body = {
             from: index,
@@ -205,7 +204,7 @@ export default class ElasticClient {
                     aggs[ [ `nested_${nestedFacetConfig.path}` ] ].aggs.filtered.aggs[ nestedFacetField.id ] = nestedFacetField.query
                     if ( !facetFilteredExcept[ [ nestedFacetField.id ] ] ) {
                         facetFilteredExcept[ [ nestedFacetField.id ] ] = { [ `nested_${nestedFacetConfig.path}` ]: aggs[ [ `nested_${nestedFacetConfig.path}` ] ] }
-                        // facetFilteredExcept[ [ nestedFacetField.id ] ][ `nested_${nestedFacetConfig.path}` ].aggs.filtered.aggs = {}
+                        facetFilteredExcept[ [ nestedFacetField.id ] ][ `nested_${nestedFacetConfig.path}` ].aggs.filtered.aggs = {}
                     }
                 } )
             } )
@@ -243,11 +242,9 @@ export default class ElasticClient {
                         const isNestedAgg = !aggs.filtered.aggs[ facetField ]
 
                         if ( isNestedAgg ) {
-                            filteredExceptAggs = facetFilteredExcept[ facetField ]
-                        }
-
-                        if ( isNestedAgg ) {
                             filteredExceptAggs = cloneDeep( facetFilteredExcept[ facetField ] )
+
+
                             filteredExceptAggs[ [ Object.keys( facetFilteredExcept[ facetField ] )[ 0 ] ] ].aggs.filtered.aggs = facetFields.reduce( ( fieldAcc, facetFieldData ) => {
                                 fieldAcc[ [ facetFieldData.id ] ] = facetFieldData.query
                                 return fieldAcc
