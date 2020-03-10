@@ -9,7 +9,7 @@ import {
     getFieldFacetNameFromFieldIdMappingFunction,
     getFieldSubtypeFromFieldIdMappingFunction
 } from './api/variant/sqon'
-import { elasticSearchTranslator } from './api/variant/sqon/dialect/es'
+import { elasticSearchTranslator, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
 
 
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
@@ -125,7 +125,6 @@ export default class ElasticClient {
         }
 
         request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
-        // console.debug(`+++ search request.body:${JSON.stringify( request.query )}`  )
 
         const body = {
             from: index,
@@ -152,32 +151,63 @@ export default class ElasticClient {
             return isArray( filter.facet )
         } )
         const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
-
+        const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
+        const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
+        const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
         const aggs = {
             filtered: {
                 aggs: {},
-                filter: { bool: { must: [] } }
+                filter: { bool: { } }
             }
         }
 
+        const facetsWithSubtypes = {
+            [ FILTER_SUBTYPE_NESTED ]: {}
+        }
+        const facetFilteredExcept = {}
+
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
-                accumulator[ [ facet.id ] ] = facet.query
+                const facetSubtype = getFieldSubtypeFromFieldId( facet.id )
+
+                if ( !facetSubtype ) {
+                    accumulator[ [ facet.id ] ] = facet.query
+                } else {
+                    facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ][ [ facet.id ] ] = facetSubtype
+                }
             } )
             return accumulator
         }, {} )
 
-        aggs.filtered.filter.bool.must = request.query.bool.filter
+        if ( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] !== {} ) {
+            Object.keys( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] ).forEach( ( nestedFacetId ) => {
+                const nestedFacetConfig = facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ][ nestedFacetId ].config
+                const nestedFacetFields = getFacetFieldNameFromFieldId( nestedFacetId )
 
-        if ( filter.length > 0 ) {
-            aggs.filtered.filter.bool.must.push( filter )
+                if ( !aggs[ [ `nested_${nestedFacetConfig.path}` ] ] ) {
+                    aggs[ [ `nested_${nestedFacetConfig.path}` ] ] = {
+                        nested: { path: nestedFacetConfig.path },
+                        aggs: {
+                            filtered: {
+                                filter: {
+                                    bool: {
+                                        filter: { term: { [ schema.fields.patient ]: patient } }
+                                    }
+                                },
+                                aggs: {}
+                            }
+                        }
+                    }
+                }
+
+                nestedFacetFields.forEach( ( nestedFacetField ) => {
+                    aggs[ [ `nested_${nestedFacetConfig.path}` ] ].aggs.filtered.aggs[ nestedFacetField.id ] = nestedFacetField.query
+                    if ( !facetFilteredExcept[ [ nestedFacetField.id ] ] ) {
+                        facetFilteredExcept[ [ nestedFacetField.id ] ] = { [ `nested_${nestedFacetConfig.path}` ]: aggs[ [ `nested_${nestedFacetConfig.path}` ] ] }
+                    }
+                } )
+            } )
         }
-
-        aggs.filtered.filter.bool.must.push( { term: { [ schema.fields.patient ]: patient } } )
-
-        const getSearchFieldNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
-        const getFacetFieldNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
-        const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
 
         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
             if ( instructionIsFilter( instruction ) ) {
@@ -185,61 +215,63 @@ export default class ElasticClient {
                 const facetFields = getFacetFieldNameFromFieldId( facetId )
 
                 if ( facetFields ) {
-                    const searchFields = getSearchFieldNameFromFieldId( facetId )
-                    let instructionsWithoutFacetId = []
+                    let searchFields = getSearchFieldNameFromFieldId( facetId )
 
-                    if ( isString( searchFields ) ) {
+                    searchFields = isString( searchFields ) ? { [ facetId ]: searchFields } : searchFields
+
+                    Object.keys( searchFields ).forEach( ( facetField ) => {
+                        let filteredExceptAggs = { [ facetField ]: aggs.filtered.aggs[ facetField ] }
+                        let instructionsWithoutFacetId = []
+
                         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
-                            if ( !isArray( iinstruction ) && ( !instructionIsFilter( iinstruction ) || iinstruction.data.id !== facetId ) ) {
-                                instructionsWithoutFacetId.push( iinstruction )
+                            if ( !isArray( iinstruction ) ) {
+                                if ( !instructionIsFilter( iinstruction ) ) {
+                                    instructionsWithoutFacetId.push( iinstruction )
+                                } else {
+                                    const fiinstruction = cloneDeep( iinstruction )
+
+                                    if ( iinstruction.data.id === facetId ) {
+                                        fiinstruction.data.values = []
+                                    }
+                                    instructionsWithoutFacetId.push( fiinstruction )
+                                }
                             }
                         } )
 
                         const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
+                        const normalizedNestedFields = Object.keys( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] ).filter( ( key ) => key.replace( '_min', '' ).replace( '_max', '' ) === facetField )
+                        const isNestedAgg = normalizedNestedFields.length > 0
 
-                        facetFields.forEach( ( facetField ) => {
-                            aggs[ [ facetField.id ] ] = {
-                                filter: translatedFacet.query,
-                                aggs: {
-                                    [ facetField.id ]: aggs.filtered.aggs[ facetField.id ]
-                                }
-                            }
-                        } )
+                        if ( isNestedAgg ) {
 
-                    } else {
-                        Object.keys( searchFields ).forEach( ( facetField ) => {
-                            instructionsWithoutFacetId = []
-                            traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( iindex, iinstruction ) => {
-                                if ( !isArray( iinstruction ) ) {
-                                    if ( !instructionIsFilter( iinstruction ) ) {
-                                        instructionsWithoutFacetId.push( iinstruction )
-                                    } else {
-                                        const fiinstruction = cloneDeep( iinstruction )
+                            normalizedNestedFields.forEach( ( normalizedNestedField ) => {
+                                filteredExceptAggs = cloneDeep( facetFilteredExcept[ normalizedNestedField ] )
+                                const normalizedNestedPath = Object.keys( filteredExceptAggs )[ 0 ]
 
-                                        if ( iinstruction.data.id === facetId ) {
-                                            fiinstruction.data.values = []
-                                        }
-                                        instructionsWithoutFacetId.push( fiinstruction )
-                                    }
-                                }
+                                filteredExceptAggs[ normalizedNestedPath ].aggs.filtered.aggs = facetFields.reduce( ( fieldAcc, facetFieldData ) => {
+                                    fieldAcc[ [ facetFieldData.id ] ] = facetFieldData.query
+                                    return fieldAcc
+                                }, {} )
                             } )
-                            const translatedFacet = elasticSearchTranslator.translate( { instructions: instructionsWithoutFacetId }, {}, getSearchFieldNameFromFieldId, getFacetFieldNameFromFieldId, getFieldSubtypeFromFieldId )
+                        }
 
-                            aggs[ [ facetField ] ] = {
-                                filter: translatedFacet.query,
-                                aggs: {
-                                    [ facetField ]: aggs.filtered.aggs[ facetField ]
+                        aggs[ [ facetField ] ] = {
+                            global: {},
+                            aggs: {
+                                [ `filtered_except_${facetField}` ]: {
+                                    filter: translatedFacet.query,
+                                    aggs: filteredExceptAggs
                                 }
                             }
-                        } )
-                    }
+                        }
+                    } )
                 }
             }
         } )
 
         const query = {
             bool: {
-                filter: []
+                filter: request.query.bool.filter
             }
         }
 

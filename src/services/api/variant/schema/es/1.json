@@ -571,7 +571,25 @@
           },
           "search": {
             "prediction_dann": "consequences.predictions.DANN_score"
-          }
+          },
+          "facet": [
+            {
+              "id": "prediction_dann_min",
+              "query": {
+                "min": {
+                  "field": "consequences.predictions.DANN_score"
+                }
+              }
+            },
+            {
+              "id": "prediction_dann_max",
+              "query": {
+                "max": {
+                  "field": "consequences.predictions.DANN_score"
+                }
+              }
+            }
+          ]
         },
         {
           "id": "prediction_cadd",
