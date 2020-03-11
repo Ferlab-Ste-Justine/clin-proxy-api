@@ -253,6 +253,12 @@ export default class ElasticClient {
                                     return fieldAcc
                                 }, {} )
                             } )
+                        } else {
+
+                            translatedFacet.query.bool.filter.push( { bool: {
+                                filter: { term: { [ schema.fields.patient ]: patient } }
+                            } } )
+
                         }
 
                         aggs[ [ facetField ] ] = {
