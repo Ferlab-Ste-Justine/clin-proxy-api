@@ -109,6 +109,7 @@ export default class ElasticClient {
         let sort = sortDefinition.sort
 
         if ( sortDefinition.postprocess ) {
+            // eslint-disable-next-line no-new-func
             const postprocess = new Function( 'context', sortDefinition.postprocess )
             const context = {
                 sort,
@@ -166,6 +167,7 @@ export default class ElasticClient {
         }
         const facetFilteredExcept = {}
 
+        // generation of the regular aggregation (all non-nested and all unfiltered one excluded)
         aggs.filtered.aggs = schemaFacets.reduce( ( accumulator, agg ) => {
             agg.facet.forEach( ( facet ) => {
                 const facetSubtype = getFieldSubtypeFromFieldId( facet.id )
@@ -178,6 +180,8 @@ export default class ElasticClient {
             } )
             return accumulator
         }, {} )
+
+        // generation of the 'filtered' nested aggregations
 
         if ( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] !== {} ) {
             Object.keys( facetsWithSubtypes[ FILTER_SUBTYPE_NESTED ] ).forEach( ( nestedFacetId ) => {
@@ -199,7 +203,7 @@ export default class ElasticClient {
                         }
                     }
                 }
-
+                // at the same time generate all nested facet
                 nestedFacetFields.forEach( ( nestedFacetField ) => {
                     aggs[ [ `nested_${nestedFacetConfig.path}` ] ].aggs.filtered.aggs[ nestedFacetField.id ] = nestedFacetField.query
                     if ( !facetFilteredExcept[ [ nestedFacetField.id ] ] ) {
@@ -208,7 +212,7 @@ export default class ElasticClient {
                 } )
             } )
         }
-
+        // generate unfiltered aggs
         traverseArrayAndApplyFunc( denormalizedRequest.instructions, ( index, instruction ) => {
             if ( instructionIsFilter( instruction ) ) {
                 const facetId = instruction.data.id
@@ -217,6 +221,7 @@ export default class ElasticClient {
                 if ( facetFields ) {
                     let searchFields = getSearchFieldNameFromFieldId( facetId )
 
+                    // boolean comparison -- normalize to always be an object
                     searchFields = isString( searchFields ) ? { [ facetId ]: searchFields } : searchFields
 
                     Object.keys( searchFields ).forEach( ( facetField ) => {
@@ -255,10 +260,17 @@ export default class ElasticClient {
                             } )
                         } else {
 
+                            // non nested aggs min max should be here
+                            if ( JSON.stringify( filteredExceptAggs ) === '{}' ) {
+                                // min and max
+                                filteredExceptAggs = { [ `${facetField}_min` ]: aggs.filtered.aggs[ `${facetField}_min` ],
+                                    [ `${facetField}_max` ]: aggs.filtered.aggs[ `${facetField}_max` ]
+                                }
+                            }
+
                             translatedFacet.query.bool.filter.push( { bool: {
                                 filter: { term: { [ schema.fields.patient ]: patient } }
                             } } )
-
                         }
 
                         aggs[ [ facetField ] ] = {

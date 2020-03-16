@@ -159,21 +159,39 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                             }, [] )
                         }
                     } else {
-                        // Unfiltered Nested
+                        // Unfiltered Nested and numcomparison non nested
                         // @TODO Currently hardcoded to nested_donors; should take value from JSON schema!
                         const nestedPath = 'nested_donors'
 
-                        delete unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered.doc_count
+                        const isNested = unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ] !== undefined
 
-                        if ( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ] === undefined ) {
-                            Object.keys( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered ).forEach( ( filterKey ) => {
-                                facetsFromResponse[ filterKey ] = [ { value: unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ filterKey ].value } ]
-                            } )
+                        if ( isNested ) {
+                            if ( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered !== undefined ) {
+                                delete unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered.doc_count
+                            }
 
+                            if ( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ] === undefined ) {
+                                Object.keys( unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered ).forEach( ( filterKey ) => {
+                                    facetsFromResponse[ filterKey ] = [ { value: unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ filterKey ].value } ]
+                                } )
+
+                            } else {
+                                facetsFromResponse[ category ] = unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ].buckets.reduce( ( accumulator, bucket ) => {
+                                    return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                                }, [] )
+                            }
                         } else {
-                            facetsFromResponse[ category ] = unfilteredCategoryData[ filterExceptSelfKey ][ nestedPath ].filtered[ category ].buckets.reduce( ( accumulator, bucket ) => {
-                                return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
-                            }, [] )
+                            delete unfilteredCategoryData[ filterExceptSelfKey ].doc_count
+                            if ( unfilteredCategoryData[ filterExceptSelfKey ][ category ] === undefined ) {
+                                Object.keys( unfilteredCategoryData[ filterExceptSelfKey ] ).forEach( ( filterKey ) => {
+                                    facetsFromResponse[ filterKey ] = [ { value: unfilteredCategoryData[ filterExceptSelfKey ][ filterKey ].value } ]
+                                } )
+
+                            } else {
+                                facetsFromResponse[ category ] = unfilteredCategoryData[ filterExceptSelfKey ][ category ].buckets.reduce( ( accumulator, bucket ) => {
+                                    return [ ...accumulator, { value: bucket.key, count: bucket.doc_count } ]
+                                }, [] )
+                            }
                         }
                     }
                 } )
