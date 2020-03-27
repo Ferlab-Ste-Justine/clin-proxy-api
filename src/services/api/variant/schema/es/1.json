@@ -281,14 +281,14 @@
           "label": "filter_genegroup_orphanet",
           "type": "generic",
           "search": {
-            "genegroup_orphanet": "genes.orphanet.keyword"
+            "genegroup_orphanet": "genes.orphanet.panel.keyword"
           },
           "facet": [
             {
               "id": "genegroup_orphanet",
               "query": {
                 "terms": {
-                  "field": "genes.orphanet.keyword",
+                  "field": "genes.orphanet.panel.keyword",
                   "order": {
                     "_count": "desc"
                   },
