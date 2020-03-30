@@ -6,18 +6,19 @@ export default class KeycloakClient {
     constructor( config ) {
         this.host = config.host
         this.clientId = config.clientId
-        this.clientSecret = config.clientSecret
+        this.clientSecret = config.clientSecret,
+        this.extraOptions = config.extraOptions || {}
     }
 
     async ping() {
-        return rp( {
+        return rp( Object.assign({
             method: 'GET',
             uri: `${this.host}`
-        } )
+        }, this.extraOptions) )
     }
 
     async authenticate( username, password ) {
-        return rp( {
+        return rp( Object.assign({
             method: 'POST',
             uri: `${this.host}/protocol/openid-connect/token`,
             form: {
@@ -28,11 +29,11 @@ export default class KeycloakClient {
                 client_id: this.clientId,
                 client_secret: this.clientSecret
             }
-        } )
+        }, this.extraOptions) )
     }
 
     async refresh( token ) {
-        return rp( {
+        return rp( Object.assign({
             method: 'POST',
             uri: `${this.host}/protocol/openid-connect/token`,
             form: {
@@ -41,7 +42,7 @@ export default class KeycloakClient {
                 client_id: this.clientId,
                 client_secret: this.clientSecret
             }
-        } )
+        }, this.extraOptions) )
     }
 
 }
