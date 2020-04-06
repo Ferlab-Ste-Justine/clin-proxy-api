@@ -13,15 +13,15 @@ const functionToGetSomethingFromScore = async ( req, res, cacheService, overture
 
         // This is what is in the mysterious sessionData variable:
         const keycloakAccessToken = sessionData.auth.access_token
-        const keycloakRefreshToken = sessionData.auth.access_token
-        const clinAclFHIRRole = sessionData.acl.fhir.role // 'administrator', 'genetician', 'practitioner'
-        const clinAclFHIROrganizationId = sessionData.acl.fhir.organization_id // 'OR00202'
-        const clinAclFHIRPractitionerId = sessionData.acl.fhir.practitioner_id // 'PR00601'
-        const clinUserUsername = sessionData.user.username // this is an email !
-        const clinUserFirstName = sessionData.user.firstName // can be empty
-        const clinUserLastName = sessionData.user.lastName // can be empty
-        const clinUserGroups = sessionData.user.groups //  [ 'chursj' ]
-        const clinUserRoles = sessionData.user.groups //  [ 'clin_administrator' || 'clin_genetician' || 'clin_practitioner' ]
+        // const keycloakRefreshToken = sessionData.auth.refresh_token // used to renew an expired access token
+        // const clinAclFHIRRole = sessionData.acl.fhir.role // 'administrator', 'genetician', 'practitioner'
+        // const clinAclFHIROrganizationId = sessionData.acl.fhir.organization_id // 'OR00202'
+        // const clinAclFHIRPractitionerId = sessionData.acl.fhir.practitioner_id // 'PR00601'
+        // const clinUserUsername = sessionData.user.username // this is an email !
+        // const clinUserFirstName = sessionData.user.firstName // can be empty
+        // const clinUserLastName = sessionData.user.lastName // can be empty
+        // const clinUserGroups = sessionData.user.groups //  [ 'chursj' ]
+        // const clinUserRoles = sessionData.user.groups //  [ 'clin_administrator' || 'clin_genetician' || 'clin_practitioner' ]
 
         const response = await overtureService.getSomethingFromScore( keycloakAccessToken )
 
