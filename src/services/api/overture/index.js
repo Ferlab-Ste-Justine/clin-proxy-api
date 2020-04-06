@@ -29,10 +29,17 @@ export default class MetaService extends ApiService {
                 await this.logService.debug( 'Cache Service is healthy.' )
 
                 try {
-                    await this.overtureService.ping()
-                } catch ( overtureException ) {
-                    throw new Error( `Overture Client health check failed with ${ overtureException.message}` )
+                    await this.overtureService.pingSong()
+                } catch ( songException ) {
+                    throw new Error( `Overture Client Song health check failed with ${ songException.message}` )
                 }
+
+                try {
+                    await this.overtureService.pingScore()
+                } catch ( scoreException ) {
+                    throw new Error( `Overture Client Score health check failed with ${ scoreException.message}` )
+                }
+
                 await this.logService.debug( 'Overture Service is healthy.' )
 
             } catch ( e ) {

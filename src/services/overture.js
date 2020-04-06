@@ -4,25 +4,32 @@ import rp from 'request-promise-native'
 export default class OvertureClient {
 
     constructor( config ) {
-        this.host = config.host
-        this.clientId = config.clientId
-        this.clientSecret = config.clientSecret
-        this.extraOptions = config.extraOptions || {}
+        this.songHost = config.song.host
+        this.scoreHost = config.score.host
+        this.songExtraOptions = config.song.extraOptions || {}
+        this.scoreExtraOptions = config.score.extraOptions || {}
     }
 
-    async ping() {
-        // @NOTE Might need to ping 2 services song+score ?
-        // This is used when "starting" a service to detect if its "alive".
-        return rp( Object.assign( this.extraOptions, {
+    async pingSong() {
+        // @NOTE Song healthcheck
+        return rp( Object.assign( this.songExtraOptions, {
             method: 'GET',
-            uri: `${this.host}`
+            uri: `${this.songHost}`
+        } ) )
+    }
+
+    async pingScore() {
+        // @NOTE Score healthcheck
+        return rp( Object.assign( this.scoreExtraOptions, {
+            method: 'GET',
+            uri: `${this.scoreHost}`
         } ) )
     }
 
     async getSomethingFromScore() {
-        return rp( Object.assign( this.extraOptions, {
+        return rp( Object.assign( this.scoreExtraOptions, {
             method: 'GET',
-            uri: `${this.host}`
+            uri: `${this.scoreHost}/somethings-are-things-sometimes-i-guess`
         } ) )
     }
 
