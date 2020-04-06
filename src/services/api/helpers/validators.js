@@ -23,7 +23,7 @@ export default {
         schema: {
             query: Joi.object( {
                 type: Joi.string().valid( [ 'partial', 'complete' ] ).required(),
-                query: Joi.string().min( 1 ),
+                query: Joi.string().alphanum().min( 1 ),
                 page: Joi.number().integer().min( 0 ),
                 size: Joi.number().integer().min( 1 ).max( 1000 )
             } ).required()
