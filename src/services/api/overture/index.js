@@ -15,7 +15,7 @@ const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
 
 export default class MetaService extends ApiService {
     constructor( config ) {
-        config.logService.info( 'Oy?' )
+        config.logService.info( 'Yarr!' )
         super( config )
         this.config.cache = config.cacheConfig
         this.config.overture = config.overtureConfig

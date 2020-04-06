@@ -8,15 +8,17 @@ const getSessionDataFromToken = async ( token, cacheService ) => {
 const functionToGetSomethingFromScore = async ( req, res, cacheService, overtureService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const params = req.query || req.params || req.body
+        // @NOTE Request parameters, query string, whatever...
+        // const params = req.query || req.params || req.body
 
-        // somewhere in sessionData
-        const keycloakToken = null;
-        console.log(sessionData)
+        // stored somewhere in sessionData
+        const keycloakToken = null
 
-        const response = await elasticService.getSomethingFromScore(keycloakToken)
+        console.log( sessionData )
 
-        await logService.debug( `Overture getSomethingFromScore returned something` )
+        const response = await overtureService.getSomethingFromScore( keycloakToken )
+
+        await logService.debug( 'Overture getSomethingFromScore returned something' )
         return {
             response
         }
@@ -24,8 +26,9 @@ const functionToGetSomethingFromScore = async ( req, res, cacheService, overture
         await logService.warning( `Overture getSomethingFromScore ${e.toString()}` )
         return new errors.InternalServerError()
     }
+}
 
 
 export default {
-    functionToGetSomethingFromScore,
+    functionToGetSomethingFromScore
 }
