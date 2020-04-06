@@ -5,7 +5,7 @@ const getSessionDataFromToken = async ( token, cacheService ) => {
     return await cacheService.read( token.uid )
 }
 
-const test = async ( req, res, cacheService, overtureService, logService ) => {
+const functionToGetSomethingFromScore = async ( req, res, cacheService, overtureService, logService ) => {
     try {
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params || req.body
@@ -27,5 +27,5 @@ const test = async ( req, res, cacheService, overtureService, logService ) => {
 
 
 export default {
-    test,
+    functionToGetSomethingFromScore,
 }

@@ -66,7 +66,7 @@ export default class MetaService extends ApiService {
             path: `${this.config.endpoint}/test`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'test' )(
+                const response = await getFunctionForApiVersion( req.version, 'functionToGetSomethingFromScore' )(
                     req,
                     res,
                     this.cacheService,
