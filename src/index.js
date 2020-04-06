@@ -90,6 +90,15 @@ try {
     process.exit( 1 )
 }
 
+let overtureServiceConfig = null
+
+try {
+    overtureServiceConfig = JSON.parse( process.env.OVERTURE_SERVICE )
+} catch ( e ) {
+    launcherLog.error( 'Invalid JSON value or missing OVERTURE_SERVICE in environment.' )
+    process.exit( 1 )
+}
+
 if ( !process.env.CONTAINER_ID ) {
     process.env.CONTAINER_ID = uniqid()
     launcherLog.warning( 'No CONTAINER_ID specified in environment, auto-generated.' )
@@ -200,6 +209,7 @@ const generateApiConfig = ( serviceName ) => {
         keycloakConfig: keycloakServiceConfig,
         aidboxConfig: aidboxServiceConfig,
         elasticConfig: elasticServiceConfig,
+        overtureConfig: overtureServiceConfig,
         docsBranch: process.env.NODE_ENV === 'production' ? 'master' : 'dev'
     }
 }
