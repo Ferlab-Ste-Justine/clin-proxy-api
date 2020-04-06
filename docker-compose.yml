@@ -92,6 +92,28 @@ services:
     env_file:
       - meta.env
 
+  overture:
+    build:
+      context: .
+      dockerfile: Dockerfile-overture
+    image: localhost:5000/clin-proxy-api-overture-service
+    volumes:
+      #      --for local dev only:
+      #      - ./data/certbot/conf:/etc/letsencrypt
+      #      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
+      - "sshvolume:/etc/letsencrypt"
+    depends_on:
+      - memcached
+    ports:
+      - "8000:8000"
+    deploy:
+      replicas: 2
+    networks:
+      - clinnet
+      - proxy
+    env_file:
+      - overture.env
+
 networks:
   clinnet:
   proxy:

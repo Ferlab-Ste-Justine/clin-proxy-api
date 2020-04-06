@@ -9,6 +9,7 @@
     "service-patient": "node dist/index.js --service patient",
     "service-variant": "node dist/index.js --service variant",
     "service-meta": "node dist/index.js --service meta",
+    "service-overture": "node dist/index.js --service overture",
     "functional-tests": "babel-node tests/functional/runner.js",
     "unit-tests": "mocha --require @babel/register 'tests/unit/**.js'"
   },
