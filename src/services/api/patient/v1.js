@@ -55,13 +55,9 @@ const searchPatientsByAutoComplete = async ( req, res, cacheService, elasticServ
         if ( type === 'partial' ) {
             fields.push(
                 'id',
-                'familyId',
-                'specimens.id',
-                'identifier.MR',
                 'identifier.JHN',
                 'name.family',
                 'name.given',
-                'studies.title'
             )
         }
 
