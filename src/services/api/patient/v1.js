@@ -55,32 +55,29 @@ const searchPatientsByAutoComplete = async ( req, res, cacheService, elasticServ
         if ( type === 'partial' ) {
             fields.push(
                 'id',
-                'familyId',
-                'specimens.id',
-                'identifier.MR',
-                'identifier.JHN',
                 'name.family',
                 'name.given',
-                'studies.title'
+                'identifier.JHN',
             )
         }
 
         const matches = [
-            { match_phrase_prefix: { id: query } },
-            { match_phrase_prefix: { 'name.family': query } },
-            { match_phrase_prefix: { 'name.given': query } },
-            { match_phrase_prefix: { 'studies.title': query } },
-            { match_phrase_prefix: { 'specimens.id': query } },
-            { match_phrase_prefix: { 'identifier.MR': query } },
-            { match_phrase_prefix: { 'identifier.JHN': query } },
-            { match_phrase_prefix: { familyId: query } },
-            { wildcard: { id: `*${query}` } },
-            { wildcard: { 'identifier.MR': `*${query}` } },
-            { wildcard: { 'identifier.MR': `*${query}` } },
-            { wildcard: { 'identifier.JHN': `*${query}` } },
-            { wildcard: { familyId: `*${query}` } },
-            { fuzzy: { 'name.given': query } },
-            { fuzzy: { 'name.family': query } }
+            {
+                multi_match: {
+                    query: query,
+                    type: 'phrase_prefix',
+                    fields: [
+                        'id',
+                        'name.family',
+                        'name.given',
+                        'studies.title',
+                        'specimens.id',
+                        'identifier.MR',
+                        'identifier.JHN',
+                        'studies.title'
+                    ]
+                }
+            }
         ]
 
         const response = await elasticService.searchPatients( sessionData.acl.fhir, fields, [], matches, index, limit )
