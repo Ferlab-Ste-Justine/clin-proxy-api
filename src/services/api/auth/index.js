@@ -131,6 +131,26 @@ export default class AuthService extends ApiService {
 
         } ) )
 
+
+        // Register Session Route
+        this.instance.get( {
+            path: `${this.config.endpoint}`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'identity' )( req, res,
+                    this.cacheService,
+                    this.logService,
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                next( e )
+            }
+
+        } ) )
+
         // Register Logout Route
         this.instance.del( `${this.config.endpoint}`, restifyAsyncWrap( async( req, res, next ) => {
             try {
