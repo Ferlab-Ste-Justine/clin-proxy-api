@@ -94,6 +94,8 @@ export default class ElasticClient {
             body.query.bool.minimum_should_match = 1
         }
 
+        console.debug( `searchPatient: ${JSON.stringify( body )}` )
+
         return rp( {
             method: 'GET',
             uri,
