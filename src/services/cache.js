@@ -19,8 +19,8 @@ export default class CacheClient {
         return this.instance.set( key, value, expiration )
     }
 
-    async read( key, value ) {
-        return this.instance.get( key, value )
+    async read( key ) {
+        return this.instance.get( key )
     }
 
     async update( key, value, expiration = this.expiry ) {

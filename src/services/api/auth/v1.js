@@ -109,6 +109,26 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
     }
 }
 
+const identity = async ( req, res, cacheService, logService ) => {
+    const cacheKey = req.jwt.uid
+
+    try {
+        const currentCachedData = await cacheService.read( cacheKey )
+
+        if ( currentCachedData ) {
+            await logService.debug( `Found identity using ${cacheKey}` )
+            return {
+                user: currentCachedData.user
+            }
+        }
+
+        await logService.warning( `No identity found using ${cacheKey}` )
+        return new errors.NotFoundError()
+    } catch ( e ) {
+        return new errors.InternalServerError()
+    }
+}
+
 const logout = async ( req, res, cacheService, logService, config ) => {
     const cacheKey = req.jwt.uid
 
@@ -186,5 +206,6 @@ const token = async ( req, res, keycloakService, cacheService, logService, confi
 export default {
     login,
     logout,
+    identity,
     token
 }
