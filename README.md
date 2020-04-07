@@ -21,12 +21,28 @@
 
 ### Development Set-up
 
+#### Directly on Computer
+
 Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/master/README.md) and run
 ```
 cp -p development.env .env
 npm install -g pnpm
 pnpm install
 pnpm start
+```
+
+#### Dockerized Version
+
+Run the following to launch:
+
+```
+./launch-docker-local.sh
+```
+
+Run the following to tear down:
+
+```
+./teardown-docker-local.sh
 ```
 
 ##### Keycloak Set-up
