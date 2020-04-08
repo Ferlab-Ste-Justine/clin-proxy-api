@@ -45,6 +45,14 @@ Run the following to tear down:
 ./teardown-docker-local.sh
 ```
 
+If your browser is giving you issues with https on localhost:
+
+Note that the clin resulting services will also have certificates for the **dev.chusj-clin-dev.org** domain. You just have to add the following entry in your **/etc/hosts** file:
+
+```
+127.0.1.1       dev.chusj-clin-dev.org
+```
+
 ##### Keycloak Set-up
 
 - Install Docker
