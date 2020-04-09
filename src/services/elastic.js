@@ -104,6 +104,38 @@ export default class ElasticClient {
         } )
     }
 
+    async searchGenes( acl, includes = [], filters = [], shoulds = [], index, limit ) {
+        const uri = `${this.host}/genes_test/_search`
+        const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
+        const body = {
+            from: index,
+            size: limit,
+            query: {
+                bool: {
+                    must: filters.concat( aclFilters )
+                }
+            }
+        }
+
+        if ( includes.length > 0 ) {
+            body._source = { includes }
+        }
+
+        if ( shoulds.length > 0 ) {
+            body.query.bool.should = shoulds
+            body.query.bool.minimum_should_match = 1
+        }
+
+        console.debug( `searchGenes: ${JSON.stringify( body )}` )
+
+        return rp( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
     async searchVariantsForPatient( patient, request, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}/_search`
         const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]

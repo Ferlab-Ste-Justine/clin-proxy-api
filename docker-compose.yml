@@ -92,6 +92,29 @@ services:
     env_file:
       - meta.env
 
+  gene:
+    build:
+      context: .
+      dockerfile: Dockerfile-gene
+    image: localhost:5000/clin-proxy-api-gene-service
+    volumes:
+      #      --for local dev only:
+      #      - ./data/certbot/conf:/etc/letsencrypt
+      #      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
+      - "sshvolume:/etc/letsencrypt"
+    depends_on:
+      - memcached
+    ports:
+      - "5002:5002"
+    deploy:
+      replicas: 2
+    networks:
+      - clinnet
+      - proxy
+    env_file:
+      - gene.env
+
+
 networks:
   clinnet:
   proxy:
