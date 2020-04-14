@@ -10,76 +10,72 @@ services:
   auth:
     image: localhost:5000/clin-proxy-api-auth-service
     volumes:
-#      -for local dev only:
       - ./certificate-generation:/etc/letsencrypt
-#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-#      - "sshvolume:/etc/letsencrypt"
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "3000:3000"
     deploy:
-      replicas: 2
+      replicas: 1
     networks:
       - clinnet
       - proxy
     env_file:
       - auth.env
+    command: ["npm", "run", "dev-service-auth"]
   patient:
     image: localhost:5000/clin-proxy-api-patient-service
     volumes:
-#      --for local dev only:
       - ./certificate-generation:/etc/letsencrypt
-#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-#      - "sshvolume:/etc/letsencrypt"
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "4000:4000"
     deploy:
-      replicas: 2
+      replicas: 1
     networks:
       - clinnet
       - proxy
       - aidbox
     env_file:
       - patient.env
+    command: ["npm", "run", "dev-service-patient"]
   variant:
     image: localhost:5000/clin-proxy-api-variant-service
     volumes:
-#      --for local dev only:
       - ./certificate-generation:/etc/letsencrypt
-#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-#      - "sshvolume:/etc/letsencrypt"
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "5001:5001"
     deploy:
-      replicas: 2
+      replicas: 1
     networks:
       - clinnet
       - proxy
     env_file:
       - variant.env
+    command: ["npm", "run", "dev-service-variant"]
   meta:
     image: localhost:5000/clin-proxy-api-meta-service
     volumes:
-#      --for local dev only:
       - ./certificate-generation:/etc/letsencrypt
-#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-#      - "sshvolume:/etc/letsencrypt"
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "7000:7000"
     deploy:
-      replicas: 2
+      replicas: 1
     networks:
       - clinnet
       - proxy
     env_file:
       - meta.env
+    command: ["npm", "run", "dev-service-meta"]
 
 networks:
   clinnet:
@@ -87,7 +83,3 @@ networks:
     external: true
   aidbox:
     external: true
-
-#volumes:
-#  sshvolume:
-#    external: true

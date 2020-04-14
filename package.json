@@ -6,9 +6,13 @@
     "start": "nodemon --exec babel-node src/index.js",
     "build": "babel src --out-dir dist --copy-files",
     "service-auth": "node dist/index.js --service auth",
+    "dev-service-auth": "nodemon --exec babel-node src/index.js --service auth",
     "service-patient": "node dist/index.js --service patient",
+    "dev-service-patient": "nodemon --exec babel-node src/index.js --service patient",
     "service-variant": "node dist/index.js --service variant",
+    "dev-service-variant": "nodemon --exec babel-node src/index.js --service variant",
     "service-meta": "node dist/index.js --service meta",
+    "dev-service-meta": "nodemon --exec babel-node src/index.js --service meta",
     "functional-tests": "babel-node tests/functional/runner.js",
     "unit-tests": "mocha --require @babel/register 'tests/unit/**.js'"
   },
