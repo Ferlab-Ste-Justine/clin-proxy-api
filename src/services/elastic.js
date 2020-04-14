@@ -104,15 +104,14 @@ export default class ElasticClient {
         } )
     }
 
-    async searchGenes( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/genes_test/_search`
-        const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
+    async searchGenes( acl, includes = [], filters = [], shoulds = [], index, limit, highlight ) {
+        const uri = `${this.host}/genes/_search`
         const body = {
             from: index,
             size: limit,
             query: {
                 bool: {
-                    must: filters.concat( aclFilters )
+                    must: filters
                 }
             }
         }
@@ -124,6 +123,10 @@ export default class ElasticClient {
         if ( shoulds.length > 0 ) {
             body.query.bool.should = shoulds
             body.query.bool.minimum_should_match = 1
+        }
+
+        if ( highlight ) {
+            body.highlight = highlight
         }
 
         console.debug( `searchGenes: ${JSON.stringify( body )}` )

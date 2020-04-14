@@ -71,7 +71,7 @@ export default class GeneService extends ApiService {
             path: `${this.config.endpoint}/search`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'searchPatients' )(
+                const response = await getFunctionForApiVersion( req.version, 'searchGenes' )(
                     req,
                     res,
                     this.cacheService,
@@ -89,37 +89,13 @@ export default class GeneService extends ApiService {
 
         } ) )
 
-        // Register searchPatientsByAutoComplete Route
+        // Register searchGenesByAutoComplete Route
         this.instance.get( {
             path: `${this.config.endpoint}/autocomplete`,
             validation: validators.searchPatientByAutoComplete
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
-                const response = await getFunctionForApiVersion( req.version, 'searchPatientsByAutoComplete' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.elasticService,
-                    this.logService
-                )
-
-                res.status( 200 )
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
-        // Register getPatientById Route
-        this.instance.get( {
-            path: `${this.config.endpoint}/:uid`,
-            validation: validators.searchPatientByPatientId
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'getPatientById' )(
+                const response = await getFunctionForApiVersion( req.version, 'searchGenesByAutoComplete' )(
                     req,
                     res,
                     this.cacheService,
