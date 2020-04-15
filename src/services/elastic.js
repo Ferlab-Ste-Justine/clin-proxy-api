@@ -104,7 +104,7 @@ export default class ElasticClient {
         } )
     }
 
-    async searchGenes( acl, includes = [], filters = [], shoulds = [], index, limit, highlight ) {
+    async searchGenes( includes = [], filters = [], shoulds = [], index, limit, highlight = null ) {
         const uri = `${this.host}/genes/_search`
         const body = {
             from: index,

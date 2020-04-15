@@ -1,13 +1,8 @@
 import errors from 'restify-errors'
 
 
-const getSessionDataFromToken = async ( token, cacheService ) => {
-    return await cacheService.read( token.uid )
-}
-
 const searchGenesByAutoComplete = async ( req, res, cacheService, elasticService, logService ) => {
     try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params
         const query = params.query
         const type = params.type || 'partial'
@@ -54,7 +49,7 @@ const searchGenesByAutoComplete = async ( req, res, cacheService, elasticService
             ]
         }
 
-        const response = await elasticService.searchGenes( sessionData.acl.fhir, fields, [], matches, index, limit, highlight )
+        const response = await elasticService.searchGenes( fields, [], matches, index, limit, highlight )
 
         await logService.debug( `Elastic searchGenesByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total} matches` )
         return {

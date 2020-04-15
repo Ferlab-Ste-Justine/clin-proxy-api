@@ -3,7 +3,6 @@ import rjwt from 'restify-jwt-community'
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
 import restifyAsyncWrap from '../helpers/async'
-import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 import validators from '../helpers/validators'
 
@@ -18,17 +17,9 @@ export default class GeneService extends ApiService {
     constructor( config ) {
         config.logService.info( 'Roger that.' )
         super( config )
-        this.config.cache = config.cacheConfig
         this.config.elastic = config.elasticConfig
         this.runServicesHealthCheck = async () => {
             try {
-                try {
-                    await this.cacheService.ping()
-                } catch ( cacheException ) {
-                    throw new Error( `Cache Service Client health check failed with ${ cacheException.message}` )
-                }
-                await this.logService.debug( 'Cache Service is healthy.' )
-
                 try {
                     const elasticPingResult = await this.elasticService.ping()
 
@@ -50,7 +41,6 @@ export default class GeneService extends ApiService {
 
         await this.logService.debug( 'Initializing service dependencies...' )
 
-        this.cacheService = new CacheClient( this.config.cache )
         this.elasticService = new ElasticClient( this.config.elastic )
 
         await this.runServicesHealthCheck()
@@ -66,6 +56,7 @@ export default class GeneService extends ApiService {
         } ) )
 
         // Register searchGenesByAutoComplete Route
+        // @NOTE Accessible to all authenticated user
         this.instance.get( {
             path: `${this.config.endpoint}/autocomplete`,
             validation: validators.searchGenesByAutoComplete
