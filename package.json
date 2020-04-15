@@ -7,6 +7,7 @@
     "build": "babel src --out-dir dist --copy-files",
     "service-auth": "node dist/index.js --service auth",
     "service-patient": "node dist/index.js --service patient",
+    "service-gene": "node dist/index.js --service gene",
     "service-variant": "node dist/index.js --service variant",
     "service-meta": "node dist/index.js --service meta",
     "functional-tests": "babel-node tests/functional/runner.js",
