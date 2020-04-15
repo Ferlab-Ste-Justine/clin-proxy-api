@@ -1,7 +1,7 @@
 import errors from 'restify-errors'
 
 
-const searchGenesByAutoComplete = async ( req, res, cacheService, elasticService, logService ) => {
+const searchGenesByAutoComplete = async ( req, res, elasticService, logService ) => {
     try {
         const params = req.query || req.params
         const query = params.query

@@ -9,8 +9,8 @@ services:
             CITY: Montreal
             ORGANIZATION: Any
             DEPARTMENT: IT
-            EMAIL: email@cadomain.com
-            DOMAINS: dev.cadomain.com;test.cadomain.com
+            EMAIL: donttry@localhost.com
+            DOMAINS: ca.chusj-clin-dev.org
             CERTIFICATE_DURATION: 1095
             KEY_FILE: "ca.key"
             CSR_FILE: "ca.csr"
@@ -26,8 +26,8 @@ services:
             CITY: Montreal
             ORGANIZATION: Any
             DEPARTMENT: IT
-            EMAIL: email@mydomain.com
-            DOMAINS: dev.mydomain.com;test.mydomain.com
+            EMAIL: donttry@localhost.com
+            DOMAINS: localhost;dev.chusj-clin-dev.org
             CERTIFICATE_DURATION: 1095
             KEY_FILE: "certificate.key"
             CSR_FILE: "certificate.csr"

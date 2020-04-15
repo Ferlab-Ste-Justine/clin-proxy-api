@@ -65,7 +65,6 @@ export default class GeneService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'searchGenesByAutoComplete' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
