@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: Patient API Service
+  title: Gene API Service
   description: >
-    Patient API Service
+    Gene API Service
 
 servers:
   - url: 'https://localhost:5002'

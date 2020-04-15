@@ -65,34 +65,10 @@ export default class GeneService extends ApiService {
             ]
         } ) )
 
-        // Register SOME searchPatients Route
-        // @TODO - need filters specifications
-        this.instance.get( {
-            path: `${this.config.endpoint}/search`
-        }, restifyAsyncWrap( async( req, res, next ) => {
-            try {
-                const response = await getFunctionForApiVersion( req.version, 'searchGenes' )(
-                    req,
-                    res,
-                    this.cacheService,
-                    this.elasticService,
-                    this.logService
-                )
-
-                res.status( 200 )
-                res.send( response )
-                next()
-            } catch ( e ) {
-                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                next( e )
-            }
-
-        } ) )
-
         // Register searchGenesByAutoComplete Route
         this.instance.get( {
             path: `${this.config.endpoint}/autocomplete`,
-            validation: validators.searchPatientByAutoComplete
+            validation: validators.searchGenesByAutoComplete
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'searchGenesByAutoComplete' )(
