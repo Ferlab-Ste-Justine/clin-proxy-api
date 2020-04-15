@@ -102,8 +102,6 @@ services:
       #      - ./data/certbot/conf:/etc/letsencrypt
       #      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
       - "sshvolume:/etc/letsencrypt"
-    depends_on:
-      - memcached
     ports:
       - "5002:5002"
     deploy:
