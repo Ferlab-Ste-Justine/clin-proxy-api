@@ -61,7 +61,7 @@ export default class ApiService {
         addAcceptMiddleware( this.instance )
         addRefreshAccessTokenMiddleware( this.instance, this.config.jwt.requestProperty )
 
-        // Register Helath Check Route
+        // Register Health Check Route
         this.instance.get( `${this.config.endpoint}/health`, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 await this.runServicesHealthCheck()
