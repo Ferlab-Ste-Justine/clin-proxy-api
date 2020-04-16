@@ -3,7 +3,7 @@ import rp from 'request-promise-native'
 
 export default class KeycloakClient {
 
-    constructor( config, logger ) {
+    constructor( config, logger = null ) {
         this.host = config.host
         this.clientId = config.clientId
         this.clientSecret = config.clientSecret
