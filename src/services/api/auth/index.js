@@ -92,7 +92,7 @@ export default class AuthService extends ApiService {
         await this.logService.debug( 'Initializing service dependencies...' )
 
         this.cacheService = new CacheClient( this.config.cache )
-        this.keycloakService = new KeycloakClient( this.config.keycloak )
+        this.keycloakService = new KeycloakClient( this.config.keycloak,  this.logService )
 
         await this.runServicesHealthCheck()
     }
