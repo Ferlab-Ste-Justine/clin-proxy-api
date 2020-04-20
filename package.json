@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
+    "test": "pnpm run unit-tests && pnpm run functional-tests",
     "build": "babel src --out-dir dist --copy-files",
     "service-auth": "node dist/index.js --service auth",
     "dev-service-auth": "nodemon --exec babel-node src/index.js --service auth",
