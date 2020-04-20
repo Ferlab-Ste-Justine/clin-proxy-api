@@ -20,6 +20,16 @@ module.exports = {
             enabled: true,
             key: 'port',
             value: serviceConfig.port
+        },
+        {
+            enabled: true,
+            key: 'username',
+            value: 'practitioner@cr-ste-justine.xyz'
+        },
+        {
+            enabled: true,
+            key: 'password',
+            value: 'qwerty123'
         }
     ]
 }
