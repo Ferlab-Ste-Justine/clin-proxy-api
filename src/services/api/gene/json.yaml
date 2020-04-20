@@ -1,0 +1,59 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Gene API Service",
+    "description": "Gene API Service\n"
+  },
+  "servers": [
+  {
+    "url": "https://localhost:5002"
+  }
+  ],
+  "paths": {
+    "/query/health": {
+      "get": {
+        "tags": [
+          "Service Health Check"
+        ],
+        "summary": "Returns the health status of the service.",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "title": "Health Check",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {}
+        }
+      }
+    }
+  }
+}

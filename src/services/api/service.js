@@ -20,7 +20,6 @@ export default class ApiService {
             packageVersion: config.packageVersion,
             defaultApiVersion: config.defaultApiVersion,
             availableApiVersions: config.availableApiVersions,
-            docsBranch: config.docsBranch,
             id: config.id,
             name: config.name,
             port: config.port,
@@ -87,13 +86,14 @@ export default class ApiService {
         } ) )
 
         this.instance.get( `${this.config.endpoint}/docs`, ( req, res ) => {
+            const contents = require( `./${this.config.id}/docs.json`) /* eslint-disable-line */
             res.end( `
                 <html>
                   <body>
                     <div id='root'></div>
                     <script src='https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js'></script>
                     <script>
-                      Redoc.init('https://raw.githubusercontent.com/cr-ste-justine/clin-proxy-api/${this.config.docsBranch}/src/services/api/${this.config.id}/docs.yaml', {
+                      Redoc.init(${JSON.stringify(contents)}, {
                         hideDownloadButton: true
                       }, document.getElementById('root'))
                     </script>
