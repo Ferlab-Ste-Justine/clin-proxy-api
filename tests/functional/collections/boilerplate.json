@@ -11,7 +11,6 @@
         {
           "listen": "test",
           "script": {
-            "id": "0482e748-9c48-4c8e-a269-c45341c66084",
             "exec": [
               "pm.test(\"Returned API Version should fallback to default version\", function () {",
               "    var jsonData = pm.response.json();",
@@ -27,7 +26,6 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{hostname}}{{port}}{{path}}",
           "host": [
             "{{hostname}}"
           ],
@@ -44,7 +42,6 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{hostname}}{{port}}{{path}}/health",
               "host": [
                 "{{hostname}}"
               ],
@@ -119,7 +116,6 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{hostname}}{{port}}/v1{{path}}/health",
           "host": [
             "{{hostname}}"
           ],
@@ -138,7 +134,6 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{hostname}}{{port}}{{path}}/health",
               "host": [
                 "{{hostname}}"
               ],
@@ -214,13 +209,13 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{hostname}}{{port}}/v0{{path}}/health",
           "host": [
             "{{hostname}}"
           ],
           "port": "{{port}}",
           "path": [
-            "v0{{path}}",
+            "v0",
+            "{{path}}",
             "health"
           ]
         }
@@ -232,7 +227,6 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{hostname}}{{port}}{{path}}/health",
               "host": [
                 "{{hostname}}"
               ],

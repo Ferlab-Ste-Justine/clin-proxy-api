@@ -9,20 +9,17 @@ module.exports = {
         {
             enabled: true,
             key: 'hostname',
-            value: serviceHostname,
-            type: 'text'
+            value: serviceHostname
         },
         {
             enabled: true,
             key: 'path',
-            value: serviceConfig.endpoint,
-            type: 'text'
+            value: serviceConfig.endpoint[ 0 ] === '/' ? serviceConfig.endpoint.substr( 1 ) : serviceConfig.endpoint
         },
         {
             enabled: true,
             key: 'port',
-            value: serviceConfig.port ? `:${serviceConfig.port}` : '',
-            type: 'text'
+            value: serviceConfig.port
         }
     ]
 }
