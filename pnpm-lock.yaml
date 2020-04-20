@@ -18,6 +18,7 @@ dependencies:
   eslint: 5.16.0
   eslint-config-airbnb: 17.1.1
   jsonwebtoken: 8.5.1
+  liquid-json: 0.3.1
   lodash: 4.17.15
   memcached-promisify: 2.0.0
   mocha: 6.2.3
@@ -5651,6 +5652,7 @@ specifiers:
   eslint: ^5.15.3
   eslint-config-airbnb: ^17.1.0
   jsonwebtoken: ^8.5.1
+  liquid-json: ^0.3.1
   lodash: ^4.17.15
   memcached-promisify: ^2.0.0
   mocha: ^6.2.0

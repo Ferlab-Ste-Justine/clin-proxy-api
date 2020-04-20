@@ -1,7 +1,7 @@
 {
   "info": {
-    "_postman_id": "7ec4d8e5-e5ff-4a02-b7e6-12e0656963ac",
-    "name": "CLIN-PROXY-API Common",
+    "_postman_id": "96fd1917-4a48-4c87-8713-7ee48e4ac684",
+    "name": "CLIN-PROXY-API Boilerplate",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -26,18 +26,14 @@
       "request": {
         "method": "GET",
         "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
         "url": {
-          "raw": "{{serviceUrl}}:{{boilerplateServicePort}}/{{boilerplateServiceEndpointPrefix}}",
+          "raw": "{{hostname}}{{port}}{{path}}",
           "host": [
-            "{{serviceUrl}}"
+            "{{hostname}}"
           ],
-          "port": "{{boilerplateServicePort}}",
+          "port": "{{port}}",
           "path": [
-            "{{boilerplateServiceEndpointPrefix}}"
+            "{{path}}"
           ]
         }
       },
@@ -47,18 +43,14 @@
           "originalRequest": {
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
             "url": {
-              "raw": "{{serviceUrl}}:2999/boilerplate/health",
+              "raw": "{{hostname}}{{port}}{{path}}/health",
               "host": [
-                "{{serviceUrl}}"
+                "{{hostname}}"
               ],
-              "port": "2999",
+              "port": "{{port}}",
               "path": [
-                "boilerplate",
+                "{{path}}",
                 "health"
               ]
             }
@@ -126,19 +118,15 @@
       "request": {
         "method": "GET",
         "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
         "url": {
-          "raw": "{{serviceUrl}}:2999/v1/boilerplate/health",
+          "raw": "{{hostname}}{{port}}/v1{{path}}/health",
           "host": [
-            "{{serviceUrl}}"
+            "{{hostname}}"
           ],
-          "port": "2999",
+          "port": "{{port}}",
           "path": [
             "v1",
-            "boilerplate",
+            "{{path}}",
             "health"
           ]
         }
@@ -149,18 +137,14 @@
           "originalRequest": {
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
             "url": {
-              "raw": "{{serviceUrl}}:2999/boilerplate/health",
+              "raw": "{{hostname}}{{port}}{{path}}/health",
               "host": [
-                "{{serviceUrl}}"
+                "{{hostname}}"
               ],
-              "port": "2999",
+              "port": "{{port}}",
               "path": [
-                "boilerplate",
+                "{{path}}",
                 "health"
               ]
             }
@@ -229,18 +213,14 @@
       "request": {
         "method": "GET",
         "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
         "url": {
-          "raw": "{{serviceUrl}}:{{boilerplateServicePort}}/v0{{boilerplateServiceEndpointPrefix}}/health",
+          "raw": "{{hostname}}{{port}}/v0{{path}}/health",
           "host": [
-            "{{serviceUrl}}"
+            "{{hostname}}"
           ],
-          "port": "{{boilerplateServicePort}}",
+          "port": "{{port}}",
           "path": [
-            "v0{{boilerplateServiceEndpointPrefix}}",
+            "v0{{path}}",
             "health"
           ]
         }
@@ -251,18 +231,14 @@
           "originalRequest": {
             "method": "GET",
             "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
             "url": {
-              "raw": "{{serviceUrl}}:2999/boilerplate/health",
+              "raw": "{{hostname}}{{port}}{{path}}/health",
               "host": [
-                "{{serviceUrl}}"
+                "{{hostname}}"
               ],
-              "port": "2999",
+              "port": "{{port}}",
               "path": [
-                "boilerplate",
+                "{{path}}",
                 "health"
               ]
             }
