@@ -131,7 +131,6 @@ export default class AuthService extends ApiService {
 
         } ) )
 
-
         // Register Session Route
         this.instance.get( {
             path: `${this.config.endpoint}`
