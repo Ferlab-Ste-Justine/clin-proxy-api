@@ -65,16 +65,8 @@ export default class AuthService extends ApiService {
         super( config )
         this.config.cache = config.cacheConfig
         this.config.keycloak = config.keycloakConfig
-        this.test = 0
         this.runServicesHealthCheck = async () => {
             try {
-
-
-                //if (this.test > 1) {
-                //    throw Error('meh')
-                //}
-                //this.test++;
-
                 try {
                     await this.cacheService.ping()
                 } catch ( cacheException ) {
