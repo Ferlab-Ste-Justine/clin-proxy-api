@@ -54,7 +54,14 @@ const login = async ( req, res, keycloakService, cacheService, logService, confi
     try {
         const password = req.body.password
         const keycloakResponse = await keycloakService.authenticate( username, password )
+
+        await logService.debug( `keycloakResponse=${JSON.stringify( keycloakResponse )}` )
         const jsonReponse = JSON.parse( keycloakResponse )
+
+        if ( jsonReponse.error && jsonReponse.error.code === 401 ) {
+            return new errors.UnauthorizedError()
+        }
+
         const accessToken = jsonReponse.access_token
         const decodedAccessToken = jwt.decode( accessToken, config.jwt.secret )
         const accessTokenExpiresInSeconds = jsonReponse.expires_in

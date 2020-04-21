@@ -204,7 +204,6 @@ const generateApiConfig = ( serviceName ) => {
 }
 
 const launchApiServices = async() => {
-
     const serviceList = !serviceToLaunch ? apiServices : [ serviceToLaunch ]
 
     if ( serviceToLaunch && apiServices.indexOf( serviceToLaunch ) === -1 ) {
@@ -215,11 +214,9 @@ const launchApiServices = async() => {
         const serviceName = serviceList[ serviceIdx ]
 
         if ( process.env[ `${serviceName.toUpperCase()}_API_SERVICE` ] ) {
-
             const config = generateApiConfig( serviceName )
 
             try {
-
                 launcherLog.info( `Requesting launch procedures from ${config.name} Service ...` )
                 const ServiceClass = require( `./services/api/${serviceName}` ) // eslint-disable-line global-require
                 const service = new ServiceClass.default( config ) // eslint-disable-line new-cap
