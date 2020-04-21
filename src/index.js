@@ -1,9 +1,7 @@
 import fs from 'fs'
 import errors from 'restify-errors'
 
-try {
-    require( 'babel-polyfill' )
-} catch ( e ) {}
+try { require( 'babel-polyfill' ) } catch ( e ) {} /* eslint-disable-line */
 require( 'dotenv' ).config()
 
 const args = require( 'yargs' ).argv
