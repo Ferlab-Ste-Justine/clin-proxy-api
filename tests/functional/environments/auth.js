@@ -1,7 +1,7 @@
 const serviceConfig = JSON.parse( process.env.AUTH_API_SERVICE )
-const serviceHostname = process.env.API_SERVICE_HOSTNAME || 'https://localhost'
-const authUsername = process.env.API_AUTH_SERVICE_USERNAME || ''
-const authPassword = process.env.API_AUTH_SERVICE_PASSWORD || ''
+const serviceHostname = process.env.TEST_API_SERVICE_HOSTNAME
+const username = process.env.TEST_AUTH_SERVICE_USERNAME
+const password = process.env.TEST_AUTH_SERVICE_PASSWORD
 
 
 module.exports = {
@@ -26,12 +26,12 @@ module.exports = {
         {
             enabled: true,
             key: 'username',
-            value: authUsername
+            value: username
         },
         {
             enabled: true,
             key: 'password',
-            value: authPassword
+            value: password
         }
     ]
 }
