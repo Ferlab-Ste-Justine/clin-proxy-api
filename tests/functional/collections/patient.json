@@ -1,0 +1,319 @@
+{
+  "info": {
+    "_postman_id": "c50bbb04-085e-4a57-86ff-5bdd5b485428",
+    "name": "CLIN-PROXY-API Patient",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Service Health Check",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "69233566-12b5-475d-927c-1be10b6b6543",
+            "exec": [
+              "pm.test(\"Should be able to retrieve service health status\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.eql('Ok');",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "{{hostname}}:{{port}}/{{path}}/health",
+          "host": [
+            "{{hostname}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "{{path}}",
+            "health"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "API Version",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{hostname}}:{{port}}/{{path}}/health",
+              "host": [
+                "{{hostname}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{path}}",
+                "health"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Server",
+              "value": "restify"
+            },
+            {
+              "key": "API-Version",
+              "value": "1"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Service Documentation",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "69233566-12b5-475d-927c-1be10b6b6543",
+            "exec": [
+              "pm.test(\"Should be able to retrieve service documentation\", function () {",
+              "    var htmlDoc = pm.response.text();",
+              "    pm.expect(htmlDoc).to.contain('Redoc.init');",
+              "    pm.expect(htmlDoc).to.contain(environment['port']);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": []
+        },
+        "url": {
+          "raw": "{{hostname}}:{{port}}/{{path}}/docs",
+          "host": [
+            "{{hostname}}"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "{{path}}",
+            "docs"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "API Version",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{hostname}}:{{port}}/{{path}}/health",
+              "host": [
+                "{{hostname}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{path}}",
+                "health"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Server",
+              "value": "restify"
+            },
+            {
+              "key": "API-Version",
+              "value": "1"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Set-up: Authenticate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "69233566-12b5-475d-927c-1be10b6b6543",
+            "exec": [
+              "pm.test(\"Should be able to login\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.message).to.eql('Ok');",
+              "    pm.expect(jsonData.data.user.username).to.eql(environment['authUsername']);",
+              "});",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "username",
+              "value": "{{authUsername}}",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "{{authPassword}}",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{authHostname}}:{{authPort}}/{{authPath}}",
+          "host": [
+            "{{authHostname}}"
+          ],
+          "port": "{{authPort}}",
+          "path": [
+            "{{authPath}}"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "API Version",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{hostname}}:{{port}}/{{path}}/health",
+              "host": [
+                "{{hostname}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{path}}",
+                "health"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Server",
+              "value": "restify"
+            },
+            {
+              "key": "API-Version",
+              "value": "1"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Encoding",
+              "value": "gzip"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+        }
+      ]
+    }
+  ],
+  "protocolProfileBehavior": {}
+}

@@ -1,7 +1,10 @@
 const serviceConfig = JSON.parse( process.env.PATIENT_API_SERVICE )
 const serviceHostname = process.env.API_SERVICE_HOSTNAME || 'https://localhost'
 const authServiceConfig = JSON.parse( process.env.AUTH_API_SERVICE )
-const authServiceHostname = process.env.API_SERVICE_HOSTNAME || 'https://localhost'
+const authServiceHostname = process.env.API_AUTH_SERVICE_HOSTNAME || 'https://localhost'
+const authUsername = process.env.API_AUTH_SERVICE_USERNAME || ''
+const authPassword = process.env.API_AUTH_SERVICE_PASSWORD || ''
+
 
 module.exports = {
     service: 'Patient Service',
@@ -44,12 +47,12 @@ module.exports = {
         },
         {
             key: 'authUsername',
-            value: 'practitioner@cr-ste-justine.xyz',
+            value: authUsername,
             enabled: true
         },
         {
             key: 'authPassword',
-            value: 'qwerty123',
+            value: authPassword,
             enabled: true
         }
     ]
