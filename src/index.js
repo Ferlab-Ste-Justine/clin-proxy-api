@@ -1,9 +1,7 @@
 import fs from 'fs'
 import errors from 'restify-errors'
 
-try {
-    require( 'babel-polyfill' )
-} catch ( e ) {}
+try { require( 'babel-polyfill' ) } catch ( e ) {} /* eslint-disable-line */
 require( 'dotenv' ).config()
 
 const args = require( 'yargs' ).argv
@@ -180,9 +178,11 @@ const generateApiConfig = ( serviceName ) => {
                         if ( req.jwt.expiry <= currentTimeInSeconds ) {
                             const refreshPayload = refreshTokenMiddleware( req )
 
-                            token = refreshPayload.data.token.value
-                            req.jwt = jwt.decode( token, jwtSecret )
-                            req.newAccessTokenIssued = token
+                            if ( refreshPayload !== null ) {
+                                token = refreshPayload.data.token.value
+                                req.jwt = jwt.decode( token, jwtSecret )
+                                req.newAccessTokenIssued = token
+                            }
                         }
 
                         return token
@@ -204,7 +204,6 @@ const generateApiConfig = ( serviceName ) => {
 }
 
 const launchApiServices = async() => {
-
     const serviceList = !serviceToLaunch ? apiServices : [ serviceToLaunch ]
 
     if ( serviceToLaunch && apiServices.indexOf( serviceToLaunch ) === -1 ) {
@@ -215,11 +214,9 @@ const launchApiServices = async() => {
         const serviceName = serviceList[ serviceIdx ]
 
         if ( process.env[ `${serviceName.toUpperCase()}_API_SERVICE` ] ) {
-
             const config = generateApiConfig( serviceName )
 
             try {
-
                 launcherLog.info( `Requesting launch procedures from ${config.name} Service ...` )
                 const ServiceClass = require( `./services/api/${serviceName}` ) // eslint-disable-line global-require
                 const service = new ServiceClass.default( config ) // eslint-disable-line new-cap
