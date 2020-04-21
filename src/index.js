@@ -199,8 +199,7 @@ const generateApiConfig = ( serviceName ) => {
         cacheConfig: cacheServiceConfig,
         keycloakConfig: keycloakServiceConfig,
         aidboxConfig: aidboxServiceConfig,
-        elasticConfig: elasticServiceConfig,
-        docsBranch: process.env.NODE_ENV === 'production' ? 'master' : 'dev'
+        elasticConfig: elasticServiceConfig
     }
 }
 
