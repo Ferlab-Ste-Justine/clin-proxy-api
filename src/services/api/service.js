@@ -93,7 +93,7 @@ export default class ApiService {
                     <div id='root'></div>
                     <script src='https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js'></script>
                     <script>
-                      Redoc.init(${JSON.stringify(contents)}, {
+                      Redoc.init(${JSON.stringify( contents )}, {
                         hideDownloadButton: true
                       }, document.getElementById('root'))
                     </script>
