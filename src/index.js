@@ -180,9 +180,11 @@ const generateApiConfig = ( serviceName ) => {
                         if ( req.jwt.expiry <= currentTimeInSeconds ) {
                             const refreshPayload = refreshTokenMiddleware( req )
 
-                            token = refreshPayload.data.token.value
-                            req.jwt = jwt.decode( token, jwtSecret )
-                            req.newAccessTokenIssued = token
+                            if ( refreshPayload !== null ) {
+                                token = refreshPayload.data.token.value
+                                req.jwt = jwt.decode( token, jwtSecret )
+                                req.newAccessTokenIssued = token
+                            }
                         }
 
                         return token

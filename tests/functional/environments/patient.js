@@ -26,11 +26,6 @@ module.exports = {
             enabled: true
         },
         {
-            key: 'patient',
-            value: 'PA00002',
-            enabled: true
-        },
-        {
             key: 'authPort',
             value: authServiceConfig.port,
             enabled: true
@@ -53,6 +48,41 @@ module.exports = {
         {
             key: 'authPassword',
             value: authPassword,
+            enabled: true
+        },
+        {
+            key: 'inexistentPatientId',
+            value: 'PA00000',
+            enabled: true
+        },
+        {
+            key: 'allowedPatientId',
+            value: 'PA00002',
+            enabled: true
+        },
+        {
+            key: 'disallowedPatientId',
+            value: 'PA14938',
+            enabled: true
+        },
+        {
+            key: 'autocompleteQueryWithResults',
+            value: 'Léo',
+            enabled: true
+        },
+        {
+            key: 'autocompleteQueryWithoutResults',
+            value: 'Zzz',
+            enabled: true
+        },
+        {
+            key: 'searchQueryWithResults',
+            value: 'Léo',
+            enabled: true
+        },
+        {
+            key: 'searchQueryWithoutResults',
+            value: 'Zzz',
             enabled: true
         }
     ]
