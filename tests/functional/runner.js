@@ -4,8 +4,16 @@
 require( 'dotenv' ).config()
 import newman from 'newman'
 
+if ( !process.env.TEST_API_SERVICES ) {
+    console.log( 'No services defined for functional test in TEST_API_SERVICES. Exiting...' )
+    process.exit( 1 )
+}
 
-const enabledServices = JSON.parse( process.env.API_SERVICES )
+if ( !process.env.TEST_AUTH_SERVICE_USERNAME || !process.env.TEST_AUTH_SERVICE_PASSWORD ) {
+    console.warn( 'No TEST_AUTH_SERVICE_USERNAME or TEST_AUTH_SERVICE_PASSWORD defined.' )
+}
+
+const enabledServices = JSON.parse( process.env.TEST_API_SERVICES )
 
 enabledServices.forEach( ( service ) => {
 
