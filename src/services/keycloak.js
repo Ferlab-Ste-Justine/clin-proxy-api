@@ -11,29 +11,46 @@ export default class KeycloakClient {
     }
 
     async ping() {
-        return rp( Object.assign(this.extraOptions, {
+        return rp( Object.assign( this.extraOptions, {
             method: 'GET',
             uri: `${this.host}`
-        }) )
+        } ) )
     }
 
     async authenticate( username, password ) {
-        return rp( Object.assign(this.extraOptions, {
-            method: 'POST',
-            uri: `${this.host}/protocol/openid-connect/token`,
-            form: {
-                username: username,
-                password: password,
-                grant_type: 'password',
-                scope: 'profile',
-                client_id: this.clientId,
-                client_secret: this.clientSecret
+
+        try {
+            const response = await rp( Object.assign( this.extraOptions, {
+                method: 'POST',
+                uri: `${this.host}/protocol/openid-connect/token`,
+                form: {
+                    username: username,
+                    password: password,
+                    grant_type: 'password',
+                    scope: 'profile',
+                    client_id: this.clientId,
+                    client_secret: this.clientSecret
+                }
+            } ) )
+
+            console.log( ` response=${JSON.stringify( response )}` )
+
+            return response
+
+        } catch ( e ) {
+            if ( e.statusCode === 401 ) {
+
+                return JSON.stringify( { error: {
+                    code: e.statusCode,
+                    message: e.error
+                } } )
             }
-        }) )
+            throw ( e )
+        }
     }
 
     async refresh( token ) {
-        return rp( Object.assign(this.extraOptions, {
+        return rp( Object.assign( this.extraOptions, {
             method: 'POST',
             uri: `${this.host}/protocol/openid-connect/token`,
             form: {
@@ -42,7 +59,7 @@ export default class KeycloakClient {
                 client_id: this.clientId,
                 client_secret: this.clientSecret
             }
-        }) )
+        } ) )
     }
 
 }
