@@ -35,8 +35,8 @@ const searchGenesByAutoComplete = async ( req, res, elasticService, logService )
         ]
 
         const highlight = {
-            pre_tags: [ '<em>' ],
-            post_tags: [ '</em>' ],
+            pre_tags: [ '{{' ],
+            post_tags: [ '}}' ],
             order: 'score',
             fields: [
                 { geneSymbol: {} },
