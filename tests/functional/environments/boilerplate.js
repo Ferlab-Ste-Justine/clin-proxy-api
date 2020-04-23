@@ -1,5 +1,5 @@
 const serviceConfig = JSON.parse( process.env.BOILERPLATE_API_SERVICE )
-const serviceHostname = process.env.API_SERVICE_HOSTNAME || 'https://localhost'
+const serviceHostname = process.env.TEST_API_SERVICE_HOSTNAME
 
 
 module.exports = {
