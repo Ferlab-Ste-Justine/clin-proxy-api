@@ -20,6 +20,7 @@ docker push localhost:5000/clin-proxy-api-meta-service:${1}
 docker push localhost:5000/clin-proxy-api-gene-service:${1}
 
 docker stack rm qa-proxy-api
+sleep 5
 docker stack deploy -c docker-compose.yml qa-proxy-api
 sleep 20
 

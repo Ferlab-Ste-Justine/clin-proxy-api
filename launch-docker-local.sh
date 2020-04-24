@@ -4,6 +4,8 @@ cp docker.local.env patient.env;
 cp docker.local.env variant.env;
 cp docker.local.env meta.env;
 cp docker.local.env gene.env;
+docker network create -d overlay --attachable proxy;
+docker network create -d overlay --attachable clinnet;
 docker build -f Dockerfile-auth -t localhost:5000/clin-proxy-api-auth-service .;
 docker build -f Dockerfile-patient -t localhost:5000/clin-proxy-api-patient-service .;
 docker build -f Dockerfile-variant -t localhost:5000/clin-proxy-api-variant-service .;

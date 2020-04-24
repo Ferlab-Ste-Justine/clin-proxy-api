@@ -106,8 +106,9 @@ pnpm run service-auth
 #### Docker Mode
 
 ```
-# Create the proxy network to connect all necessary services together
+# Create the proxy & clinnet network to connect all necessary services together
 docker network create -d overlay --attachable proxy
+docker network create -d overlay --attachable clinnet
 # Install on all box sshfs docker volume pluggin
 docker plugin install vieux/sshfs DEBUG=1 sshkey.source=/home/ubuntu/.ssh/
 # (Optional) Tot test the sshvolume with vieux/sshfs (does not work on macosx)
