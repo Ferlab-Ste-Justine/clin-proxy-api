@@ -115,6 +115,7 @@ services:
 
 networks:
   clinnet:
+    external: true
   proxy:
     external: true
 
