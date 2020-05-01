@@ -7,8 +7,8 @@ const authPassword = process.env.TEST_AUTH_SERVICE_PASSWORD
 
 
 module.exports = {
-    service: 'Variant Service',
-    name: 'variant',
+    service: 'Gene Service',
+    name: 'gene',
     values: [
         {
             key: 'port',
