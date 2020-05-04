@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "3955ac18-5016-407d-b2a1-571e868e1b60",
+		"name": "CLIN-PROXY-API Meta",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Service Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "41bd1f22-b877-4d9c-9f76-d97b65d7eb8f",
+						"exec": [
+							"pm.test(\"Should be able to retrieve service health status\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql('Ok');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/health",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"health"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Service Documentation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1d0c8d94-32fc-4355-8fa3-87651e16c5c4",
+						"exec": [
+							"pm.test(\"Should be able to retrieve service documentation\", function () {",
+							"    var htmlDoc = pm.response.text();",
+							"    pm.expect(htmlDoc).to.contain('Redoc.init');",
+							"    pm.expect(htmlDoc).to.contain(environment['port']);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/docs",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"docs"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Set-up: Authenticate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dcd4e072-e8b4-4f8c-8dc9-9162305a15ea",
+						"exec": [
+							"pm.test(\"Should be able to login to complete the remaining tests\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql('Ok');",
+							"    pm.expect(jsonData.data.user.username).to.eql(environment['authUsername']);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "{{authUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{authPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{authHostname}}:{{authPort}}/{{authPath}}",
+					"host": [
+						"{{authHostname}}"
+					],
+					"port": "{{authPort}}",
+					"path": [
+						"{{authPath}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9c49d4c5-a8dc-4f26-b81b-2b42931a9e1e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "aee77e40-31f2-4441-983c-11f438bf7401",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
