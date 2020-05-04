@@ -26,6 +26,16 @@ module.exports = {
             enabled: true
         },
         {
+            key: 'schemaName',
+            value: 'statement',
+            enabled: true
+        },
+        {
+            key: 'practitionerId',
+            value: 'PR00601',
+            enabled: true
+        },
+        {
             key: 'authPort',
             value: authServiceConfig.port,
             enabled: true
