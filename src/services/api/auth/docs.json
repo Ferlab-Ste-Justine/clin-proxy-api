@@ -11,13 +11,13 @@
     }
   ],
   "info": {
-    "version": "1.0.0",
+    "version": "1.x",
     "license": {
       "name": "GNU Affero General Public License v3.0",
-      "url": "https://github.com/cr-ste-justine/clin-frontend/blob/master/LICENSE"
+      "url": "https://github.com/cr-ste-justine/clin-proxy-api/blob/master/LICENSE"
     },
     "title": "Authentication Service",
-    "description": "Authentication REST API Service provides a JWT HTTPS-Only Secure Cookie used by other services from clin-proxy-api for Authentication and Authorization Access Control purposes.\n"
+    "description": "Authentication REST API Service; This service provides a JWT HTTPS-Only Secure Cookie used by other services from clin-proxy-api for Authentication and Authorization Access Control purposes.\n"
   },
   "paths": {
     "/auth/health": {
@@ -59,6 +59,14 @@
         "responses": {
           "200": {
             "description": "Success",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "token=abcde12345; Path=/; HttpOnly; Secure"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -67,12 +75,12 @@
               }
             }
           },
-          "404": {
-            "description": "NotFound",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error404"
+                  "$ref": "#/components/schemas/Error401"
                 }
               }
             }
@@ -100,6 +108,11 @@
         }
       },
       "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "tags": [
           "Authentication"
         ],
@@ -114,10 +127,25 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "tags": [
           "Authentication"
         ],
@@ -142,12 +170,64 @@
                 }
               }
             }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/token": {
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Token Refresh Route"
+        ],
+        "summary": "Refresh user",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshSuccess"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token"
+      }
+    },
     "schemas": {
       "UserForm": {
         "properties": {
@@ -188,6 +268,28 @@
                 "clin_practitioner"
               ]
             }
+          }
+        }
+      },
+      "RefreshSuccess": {
+        "title": "Refresh",
+        "type": "object",
+        "example": {
+          "timestamp": 1587404265303,
+          "message": "Ok",
+          "data": {
+            "user": {
+              "username": "practitioner@cr-ste-justine.xyz",
+              "firstName": "Practitioner",
+              "groups": [],
+              "roles": [
+                "clin_practitioner"
+              ]
+            }
+          },
+          "token": {
+            "value": "string",
+            "expiry": "long"
           }
         }
       },
@@ -319,7 +421,6 @@
         }
       }
     },
-    "requestBodies": {
-    }
+    "requestBodies": {}
   }
 }

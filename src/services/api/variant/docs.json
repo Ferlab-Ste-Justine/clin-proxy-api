@@ -1,17 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "1.0.0",
+    "version": "1.x",
     "title": "Variant API Service",
-    "description": "Variant API Service\n"
+    "description": "Variant API Service\n",
+    "license": {
+      "name": "GNU Affero General Public License v3.0",
+      "url": "https://github.com/cr-ste-justine/clin-proxy-api/blob/master/LICENSE"
+    }
   },
   "servers": [
-  {
-    "url": "https://localhost:5000"
-  }
+    {
+      "url": "https://localhost:5000",
+      "description": "Localhost"
+    },
+    {
+      "url": "https://clin.cr-ste-justine.xyz/api",
+      "description": "QA"
+    }
   ],
   "paths": {
-    "/query/health": {
+    "/variant/health": {
       "get": {
         "tags": [
           "Service Health Check"
@@ -33,6 +42,13 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token"
+      }
+    },
     "schemas": {
       "Health": {
         "title": "Health Check",
