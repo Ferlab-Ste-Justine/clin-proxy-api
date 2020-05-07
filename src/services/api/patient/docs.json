@@ -39,6 +39,186 @@
           }
         }
       }
+    },
+    "/patient/search": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Patient Query"
+        ],
+        "summary": "Returns the result of the patient query",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "description": "the 'Query' parameter",
+            "schema": {
+              "type": "string",
+              "minimum": 2
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/patient/{uid}": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Patient Query"
+        ],
+        "summary": "Get a patient by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "uid",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "patient ID of the patient to get"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/patient/autocomplete": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Patient Query"
+        ],
+        "summary": "Returns the result of the patient query",
+        "description": "execute query on patient index based on 'id', 'name.family', 'name.given', 'studies.title', 'specimens.id', 'identifier.MR', 'identifier.JHN', 'studies.title'",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "the 'Query' parameter",
+            "schema": {
+              "type": "string",
+              "minimum": 2
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "return simpler, i.e. 'partial' result or default",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -68,6 +248,52 @@
           "timestamp": 1553284037677,
           "message": "Ok",
           "data": {}
+        }
+      },
+      "Error500": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "InternalError",
+          "data": {
+            "messages": [
+              "Halp! I has error."
+            ]
+          }
+        }
+      },
+      "Error401": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "Unauthorized",
+          "data": {
+            "messages": [
+              "Halp! I has the forgottenz."
+            ]
+          }
         }
       }
     }

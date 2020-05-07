@@ -20,13 +20,8 @@
     }
   ],
   "paths": {
-    "/gene/helth": {
+    "/gene/health": {
       "get": {
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
         "tags": [
           "Service Health Check"
         ],
@@ -43,6 +38,73 @@
             }
           }
         }
+      }
+    },
+    "/gene/autocomplete": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Gene Query"
+        ],
+        "summary": "Returns the result of the gene query with highligh",
+        "description": "execute query on gene index based on geneSymbol, alias, ensemblId, name, omim, hgnc and NCBI's geneId.",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "the 'Query' parameter",
+            "schema": {
+              "type": "string",
+              "minimum": 2
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "return simpler, i.e. 'partial' result or default",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
       }
     }
   },
@@ -73,6 +135,52 @@
           "timestamp": 1553284037677,
           "message": "Ok",
           "data": {}
+        }
+      },
+      "Error500": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "InternalError",
+          "data": {
+            "messages": [
+              "Halp! I has error."
+            ]
+          }
+        }
+      },
+      "Error401": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "Unauthorized",
+          "data": {
+            "messages": [
+              "Halp! I has the forgottenz."
+            ]
+          }
         }
       }
     }
