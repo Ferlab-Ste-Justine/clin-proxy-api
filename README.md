@@ -1,3 +1,5 @@
+![](https://github.com/cr-ste-justine/clin-proxy-api/workflows/Build%20Images/badge.svg)
+
 # CLIN Proxy API
 
 ### Creating Services
