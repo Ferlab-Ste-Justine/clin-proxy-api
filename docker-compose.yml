@@ -23,6 +23,8 @@ services:
       - "3000:3000"
     deploy:
       replicas: 2
+      placement:
+        constraints: [node.labels.node_role == devops]
     networks:
       - clinnet
       - proxy
@@ -44,6 +46,8 @@ services:
       - "4000:4000"
     deploy:
       replicas: 2
+      placement:
+        constraints: [node.labels.node_role == devops]
     networks:
       - clinnet
       - proxy
@@ -65,6 +69,8 @@ services:
       - "5001:5001"
     deploy:
       replicas: 2
+      placement:
+        constraints: [node.labels.node_role == devops]
     networks:
       - clinnet
       - proxy
@@ -86,6 +92,8 @@ services:
       - "7000:7000"
     deploy:
       replicas: 2
+      placement:
+        constraints: [node.labels.node_role == devops]
     networks:
       - clinnet
       - proxy
@@ -106,6 +114,8 @@ services:
       - "5002:5002"
     deploy:
       replicas: 2
+      placement:
+        constraints: [node.labels.node_role == devops]
     networks:
       - clinnet
       - proxy
