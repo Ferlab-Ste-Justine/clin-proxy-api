@@ -50,6 +50,14 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
+
+                console.log( '++++' )
+                console.log( JSON.stringify( translatedQuery ) )
+                console.log( JSON.stringify( statement ) )
+                console.log( JSON.stringify( query ) )
+                console.log( JSON.stringify( group ) )
+                console.log( '++++' )
+
                 response = await elasticService.searchVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
                 totalFromResponse = response.hits.total
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {

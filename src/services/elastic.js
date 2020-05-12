@@ -2,12 +2,12 @@ import rp from 'request-promise-native'
 import { flatten, map, isArray, isString, cloneDeep } from 'lodash'
 
 import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
-import {
+import translate, {
     traverseArrayAndApplyFunc,
     instructionIsFilter,
     getFieldSearchNameFromFieldIdMappingFunction,
     getFieldFacetNameFromFieldIdMappingFunction,
-    getFieldSubtypeFromFieldIdMappingFunction
+    getFieldSubtypeFromFieldIdMappingFunction, denormalize, getQueryByKey
 } from './api/variant/sqon'
 import { elasticSearchTranslator, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
 
@@ -350,7 +350,7 @@ export default class ElasticClient {
         const uri = `${this.host}${schema.path}/_search`
         const body = generateVariantQuery( patient, request, acl, schema, group, index, limit )
 
-        console.debug( `searchVariantsForPatient: ${JSON.stringify( body )}` )
+        // console.debug( `searchVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -360,11 +360,17 @@ export default class ElasticClient {
         } )
     }
 
-    async getFacetsForVariant( patient, request, denormalizedRequest, acl, schema ) {
+    async getFacetsForVariant( patient, request, acl, schema ) {
         const uri = `${this.host}${schema.path}/_search`
         const body = generateFacetQuery( patient, request, denormalizedRequest, acl, schema )
 
-        console.debug( `getFacetsForVariant: ${JSON.stringify( body )}` )
+
+        // const denormalizedStatement = denormalize( statement )
+        // const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
+
+
+
+        // console.debug( `getFacetsForVariant: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -378,7 +384,7 @@ export default class ElasticClient {
         const uri = `${this.host}${schema.path}/_count`
         const body = generateCountQuery( patient, request, acl, schema, group )
 
-        console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
+        // console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
