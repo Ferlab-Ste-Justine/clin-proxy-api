@@ -9,7 +9,7 @@ import translate, {
     getFieldFacetNameFromFieldIdMappingFunction,
     getFieldSubtypeFromFieldIdMappingFunction, denormalize, getQueryByKey
 } from './api/variant/sqon'
-import { elasticSearchTranslator, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
+import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
 
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
     return JSON.parse(
@@ -346,8 +346,9 @@ export default class ElasticClient {
         } )
     }
 
-    async searchVariantsForPatient( patient, request, acl, schema, group, index, limit ) {
+    async searchVariantsForPatient( patient, statement, query, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}/_search`
+        const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
         const body = generateVariantQuery( patient, request, acl, schema, group, index, limit )
 
         // console.debug( `searchVariantsForPatient: ${JSON.stringify( body )}` )
@@ -360,17 +361,12 @@ export default class ElasticClient {
         } )
     }
 
-    async getFacetsForVariant( patient, request, acl, schema ) {
+    async getFacetsForVariant( patient, statement, query, acl, schema ) {
         const uri = `${this.host}${schema.path}/_search`
-        const body = generateFacetQuery( patient, request, denormalizedRequest, acl, schema )
-
-
-        // const denormalizedStatement = denormalize( statement )
-        // const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
-
-
-
-        // console.debug( `getFacetsForVariant: ${JSON.stringify( body )}` )
+        const denormalizedStatement = denormalize( statement )
+        const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
+        const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
+        const body = generateFacetQuery( patient, request, denormalizedQuery, acl, schema )
 
         return rp( {
             method: 'POST',

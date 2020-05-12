@@ -2,7 +2,6 @@
 
 import { readFileSync } from 'fs'
 import { expect } from 'chai'
-import { cloneDeep } from 'lodash';
 
 import { generateVariantQuery, generateFacetQuery, generateCountQuery } from '../../src/services/elastic'
 
@@ -10,9 +9,6 @@ import { DIALECT_LANGUAGE_ELASTIC_SEARCH, elasticSearchTranslator } from '../../
 import translate from '../../src/services/api/variant/sqon'
 
 const ELASTIC_SEARCH_SCHEMA_V1 = JSON.parse( readFileSync( `${__dirname}/../../src/services/api/variant/schema/${DIALECT_LANGUAGE_ELASTIC_SEARCH}/1.json`, 'utf8' ) )
-
-
-
 
 const PATIENT_ID = 'PA00001';
 const ADMINISTRATOR_ACL = { role: 'administrator', organization_id: 'OR00202', practitioner_id: 'PR00601'}

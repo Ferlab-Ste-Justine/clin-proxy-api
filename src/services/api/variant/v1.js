@@ -38,7 +38,6 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const dialect = params.dialect || DIALECT_LANGUAGE_ELASTIC_SEARCH
         const schema = schemas[ dialect ]
-        const translatedQuery = translate( statement, query, schema, dialect )
 
         let response = {}
         let totalFromResponse = 0
@@ -50,15 +49,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-
-                console.log( '++++' )
-                console.log( JSON.stringify( translatedQuery ) )
-                console.log( JSON.stringify( statement ) )
-                console.log( JSON.stringify( query ) )
-                console.log( JSON.stringify( group ) )
-                console.log( '++++' )
-
-                response = await elasticService.searchVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
+                response = await elasticService.searchVariantsForPatient( patient, statement, query, sessionData.acl.fhir, schema, group, index, limit )
                 totalFromResponse = response.hits.total
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {
                     const result = hit._source
@@ -94,9 +85,6 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
         const dialect = params.dialect || DIALECT_LANGUAGE_ELASTIC_SEARCH
         const facets = params.facets || []
         const schema = schemas[ dialect ]
-        const denormalizedStatement = denormalize( statement )
-        const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
-        const translatedQuery = translate( statement, query, schema, dialect )
         let response = {}
         let facetsFromResponse = {}
 
@@ -106,7 +94,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForVariant( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
+                response = await elasticService.getFacetsForVariant( patient, statement, query, sessionData.acl.fhir, schema, facets )
 
                 // Filtered Non-Nested
                 if ( response.aggregations.filtered ) {
