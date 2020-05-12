@@ -1,0 +1,14 @@
+name: Publish Images
+
+on: [push]
+
+jobs:
+  build:
+    name: Publish Images
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Log into registry
+      run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u chusj --password-stdin
+    - name: Push Images
+      run: ./push_images.sh
