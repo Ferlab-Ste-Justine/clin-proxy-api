@@ -1,4 +1,5 @@
 ![](https://github.com/cr-ste-justine/clin-proxy-api/workflows/Build%20Images/badge.svg)
+![](https://github.com/cr-ste-justine/clin-proxy-api/workflows/Unit%20Tests/badge.svg)
 
 # CLIN Proxy API
 
