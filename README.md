@@ -147,39 +147,26 @@ copy docker.env patient.env
 copy docker.env auth.env
 nano patient.env  -- fix environment
 nano auth.env -- fix environment
-docker-compose build 
-docker push localhost:5000/clin-proxy-api-auth-service:latest
-docker push localhost:5000/clin-proxy-api-patient-service:latest
-docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.0
-docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:1.0
-docker push localhost:5000/clin-proxy-api-auth-service:1.0
-docker push localhost:5000/clin-proxy-api-patient-service:1.0
-docker stack deploy -c docker-compose.yml qa-proxy-api
-docker service update qa-proxi-api_auth --image localhost:5000/clin-proxy-api-auth-service:1.0
-docker service update qa-proxi-api_patient --image localhost:5000/clin-proxy-api-patient-service:1.0
-
-
+./apply.sh
 ```
 
 #### Update a service to another version i.e. (1.1)
+
+Edit the **docker-compose.yml** and **apply.sh** script so that your desired version is deployed for each service (they point to the same version by default, they don't need to if you need to rollback a particular service) with the number of replicas you want.
+
 
 ```
 copy docker.env patient.env
 copy docker.env auth.env
 nano patient.env  -- fix environment
 nano auth.env -- fix environment
-docker-compose build
-docker tag localhost:5000/clin-proxy-api-auth-service:latest localhost:5000/clin-proxy-api-auth-service:1.2.0
-docker tag localhost:5000/clin-proxy-api-patient-service:latest localhost:5000/clin-proxy-api-patient-service:1.2.0
-docker push localhost:5000/clin-proxy-api-auth-service:1.2.0
-docker push localhost:5000/clin-proxy-api-patient-service:1.2.0
-docker service update qa_auth --image localhost:5000/clin-proxy-api-auth-service:1.2.0
-docker service update qa_patient --image localhost:5000/clin-proxy-api-patient-service:1.2.0
+./apply.sh
 ```
-To scale the service up or down...
-```
-docker service scale qa-proxi-api_auth=3
-docker service scale qa-proxi-api_patient=3
-or
-use portainer (port 9000)
-```
+
+### CI/CD Workflow
+
+#### Pushing images
+
+Images are pushed by merging on master. The version tag is taken from the version in the package.json file so make sure you increment it before merging to master.
+
+If you add a new service, make sure to add the building and pushing of its image to the **push_images.sh** script and its orchestration in the **docker-compose.yml** file.
