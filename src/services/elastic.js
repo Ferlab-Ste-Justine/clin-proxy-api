@@ -57,7 +57,8 @@ const generateAclFilters = ( acl, service, schema = null ) => {
     return filters
 }
 
-export const generateVariantQuery = ( patient, request, acl, schema, group, index, limit ) => {
+export const generateVariantQuery = ( patient, statement, query, acl, schema, group, index, limit ) => {
+    const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
     const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
     const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
     let sort = sortDefinition.sort
@@ -93,7 +94,6 @@ export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) =
     const denormalizedStatement = denormalize( statement )
     const denormalizedRequest = getQueryByKey( denormalizedStatement, queryId )
     const request = translate( statement, queryId, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
-
     const schemaFacets = flatten(
         map( schema.categories, 'filters' )
     ).filter( ( filter ) => {
@@ -254,7 +254,8 @@ export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) =
     }
 }
 
-export const generateCountQuery = ( patient, request, acl, schema ) => {
+export const generateCountQuery = ( patient, statement, query, acl, schema ) => {
+    const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
     const filter = generateAclFilters( acl, SERVICE_TYPE_VARIANT, schema )
 
     if ( filter.length > 0 ) {
@@ -352,10 +353,9 @@ export default class ElasticClient {
 
     async searchVariantsForPatient( patient, statement, query, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}/_search`
-        const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
-        const body = generateVariantQuery( patient, request, acl, schema, group, index, limit )
+        const body = generateVariantQuery( patient, statement, query, acl, schema, group, index, limit )
 
-        // console.debug( `searchVariantsForPatient: ${JSON.stringify( body )}` )
+        console.debug( `searchVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -369,7 +369,7 @@ export default class ElasticClient {
         const uri = `${this.host}${schema.path}/_search`
         const body = generateFacetQuery( patient, statement, query, acl, schema )
 
-        // console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
+        console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -381,10 +381,9 @@ export default class ElasticClient {
 
     async countVariantsForPatient( patient, statement, query, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
-        const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
-        const body = generateCountQuery( patient, request, acl, schema, group )
+        const body = generateCountQuery( patient, statement, query, acl, schema, group )
 
-        // console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
+        console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',

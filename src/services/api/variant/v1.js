@@ -1,7 +1,6 @@
 import errors from 'restify-errors'
 import { readFileSync } from 'fs'
 
-import translate, { denormalize, getQueryByKey } from './sqon'
 import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from './sqon/dialect/es'
 import { DIALECT_LANGUAGE_GRAPHQL } from './sqon/dialect/gql'
 
@@ -86,9 +85,6 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
         const schema = schemas[ dialect ]
         let response = {}
         let facetsFromResponse = {}
-
-        console.log( `++ query ${ JSON.stringify( query )}` )
-        console.log( `++ statement ${ JSON.stringify( statement )}` )
 
         switch ( dialect ) {
             default:
