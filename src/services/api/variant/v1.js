@@ -228,8 +228,7 @@ const countVariants = async ( req, res, cacheService, elasticService, logService
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 await Promise.all(
                     queries.map( async( query ) => {
-                        const translatedQuery = translate( statement, query, schema, dialect )
-                        const response = await elasticService.countVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group )
+                        const response = await elasticService.countVariantsForPatient( patient, statement, query, sessionData.acl.fhir, schema, group )
 
                         totalFromResponse[ query ] = response.count
                         await logService.debug( `Elastic countVariants in ${dialect} dialect resolved query ${patient}/${query} found ${response.count} matches` )

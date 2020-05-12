@@ -376,8 +376,9 @@ export default class ElasticClient {
         } )
     }
 
-    async countVariantsForPatient( patient, request, acl, schema, group ) {
+    async countVariantsForPatient( patient, statement, query, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
+        const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
         const body = generateCountQuery( patient, request, acl, schema, group )
 
         // console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
