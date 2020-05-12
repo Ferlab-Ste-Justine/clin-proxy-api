@@ -89,7 +89,11 @@ export const generateVariantQuery = ( patient, request, acl, schema, group, inde
     }
 }
 
-export const generateFacetQuery = ( patient, request, denormalizedRequest, acl, schema ) => {
+export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) => {
+    const denormalizedStatement = denormalize( statement )
+    const denormalizedRequest = getQueryByKey( denormalizedStatement, queryId )
+    const request = translate( statement, queryId, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
+
     const schemaFacets = flatten(
         map( schema.categories, 'filters' )
     ).filter( ( filter ) => {
@@ -363,10 +367,9 @@ export default class ElasticClient {
 
     async getFacetsForVariant( patient, statement, query, acl, schema ) {
         const uri = `${this.host}${schema.path}/_search`
-        const denormalizedStatement = denormalize( statement )
-        const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
-        const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
-        const body = generateFacetQuery( patient, request, denormalizedQuery, acl, schema )
+        const body = generateFacetQuery( patient, statement, query, acl, schema )
+
+        // console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',

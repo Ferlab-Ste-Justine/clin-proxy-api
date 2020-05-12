@@ -83,10 +83,12 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
         const statement = params.statement
         const query = params.query
         const dialect = params.dialect || DIALECT_LANGUAGE_ELASTIC_SEARCH
-        const facets = params.facets || []
         const schema = schemas[ dialect ]
         let response = {}
         let facetsFromResponse = {}
+
+        console.log( `++ query ${ JSON.stringify( query )}` )
+        console.log( `++ statement ${ JSON.stringify( statement )}` )
 
         switch ( dialect ) {
             default:
@@ -94,7 +96,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForVariant( patient, statement, query, sessionData.acl.fhir, schema, facets )
+                response = await elasticService.getFacetsForVariant( patient, statement, query, sessionData.acl.fhir, schema )
 
                 // Filtered Non-Nested
                 if ( response.aggregations.filtered ) {
