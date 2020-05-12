@@ -8,10 +8,7 @@ services:
     networks:
       - clinnet
   auth:
-    build:
-      context: .
-      dockerfile: Dockerfile-auth
-    image: localhost:5000/clin-proxy-api-auth-service
+    image: chusj/clin-proxy-api-auth-service:$DEFAULT_PROD_VERSION
     volumes:
 #      -for local dev only:
 #      - ./data/certbot/conf:/etc/letsencrypt
@@ -31,10 +28,7 @@ services:
     env_file:
       - auth.env
   patient:
-    build:
-      context: .
-      dockerfile: Dockerfile-patient
-    image: localhost:5000/clin-proxy-api-patient-service
+    image: chusj/clin-proxy-api-patient-service:$DEFAULT_PROD_VERSION
     volumes:
 #      --for local dev only:
 #      - ./data/certbot/conf:/etc/letsencrypt
@@ -54,10 +48,7 @@ services:
     env_file:
       - patient.env
   variant:
-    build:
-      context: .
-      dockerfile: Dockerfile-variant
-    image: localhost:5000/clin-proxy-api-variant-service
+    image: chusj/clin-proxy-api-variant-service:$DEFAULT_PROD_VERSION
     volumes:
 #      --for local dev only:
 #      - ./data/certbot/conf:/etc/letsencrypt
@@ -77,10 +68,7 @@ services:
     env_file:
       - variant.env
   meta:
-    build:
-      context: .
-      dockerfile: Dockerfile-meta
-    image: localhost:5000/clin-proxy-api-meta-service
+    image: chusj/clin-proxy-api-meta-service:$DEFAULT_PROD_VERSION
     volumes:
       #      --for local dev only:
       #      - ./data/certbot/conf:/etc/letsencrypt
@@ -101,10 +89,7 @@ services:
       - meta.env
 
   gene:
-    build:
-      context: .
-      dockerfile: Dockerfile-gene
-    image: localhost:5000/clin-proxy-api-gene-service
+    image: chusj/clin-proxy-api-gene-service:$DEFAULT_PROD_VERSION
     volumes:
       #      --for local dev only:
       #      - ./data/certbot/conf:/etc/letsencrypt
