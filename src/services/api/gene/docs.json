@@ -58,7 +58,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Health"
+                  "$ref": "#/components/schemas/ResultSuccess"
                 }
               }
             }
@@ -103,6 +103,24 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "return the page number based on size of result",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "description": "return the quantity from the result",
+            "schema": {
+              "type": "integer"
+            }
           }
         ]
       }
@@ -135,6 +153,87 @@
           "timestamp": 1553284037677,
           "message": "Ok",
           "data": {}
+        }
+      },
+      "ResultSuccess": {
+        "title": "Gene result",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              }
+            }
+          },
+          "hits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_index": {
+                  "type": "string"
+                },
+                "_type": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "_score": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "_source": {
+                  "type": "object",
+                  "items": {
+                    "properties": {
+                      "geneSymbol": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "highlight": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {
+            "total": 49,
+            "hits": [
+              {
+                "_index": "genes",
+                "_type": "_doc",
+                "_id": "ENSG00000157764",
+                "_score": 86.49973,
+                "_source": {
+                  "geneSymbol": "BRAF"
+                },
+                "highlight": {
+                  "alias": [
+                    "{{Braf}}",
+                    "{{BRAF1}}"
+                  ],
+                  "geneSymbol": [
+                    "{{BRAF}}"
+                  ]
+                }
+              }
+            ]
+          }
         }
       },
       "Error500": {
