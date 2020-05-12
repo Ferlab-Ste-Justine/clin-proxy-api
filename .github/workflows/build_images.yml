@@ -11,10 +11,10 @@ jobs:
     - name: Ensure we can build the auth service
       run: docker build -t test:test -f Dockerfile-auth .
     - name: Ensure we can build the patient service
-      run: docker build -t test:test -f Dockerfile-patient
+      run: docker build -t test:test -f Dockerfile-patient .
     - name: Ensure we can build the meta service
-      run: docker build -t test:test -f Dockerfile-meta
+      run: docker build -t test:test -f Dockerfile-meta .
     - name: Ensure we can build the variant service
-      run: docker build -t test:test -f Dockerfile-variant
+      run: docker build -t test:test -f Dockerfile-variant .
     - name: Ensure we can build the gene service
-      run: docker build -t test:test -f Dockerfile-gene
+      run: docker build -t test:test -f Dockerfile-gene .
