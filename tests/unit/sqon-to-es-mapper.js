@@ -74,7 +74,7 @@ describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => 
             )
         } )
 
-        it( 'should contain ACL for Practitioner role in Query Search translation', () => {
+        it( 'should contain ACL for Practitioner role in Query Count translation', () => {
             const countQuery = generateCountQuery( PATIENT_ID, EMPTY_STATEMENT, EMPTY_STATEMENT_QUERY, PRACTITIONER_ACL, ELASTIC_SEARCH_SCHEMA_V1 )
             expect( countQuery ).to.eql(
                 {"query":{"bool":{"filter":[[{"term":{"donors.practitionerId.keyword":"PR00603"}}],{"term":{"donors.patientId.keyword":"PA00001"}}]}}}
@@ -95,7 +95,7 @@ describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => 
             )
         } )
 
-        it( 'should contain ACL for Practitioner role in Query Match translation', () => {
+        it( 'should contain ACL for Practitioner role in Query Search translation', () => {
             const variantQuery = generateVariantQuery( PATIENT_ID, EMPTY_STATEMENT, EMPTY_STATEMENT_QUERY, PRACTITIONER_ACL, ELASTIC_SEARCH_SCHEMA_V1, DEFAULT_GROUP, DEFAULT_INDEX, DEFAULT_LIMIT )
             expect( variantQuery ).to.eql(
                 {"from":0,"size":25,"query":{"bool":{"filter":[[{"term":{"donors.practitionerId.keyword":"PR00603"}}],{"term":{"donors.patientId.keyword":"PA00001"}}]}},"sort":[{"donors.exomiserScore":{"order":"desc","nested":{"path":"donors","filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}},{"impactScore":{"order":"desc"}}]}
@@ -518,6 +518,143 @@ describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => 
             const variantQuery = generateVariantQuery( PATIENT_ID, statementMultipleUnion, statementMultipleUnionQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1, DEFAULT_GROUP, DEFAULT_INDEX, DEFAULT_LIMIT )
             expect( variantQuery ).to.eql(
                 {"from":0,"size":25,"query":{"bool":{"filter":[{"bool":{"should":[{"term":{"availableDbExt.hpo":true}},{"term":{"availableDbExt.radboudumc":true}}],"minimum_should_match":1}},{"term":{"donors.patientId.keyword":"PA00001"}}]}},"sort":[{"donors.exomiserScore":{"order":"desc","nested":{"path":"donors","filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}},{"impactScore":{"order":"desc"}}]}
+            )
+        } )
+
+    } )
+
+    describe( 'Solo Numerical Comparison (Non-Nested)', () => {
+        const statementGreaterThanOrEqualQueryKey = uniqid();
+        const statementGreaterThanOrEqual = [
+            {
+                "key": statementGreaterThanOrEqualQueryKey,
+                "title": "Query 1",
+                "instructions": [
+                    {
+                        "type": "filter",
+                        "data": {
+                            "id": "prediction_dann",
+                            "type": "numcomparison",
+                            "values": [
+                                {
+                                    "comparator": ">=",
+                                    "value": 0.38
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+        const statementLowerThanOrEqualQueryKey = uniqid();
+        const statementLowerThanOrEqual = [
+            {
+                "key": statementLowerThanOrEqualQueryKey,
+                "title": "Query 2",
+                "instructions": [
+                    {
+                        "type": "filter",
+                        "data": {
+                            "id": "prediction_dann",
+                            "type": "numcomparison",
+                            "values": [
+                                {
+                                    "comparator": "<=",
+                                    "value": 0.67
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+        const statementInBetweenQueryKey = uniqid();
+        const statementInBetween = [
+            {
+                "key": statementInBetweenQueryKey,
+                "title": "Query 3",
+                "instructions": [
+                    {
+                        "type": "filter",
+                        "data": {
+                            "id": "prediction_dann",
+                            "type": "numcomparison",
+                            "values": [
+                                {
+                                    "comparator": ">=",
+                                    "value": 0.27
+                                },
+                                {
+                                    "comparator": "<=",
+                                    "value": 0.69
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+
+        it( 'should return correct translation for greater than or equal comparator in Aggregation Count translation', () => {
+            const facetQuery = generateFacetQuery( PATIENT_ID, statementGreaterThanOrEqual, statementGreaterThanOrEqualQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1 )
+            expect( facetQuery ).to.eql(
+                {"size":0,"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"gte":0.38}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}},"aggs":{"filtered":{"aggs":{"variant_type":{"terms":{"field":"type.keyword","order":{"_count":"desc"},"size":999}},"consequence":{"terms":{"field":"consequences.consequence.keyword","order":{"_count":"desc"},"size":999}},"extdb_pubmed":{"terms":{"field":"availableDbExt.pubmed","size":1}},"extdb_clinvar":{"terms":{"field":"availableDbExt.clinvar","size":1}},"extdb_dbsnp":{"terms":{"field":"availableDbExt.dbSNP","size":1}},"chromosome":{"terms":{"field":"chrom.keyword","order":{"_count":"desc"},"size":24}},"gene_type":{"terms":{"field":"genes.biotype.keyword","order":{"_count":"desc"},"size":999}},"extref_hpo":{"terms":{"field":"availableDbExt.hpo","size":1}},"extref_orphanet":{"terms":{"field":"availableDbExt.orphanet","size":1}},"extref_radboudumc":{"terms":{"field":"availableDbExt.radboudumc","size":1}},"extref_omim":{"terms":{"field":"availableDbExt.omim","size":1}},"gene_hpo":{"terms":{"field":"genes.hpo.keyword","order":{"_count":"desc"},"size":9999}},"genegroup_radboud":{"terms":{"field":"genes.radboudumc.keyword","order":{"_count":"desc"},"size":999}},"genegroup_orphanet":{"terms":{"field":"genes.orphanet.panel.keyword","order":{"_count":"desc"},"size":999}},"clinvar_clinsig":{"terms":{"field":"clinvar.clinvar_clinsig.keyword","order":{"_count":"desc"},"size":999}},"impact":{"terms":{"field":"consequences.impact.keyword","order":{"_count":"desc"},"size":999}},"prediction_fathmm":{"terms":{"field":"consequences.predictions.FATHMM.keyword","order":{"_count":"desc"},"size":9}},"prediction_fathmm_min":{"min":{"field":"consequences.predictions.SIFT_score"}},"prediction_fathmm_max":{"max":{"field":"consequences.predictions.SIFT_score"}},"prediction_sift":{"terms":{"field":"consequences.predictions.SIFT.keyword","order":{"_count":"desc"},"size":9}},"prediction_sift_min":{"min":{"field":"consequences.predictions.SIFT_score"}},"prediction_sift_max":{"max":{"field":"consequences.predictions.SIFT_score"}},"prediction_polyphen2_hvar":{"terms":{"field":"consequences.predictions.Polyphen2_HVAR_pred.keyword","order":{"_count":"desc"},"size":9}},"prediction_polyphen2_hvar_min":{"min":{"field":"consequences.predictions.Polyphen2_HVAR_score"}},"prediction_polyphen2_hvar_max":{"max":{"field":"consequences.predictions.Polyphen2_HVAR_score"}},"prediction_lrt":{"terms":{"field":"consequences.predictions.LRT_pred.keyword","order":{"_count":"desc"},"size":9}},"prediction_lrt_min":{"min":{"field":"consequences.predictions.LRT_score"}},"prediction_lrt_max":{"max":{"field":"consequences.predictions.LRT_score"}},"prediction_dann_min":{"min":{"field":"consequences.predictions.DANN_score"}},"prediction_dann_max":{"max":{"field":"consequences.predictions.DANN_score"}},"prediction_cadd_min":{"min":{"field":"consequences.predictions.CADD_score"}},"prediction_cadd_max":{"max":{"field":"consequences.predictions.CADD_score"}},"prediction_revel_min":{"min":{"field":"consequences.predictions.REVEL_score"}},"prediction_revel_max":{"max":{"field":"consequences.predictions.REVEL_score"}},"conservation_phylop_min":{"min":{"field":"consequences.conservationsScores.PhyloP17Way"}},"conservation_phylop_max":{"max":{"field":"consequences.conservationsScores.PhyloP17Way"}},"cohort_rqdm_min":{"min":{"field":"frequencies.interne.AF"}},"cohort_rqdm_max":{"max":{"field":"frequencies.interne.AF"}},"cohort_gnomad_exomes_min":{"min":{"field":"frequencies.gnomAD_exomes.AF"}},"cohort_gnomad_exomes_max":{"max":{"field":"frequencies.gnomAD_exomes.AF"}},"cohort_gnomad_genomes_min":{"min":{"field":"frequencies.gnomAD_genomes.AF"}},"cohort_gnomad_genomes_max":{"max":{"field":"frequencies.gnomAD_genomes.AF"}},"cohort_exac_min":{"min":{"field":"frequencies.ExAc.AF"}},"cohort_exac_max":{"max":{"field":"frequencies.ExAc.AF"}},"cohort_uk10k_min":{"min":{"field":"frequencies.Uk10k.AF"}},"cohort_uk10k_max":{"max":{"field":"frequencies.Uk10k.AF"}},"cohort_1000gp3_min":{"min":{"field":"frequencies.1000Gp3.AF"}},"cohort_1000gp3_max":{"max":{"field":"frequencies.1000Gp3.AF"}}},"filter":{"bool":{}}},"nested_donors":{"nested":{"path":"donors"},"aggs":{"filtered":{"filter":{"bool":{"filter":{"term":{"donors.patientId.keyword":"PA00001"}}}},"aggs":{"exomiser_score_min":{"min":{"field":"donors.exomiserScore"}},"exomiser_score_max":{"max":{"field":"donors.exomiserScore"}},"transmission":{"terms":{"field":"donors.transmission.keyword","order":{"_count":"desc"},"size":9}},"zygosity":{"terms":{"field":"donors.zygosity.keyword","order":{"_count":"desc"},"size":9}},"metric_depth_quality_min":{"min":{"field":"donors.qd"}},"metric_depth_quality_max":{"max":{"field":"donors.qd"}},"metric_allelic_alt_depth_min":{"min":{"field":"donors.adAlt"}},"metric_allelic_alt_depth_max":{"max":{"field":"donors.adAlt"}},"metric_total_depth_min":{"min":{"field":"donors.adTotal"}},"metric_total_depth_max":{"max":{"field":"donors.adTotal"}},"metric_ratio_min":{"min":{"field":"donors.adFreq"}},"metric_ratio_max":{"max":{"field":"donors.adFreq"}},"metric_genotype_quality_min":{"min":{"field":"donors.gq"}},"metric_genotype_quality_max":{"max":{"field":"donors.gq"}}}}}},"prediction_dann":{"global":{},"aggs":{"filtered_except_prediction_dann":{"filter":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{}}}}},{"bool":{"filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}]}},"aggs":{"prediction_dann_min":{"min":{"field":"consequences.predictions.DANN_score"}},"prediction_dann_max":{"max":{"field":"consequences.predictions.DANN_score"}}}}}}}}
+            )
+        } )
+
+        it( 'should return correct translation for greater than or equal comparator in Query Count translation', () => {
+            const countQuery = generateCountQuery( PATIENT_ID, statementGreaterThanOrEqual, statementGreaterThanOrEqualQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1 )
+            expect( countQuery ).to.eql(
+                {"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"gte":0.38}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}}}
+            )
+        } )
+
+        it( 'should return correct translation for greater than or equal comparator in Query Search translation', () => {
+            const variantQuery = generateVariantQuery( PATIENT_ID, statementGreaterThanOrEqual, statementGreaterThanOrEqualQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1, DEFAULT_GROUP, DEFAULT_INDEX, DEFAULT_LIMIT )
+            expect( variantQuery ).to.eql(
+                {"from":0,"size":25,"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"gte":0.38}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}},"sort":[{"donors.exomiserScore":{"order":"desc","nested":{"path":"donors","filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}},{"impactScore":{"order":"desc"}}]}
+            )
+        } )
+
+        it( 'should return correct translation for lower than or equal comparator in Aggregation Count translation', () => {
+            const facetQuery = generateFacetQuery( PATIENT_ID, statementLowerThanOrEqual, statementLowerThanOrEqualQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1 )
+            expect( facetQuery ).to.eql(
+                {"size":0,"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"lte":0.67}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}},"aggs":{"filtered":{"aggs":{"variant_type":{"terms":{"field":"type.keyword","order":{"_count":"desc"},"size":999}},"consequence":{"terms":{"field":"consequences.consequence.keyword","order":{"_count":"desc"},"size":999}},"extdb_pubmed":{"terms":{"field":"availableDbExt.pubmed","size":1}},"extdb_clinvar":{"terms":{"field":"availableDbExt.clinvar","size":1}},"extdb_dbsnp":{"terms":{"field":"availableDbExt.dbSNP","size":1}},"chromosome":{"terms":{"field":"chrom.keyword","order":{"_count":"desc"},"size":24}},"gene_type":{"terms":{"field":"genes.biotype.keyword","order":{"_count":"desc"},"size":999}},"extref_hpo":{"terms":{"field":"availableDbExt.hpo","size":1}},"extref_orphanet":{"terms":{"field":"availableDbExt.orphanet","size":1}},"extref_radboudumc":{"terms":{"field":"availableDbExt.radboudumc","size":1}},"extref_omim":{"terms":{"field":"availableDbExt.omim","size":1}},"gene_hpo":{"terms":{"field":"genes.hpo.keyword","order":{"_count":"desc"},"size":9999}},"genegroup_radboud":{"terms":{"field":"genes.radboudumc.keyword","order":{"_count":"desc"},"size":999}},"genegroup_orphanet":{"terms":{"field":"genes.orphanet.panel.keyword","order":{"_count":"desc"},"size":999}},"clinvar_clinsig":{"terms":{"field":"clinvar.clinvar_clinsig.keyword","order":{"_count":"desc"},"size":999}},"impact":{"terms":{"field":"consequences.impact.keyword","order":{"_count":"desc"},"size":999}},"prediction_fathmm":{"terms":{"field":"consequences.predictions.FATHMM.keyword","order":{"_count":"desc"},"size":9}},"prediction_fathmm_min":{"min":{"field":"consequences.predictions.SIFT_score"}},"prediction_fathmm_max":{"max":{"field":"consequences.predictions.SIFT_score"}},"prediction_sift":{"terms":{"field":"consequences.predictions.SIFT.keyword","order":{"_count":"desc"},"size":9}},"prediction_sift_min":{"min":{"field":"consequences.predictions.SIFT_score"}},"prediction_sift_max":{"max":{"field":"consequences.predictions.SIFT_score"}},"prediction_polyphen2_hvar":{"terms":{"field":"consequences.predictions.Polyphen2_HVAR_pred.keyword","order":{"_count":"desc"},"size":9}},"prediction_polyphen2_hvar_min":{"min":{"field":"consequences.predictions.Polyphen2_HVAR_score"}},"prediction_polyphen2_hvar_max":{"max":{"field":"consequences.predictions.Polyphen2_HVAR_score"}},"prediction_lrt":{"terms":{"field":"consequences.predictions.LRT_pred.keyword","order":{"_count":"desc"},"size":9}},"prediction_lrt_min":{"min":{"field":"consequences.predictions.LRT_score"}},"prediction_lrt_max":{"max":{"field":"consequences.predictions.LRT_score"}},"prediction_dann_min":{"min":{"field":"consequences.predictions.DANN_score"}},"prediction_dann_max":{"max":{"field":"consequences.predictions.DANN_score"}},"prediction_cadd_min":{"min":{"field":"consequences.predictions.CADD_score"}},"prediction_cadd_max":{"max":{"field":"consequences.predictions.CADD_score"}},"prediction_revel_min":{"min":{"field":"consequences.predictions.REVEL_score"}},"prediction_revel_max":{"max":{"field":"consequences.predictions.REVEL_score"}},"conservation_phylop_min":{"min":{"field":"consequences.conservationsScores.PhyloP17Way"}},"conservation_phylop_max":{"max":{"field":"consequences.conservationsScores.PhyloP17Way"}},"cohort_rqdm_min":{"min":{"field":"frequencies.interne.AF"}},"cohort_rqdm_max":{"max":{"field":"frequencies.interne.AF"}},"cohort_gnomad_exomes_min":{"min":{"field":"frequencies.gnomAD_exomes.AF"}},"cohort_gnomad_exomes_max":{"max":{"field":"frequencies.gnomAD_exomes.AF"}},"cohort_gnomad_genomes_min":{"min":{"field":"frequencies.gnomAD_genomes.AF"}},"cohort_gnomad_genomes_max":{"max":{"field":"frequencies.gnomAD_genomes.AF"}},"cohort_exac_min":{"min":{"field":"frequencies.ExAc.AF"}},"cohort_exac_max":{"max":{"field":"frequencies.ExAc.AF"}},"cohort_uk10k_min":{"min":{"field":"frequencies.Uk10k.AF"}},"cohort_uk10k_max":{"max":{"field":"frequencies.Uk10k.AF"}},"cohort_1000gp3_min":{"min":{"field":"frequencies.1000Gp3.AF"}},"cohort_1000gp3_max":{"max":{"field":"frequencies.1000Gp3.AF"}}},"filter":{"bool":{}}},"nested_donors":{"nested":{"path":"donors"},"aggs":{"filtered":{"filter":{"bool":{"filter":{"term":{"donors.patientId.keyword":"PA00001"}}}},"aggs":{"exomiser_score_min":{"min":{"field":"donors.exomiserScore"}},"exomiser_score_max":{"max":{"field":"donors.exomiserScore"}},"transmission":{"terms":{"field":"donors.transmission.keyword","order":{"_count":"desc"},"size":9}},"zygosity":{"terms":{"field":"donors.zygosity.keyword","order":{"_count":"desc"},"size":9}},"metric_depth_quality_min":{"min":{"field":"donors.qd"}},"metric_depth_quality_max":{"max":{"field":"donors.qd"}},"metric_allelic_alt_depth_min":{"min":{"field":"donors.adAlt"}},"metric_allelic_alt_depth_max":{"max":{"field":"donors.adAlt"}},"metric_total_depth_min":{"min":{"field":"donors.adTotal"}},"metric_total_depth_max":{"max":{"field":"donors.adTotal"}},"metric_ratio_min":{"min":{"field":"donors.adFreq"}},"metric_ratio_max":{"max":{"field":"donors.adFreq"}},"metric_genotype_quality_min":{"min":{"field":"donors.gq"}},"metric_genotype_quality_max":{"max":{"field":"donors.gq"}}}}}},"prediction_dann":{"global":{},"aggs":{"filtered_except_prediction_dann":{"filter":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{}}}}},{"bool":{"filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}]}},"aggs":{"prediction_dann_min":{"min":{"field":"consequences.predictions.DANN_score"}},"prediction_dann_max":{"max":{"field":"consequences.predictions.DANN_score"}}}}}}}}
+            )
+        } )
+
+        it( 'should return correct translation for lower than or equal comparator in Query Count translation', () => {
+            const countQuery = generateCountQuery( PATIENT_ID, statementLowerThanOrEqual, statementLowerThanOrEqualQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1 )
+            expect( countQuery ).to.eql(
+                {"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"lte":0.67}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}}}
+            )
+        } )
+
+        it( 'should return correct translation for lower than or equal comparator in Query Search translation', () => {
+            const variantQuery = generateVariantQuery( PATIENT_ID, statementLowerThanOrEqual, statementLowerThanOrEqualQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1, DEFAULT_GROUP, DEFAULT_INDEX, DEFAULT_LIMIT )
+            expect( variantQuery ).to.eql(
+                {"from":0,"size":25,"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"lte":0.67}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}},"sort":[{"donors.exomiserScore":{"order":"desc","nested":{"path":"donors","filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}},{"impactScore":{"order":"desc"}}]}
+            )
+        } )
+
+        it( 'should return correct translation for in-between comparator in Aggregation Count translation', () => {
+            const facetQuery = generateFacetQuery( PATIENT_ID, statementInBetween, statementInBetweenQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1 )
+            expect( facetQuery ).to.eql(
+                {"size":0,"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"gte":0.27,"lte":0.69}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}},"aggs":{"filtered":{"aggs":{"variant_type":{"terms":{"field":"type.keyword","order":{"_count":"desc"},"size":999}},"consequence":{"terms":{"field":"consequences.consequence.keyword","order":{"_count":"desc"},"size":999}},"extdb_pubmed":{"terms":{"field":"availableDbExt.pubmed","size":1}},"extdb_clinvar":{"terms":{"field":"availableDbExt.clinvar","size":1}},"extdb_dbsnp":{"terms":{"field":"availableDbExt.dbSNP","size":1}},"chromosome":{"terms":{"field":"chrom.keyword","order":{"_count":"desc"},"size":24}},"gene_type":{"terms":{"field":"genes.biotype.keyword","order":{"_count":"desc"},"size":999}},"extref_hpo":{"terms":{"field":"availableDbExt.hpo","size":1}},"extref_orphanet":{"terms":{"field":"availableDbExt.orphanet","size":1}},"extref_radboudumc":{"terms":{"field":"availableDbExt.radboudumc","size":1}},"extref_omim":{"terms":{"field":"availableDbExt.omim","size":1}},"gene_hpo":{"terms":{"field":"genes.hpo.keyword","order":{"_count":"desc"},"size":9999}},"genegroup_radboud":{"terms":{"field":"genes.radboudumc.keyword","order":{"_count":"desc"},"size":999}},"genegroup_orphanet":{"terms":{"field":"genes.orphanet.panel.keyword","order":{"_count":"desc"},"size":999}},"clinvar_clinsig":{"terms":{"field":"clinvar.clinvar_clinsig.keyword","order":{"_count":"desc"},"size":999}},"impact":{"terms":{"field":"consequences.impact.keyword","order":{"_count":"desc"},"size":999}},"prediction_fathmm":{"terms":{"field":"consequences.predictions.FATHMM.keyword","order":{"_count":"desc"},"size":9}},"prediction_fathmm_min":{"min":{"field":"consequences.predictions.SIFT_score"}},"prediction_fathmm_max":{"max":{"field":"consequences.predictions.SIFT_score"}},"prediction_sift":{"terms":{"field":"consequences.predictions.SIFT.keyword","order":{"_count":"desc"},"size":9}},"prediction_sift_min":{"min":{"field":"consequences.predictions.SIFT_score"}},"prediction_sift_max":{"max":{"field":"consequences.predictions.SIFT_score"}},"prediction_polyphen2_hvar":{"terms":{"field":"consequences.predictions.Polyphen2_HVAR_pred.keyword","order":{"_count":"desc"},"size":9}},"prediction_polyphen2_hvar_min":{"min":{"field":"consequences.predictions.Polyphen2_HVAR_score"}},"prediction_polyphen2_hvar_max":{"max":{"field":"consequences.predictions.Polyphen2_HVAR_score"}},"prediction_lrt":{"terms":{"field":"consequences.predictions.LRT_pred.keyword","order":{"_count":"desc"},"size":9}},"prediction_lrt_min":{"min":{"field":"consequences.predictions.LRT_score"}},"prediction_lrt_max":{"max":{"field":"consequences.predictions.LRT_score"}},"prediction_dann_min":{"min":{"field":"consequences.predictions.DANN_score"}},"prediction_dann_max":{"max":{"field":"consequences.predictions.DANN_score"}},"prediction_cadd_min":{"min":{"field":"consequences.predictions.CADD_score"}},"prediction_cadd_max":{"max":{"field":"consequences.predictions.CADD_score"}},"prediction_revel_min":{"min":{"field":"consequences.predictions.REVEL_score"}},"prediction_revel_max":{"max":{"field":"consequences.predictions.REVEL_score"}},"conservation_phylop_min":{"min":{"field":"consequences.conservationsScores.PhyloP17Way"}},"conservation_phylop_max":{"max":{"field":"consequences.conservationsScores.PhyloP17Way"}},"cohort_rqdm_min":{"min":{"field":"frequencies.interne.AF"}},"cohort_rqdm_max":{"max":{"field":"frequencies.interne.AF"}},"cohort_gnomad_exomes_min":{"min":{"field":"frequencies.gnomAD_exomes.AF"}},"cohort_gnomad_exomes_max":{"max":{"field":"frequencies.gnomAD_exomes.AF"}},"cohort_gnomad_genomes_min":{"min":{"field":"frequencies.gnomAD_genomes.AF"}},"cohort_gnomad_genomes_max":{"max":{"field":"frequencies.gnomAD_genomes.AF"}},"cohort_exac_min":{"min":{"field":"frequencies.ExAc.AF"}},"cohort_exac_max":{"max":{"field":"frequencies.ExAc.AF"}},"cohort_uk10k_min":{"min":{"field":"frequencies.Uk10k.AF"}},"cohort_uk10k_max":{"max":{"field":"frequencies.Uk10k.AF"}},"cohort_1000gp3_min":{"min":{"field":"frequencies.1000Gp3.AF"}},"cohort_1000gp3_max":{"max":{"field":"frequencies.1000Gp3.AF"}}},"filter":{"bool":{}}},"nested_donors":{"nested":{"path":"donors"},"aggs":{"filtered":{"filter":{"bool":{"filter":{"term":{"donors.patientId.keyword":"PA00001"}}}},"aggs":{"exomiser_score_min":{"min":{"field":"donors.exomiserScore"}},"exomiser_score_max":{"max":{"field":"donors.exomiserScore"}},"transmission":{"terms":{"field":"donors.transmission.keyword","order":{"_count":"desc"},"size":9}},"zygosity":{"terms":{"field":"donors.zygosity.keyword","order":{"_count":"desc"},"size":9}},"metric_depth_quality_min":{"min":{"field":"donors.qd"}},"metric_depth_quality_max":{"max":{"field":"donors.qd"}},"metric_allelic_alt_depth_min":{"min":{"field":"donors.adAlt"}},"metric_allelic_alt_depth_max":{"max":{"field":"donors.adAlt"}},"metric_total_depth_min":{"min":{"field":"donors.adTotal"}},"metric_total_depth_max":{"max":{"field":"donors.adTotal"}},"metric_ratio_min":{"min":{"field":"donors.adFreq"}},"metric_ratio_max":{"max":{"field":"donors.adFreq"}},"metric_genotype_quality_min":{"min":{"field":"donors.gq"}},"metric_genotype_quality_max":{"max":{"field":"donors.gq"}}}}}},"prediction_dann":{"global":{},"aggs":{"filtered_except_prediction_dann":{"filter":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{}}}}},{"bool":{"filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}]}},"aggs":{"prediction_dann_min":{"min":{"field":"consequences.predictions.DANN_score"}},"prediction_dann_max":{"max":{"field":"consequences.predictions.DANN_score"}}}}}}}}
+            )
+        } )
+
+        it( 'should return correct translation for in-between comparator in Query Count translation', () => {
+            const countQuery = generateCountQuery( PATIENT_ID, statementInBetween, statementInBetweenQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1 )
+            expect( countQuery ).to.eql(
+                {"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"gte":0.27,"lte":0.69}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}}}
+            )
+        } )
+
+        it( 'should return correct translation for in-between comparator in Query Search translation', () => {
+            const variantQuery = generateVariantQuery( PATIENT_ID, statementInBetween, statementInBetweenQueryKey, ADMINISTRATOR_ACL, ELASTIC_SEARCH_SCHEMA_V1, DEFAULT_GROUP, DEFAULT_INDEX, DEFAULT_LIMIT )
+            expect( variantQuery ).to.eql(
+                {"from":0,"size":25,"query":{"bool":{"filter":[{"bool":{"must":{"range":{"consequences.predictions.DANN_score":{"gte":0.27,"lte":0.69}}}}},{"term":{"donors.patientId.keyword":"PA00001"}}]}},"sort":[{"donors.exomiserScore":{"order":"desc","nested":{"path":"donors","filter":{"term":{"donors.patientId.keyword":"PA00001"}}}}},{"impactScore":{"order":"desc"}}]}
             )
         } )
 
