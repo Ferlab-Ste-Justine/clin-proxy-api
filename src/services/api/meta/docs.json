@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://localhost:6000",
+      "url": "https://localhost:7000",
       "description": "Localhost"
     },
     {
@@ -538,9 +538,6 @@
           "description": {
             "type": "string"
           },
-          "isDefault": {
-            "type": "boolean"
-          },
           "queries": {
             "type": "array",
             "items": {
@@ -551,7 +548,6 @@
         "example": {
           "title": "My one statement",
           "description": "My one statement",
-          "isDefault": false,
           "queries": [
             {
               "key": "a62358e0-2023-11ea-a4ec-97496af1912d",

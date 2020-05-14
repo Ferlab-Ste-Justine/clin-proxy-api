@@ -11,7 +11,7 @@
   },
   "servers": [
     {
-      "url": "https://localhost:5000",
+      "url": "https://localhost:5001",
       "description": "Localhost"
     },
     {
@@ -39,6 +39,257 @@
           }
         }
       }
+    },
+    "/variant/schema": {
+      "get": {
+        "tags": [
+          "Variant Schema"
+        ],
+        "summary": "Returns the current schema for the variant API",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Schema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/variant/{uid}": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Variant Query"
+        ],
+        "summary": "Get a variant by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "uid",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "variant ID to get"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/variantResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/variant/search": {
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Variant Query"
+        ],
+        "summary": "execute a search for variants with a patient and a SQON",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/variantQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/variantsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/variant/count": {
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Variant Queries's Counts"
+        ],
+        "summary": "execute counts of variants for queries with a patient and a SQON",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/variantCount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/variantCountResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/variant/facet": {
+      "post": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Variant query facet result"
+        ],
+        "summary": "return facets for variants with a patient and a SQON",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/variantQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/variantFacetsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -51,7 +302,7 @@
     },
     "schemas": {
       "Health": {
-        "title": "Health Check",
+        "title": "Health Check response",
         "type": "object",
         "properties": {
           "timestamp": {
@@ -68,6 +319,2690 @@
           "timestamp": 1553284037677,
           "message": "Ok",
           "data": {}
+        }
+      },
+      "Schema": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "dialect": {
+            "type": "string"
+          },
+          "index": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "object",
+            "properties": {
+              "patient": {
+                "type": "string"
+              },
+              "practitioner": {
+                "type": "string"
+              },
+              "organization": {
+                "type": "string"
+              }
+            }
+          },
+          "groups": {
+            "type": "object",
+            "properties": {
+              "impact": {
+                "type": "object",
+                "properties": {
+                  "sort": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "postprocess": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "defaultGroup": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "filters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "search": {
+                        "type": "object",
+                        "additionalProperties": {}
+                      },
+                      "facet": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "query": {
+                              "type": "object",
+                              "properties": {
+                                "terms": {
+                                  "type": "object",
+                                  "properties": {
+                                    "fields": {
+                                      "type": "string"
+                                    },
+                                    "order": {
+                                      "type": "object",
+                                      "additionalProperties": {}
+                                    },
+                                    "size": {
+                                      "type": "integer"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "version": "1.0",
+          "dialect": "es",
+          "index": "clin-mutation-centric",
+          "path": "/mutations",
+          "fields": {
+            "patient": "donors.patientId.keyword",
+            "practitioner": "donors.practitionerId.keyword",
+            "organization": "donors.organizationId.keyword"
+          },
+          "groups": {
+            "impact": {
+              "sort": [
+                {
+                  "donors.exomiserScore": {
+                    "order": "desc",
+                    "nested": {
+                      "path": "donors"
+                    }
+                  }
+                },
+                {
+                  "impactScore": {
+                    "order": "desc"
+                  }
+                }
+              ],
+              "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { term: { 'donors.patientId.keyword': context.patient } }; return context.sort"
+            }
+          },
+          "defaultGroup": "impact",
+          "categories": [
+            {
+              "id": "variant",
+              "label": "category_variant",
+              "filters": [
+                {
+                  "id": "variant_type",
+                  "label": "filter_variant_type",
+                  "type": "generic",
+                  "search": {
+                    "variant_type": "type.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "variant_type",
+                      "query": {
+                        "terms": {
+                          "field": "type.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 999
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "consequence",
+                  "label": "filter_consequence",
+                  "type": "generic",
+                  "search": {
+                    "consequence": "consequences.consequence.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "consequence",
+                      "query": {
+                        "terms": {
+                          "field": "consequences.consequence.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 999
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "extdb",
+                  "label": "filter_extdb",
+                  "type": "genericbool",
+                  "search": {
+                    "extdb_pubmed": "availableDbExt.pubmed",
+                    "extdb_clinvar": "availableDbExt.clinvar",
+                    "extdb_dbsnp": "availableDbExt.dbSNP"
+                  },
+                  "facet": [
+                    {
+                      "id": "extdb_pubmed",
+                      "label": "filter_extdb_pubmed",
+                      "query": {
+                        "terms": {
+                          "field": "availableDbExt.pubmed",
+                          "size": 1
+                        }
+                      }
+                    },
+                    {
+                      "id": "extdb_clinvar",
+                      "label": "filter_extdb_clinvar",
+                      "query": {
+                        "terms": {
+                          "field": "availableDbExt.clinvar",
+                          "size": 1
+                        }
+                      }
+                    },
+                    {
+                      "id": "extdb_dbsnp",
+                      "label": "filter_extdb_dbsnp",
+                      "query": {
+                        "terms": {
+                          "field": "availableDbExt.dbSNP",
+                          "size": 1
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "chromosome",
+                  "label": "filter_chromosome",
+                  "type": "generic",
+                  "search": {
+                    "chromosome": "chrom.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "chromosome",
+                      "query": {
+                        "terms": {
+                          "field": "chrom.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 24
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "genomic",
+              "label": "category_genomic",
+              "filters": [
+                {
+                  "id": "gene_type",
+                  "label": "filter_gene_type",
+                  "type": "generic",
+                  "search": {
+                    "gene_type": "genes.biotype.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "gene_type",
+                      "query": {
+                        "terms": {
+                          "field": "genes.biotype.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 999
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "extref",
+                  "label": "filter_extref",
+                  "type": "genericbool",
+                  "search": {
+                    "extref_hpo": "availableDbExt.hpo",
+                    "extref_orphanet": "availableDbExt.orphanet",
+                    "extref_radboudumc": "availableDbExt.radboudumc",
+                    "extref_omim": "availableDbExt.omim"
+                  },
+                  "facet": [
+                    {
+                      "id": "extref_hpo",
+                      "label": "filter_extref_hpo",
+                      "query": {
+                        "terms": {
+                          "field": "availableDbExt.hpo",
+                          "size": 1
+                        }
+                      }
+                    },
+                    {
+                      "id": "extref_orphanet",
+                      "label": "filter_extref_orphanet",
+                      "query": {
+                        "terms": {
+                          "field": "availableDbExt.orphanet",
+                          "size": 1
+                        }
+                      }
+                    },
+                    {
+                      "id": "extref_radboudumc",
+                      "label": "filter_extref_radboudumc",
+                      "query": {
+                        "terms": {
+                          "field": "availableDbExt.radboudumc",
+                          "size": 1
+                        }
+                      }
+                    },
+                    {
+                      "id": "extref_omim",
+                      "label": "filter_extref_omim",
+                      "query": {
+                        "terms": {
+                          "field": "availableDbExt.omim",
+                          "size": 1
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "gene_hpo",
+                  "label": "filter_gene_hpo",
+                  "type": "specific",
+                  "config": {
+                    "gene_hpo": {
+                      "operands": [
+                        "all",
+                        "one",
+                        "none"
+                      ]
+                    }
+                  },
+                  "search": {
+                    "gene_hpo": "genes.hpo.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "gene_hpo",
+                      "query": {
+                        "terms": {
+                          "field": "genes.hpo.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 9999
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "genegroup_radboud",
+                  "label": "filter_genegroup_radboud",
+                  "type": "generic",
+                  "search": {
+                    "genegroup_radboud": "genes.radboudumc.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "genegroup_radboud",
+                      "query": {
+                        "terms": {
+                          "field": "genes.radboudumc.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 999
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "genegroup_orphanet",
+                  "label": "filter_genegroup_orphanet",
+                  "type": "generic",
+                  "search": {
+                    "genegroup_orphanet": "genes.orphanet.panel.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "genegroup_orphanet",
+                      "query": {
+                        "terms": {
+                          "field": "genes.orphanet.panel.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 999
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "impacts",
+              "label": "category_impacts",
+              "filters": [
+                {
+                  "id": "exomiser_score",
+                  "label": "filter_exomiser_score",
+                  "type": "numcomparison",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "config": {
+                    "min": "exomiser_score_min",
+                    "max": "exomiser_score_max"
+                  },
+                  "search": {
+                    "exomiser_score": "donors.exomiserScore"
+                  },
+                  "facet": [
+                    {
+                      "id": "exomiser_score_min",
+                      "query": {
+                        "min": {
+                          "field": "donors.exomiserScore"
+                        }
+                      }
+                    },
+                    {
+                      "id": "exomiser_score_max",
+                      "query": {
+                        "max": {
+                          "field": "donors.exomiserScore"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "clinvar_clinsig",
+                  "label": "filter_clinvar_clinsig",
+                  "type": "generic",
+                  "search": {
+                    "clinvar_clinsig": "clinvar.clinvar_clinsig.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "clinvar_clinsig",
+                      "query": {
+                        "terms": {
+                          "field": "clinvar.clinvar_clinsig.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 999
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "impact",
+                  "label": "filter_impacts",
+                  "type": "generic",
+                  "search": {
+                    "impact": "consequences.impact.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "impact",
+                      "query": {
+                        "terms": {
+                          "field": "consequences.impact.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 999
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "prediction_fathmm",
+                  "label": "filter_prediction_fathmm",
+                  "type": "composite",
+                  "config": {
+                    "min": "prediction_fathmm_min",
+                    "max": "prediction_fathmm_max"
+                  },
+                  "search": {
+                    "prediction_fathmm": {
+                      "score": "consequences.predictions.FATHMM_score",
+                      "quality": "consequences.predictions.FATHMM.keyword"
+                    }
+                  },
+                  "facet": [
+                    {
+                      "id": "prediction_fathmm",
+                      "query": {
+                        "terms": {
+                          "field": "consequences.predictions.FATHMM.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 9
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_fathmm_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.predictions.SIFT_score"
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_fathmm_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.predictions.SIFT_score"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "prediction_sift",
+                  "label": "filter_prediction_sift",
+                  "type": "composite",
+                  "search": {
+                    "prediction_sift": {
+                      "score": "consequences.predictions.SIFT_score",
+                      "quality": "consequences.predictions.SIFT.keyword"
+                    }
+                  },
+                  "facet": [
+                    {
+                      "id": "prediction_sift",
+                      "query": {
+                        "terms": {
+                          "field": "consequences.predictions.SIFT.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 9
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_sift_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.predictions.SIFT_score"
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_sift_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.predictions.SIFT_score"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "prediction_polyphen2_hvar",
+                  "label": "filter_prediction_polyphen2_hvar",
+                  "type": "composite",
+                  "config": {
+                    "min": "prediction_polyphen2_hvar_min",
+                    "max": "prediction_polyphen2_hvar_max"
+                  },
+                  "search": {
+                    "prediction_polyphen2_hvar": {
+                      "score": "consequences.predictions.Polyphen2_HVAR_score",
+                      "quality": "consequences.predictions.Polyphen2_HVAR_pred.keyword"
+                    }
+                  },
+                  "facet": [
+                    {
+                      "id": "prediction_polyphen2_hvar",
+                      "query": {
+                        "terms": {
+                          "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 9
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_polyphen2_hvar_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.predictions.Polyphen2_HVAR_score"
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_polyphen2_hvar_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.predictions.Polyphen2_HVAR_score"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "prediction_lrt",
+                  "label": "filter_prediction_lrt",
+                  "type": "composite",
+                  "config": {
+                    "min": "prediction_lrt_min",
+                    "max": "prediction_lrt_max"
+                  },
+                  "search": {
+                    "prediction_lrt": {
+                      "score": "consequences.predictions.LRT_score",
+                      "quality": "consequences.predictions.LRT_pred.keyword"
+                    }
+                  },
+                  "facet": [
+                    {
+                      "id": "prediction_lrt",
+                      "query": {
+                        "terms": {
+                          "field": "consequences.predictions.LRT_pred.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 9
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_lrt_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.predictions.LRT_score"
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_lrt_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.predictions.LRT_score"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "prediction_dann",
+                  "label": "filter_prediction_dann",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "prediction_dann_min",
+                    "max": "prediction_dann_max"
+                  },
+                  "search": {
+                    "prediction_dann": "consequences.predictions.DANN_score"
+                  },
+                  "facet": [
+                    {
+                      "id": "prediction_dann_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.predictions.DANN_score"
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_dann_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.predictions.DANN_score"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "prediction_cadd",
+                  "label": "filter_prediction_cadd",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "prediction_cadd_min",
+                    "max": "prediction_cadd_max"
+                  },
+                  "search": {
+                    "prediction_cadd": "consequences.predictions.CADD_score"
+                  },
+                  "facet": [
+                    {
+                      "id": "prediction_cadd_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.predictions.CADD_score"
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_cadd_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.predictions.CADD_score"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "prediction_revel",
+                  "label": "filter_prediction_revel",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "prediction_revel_min",
+                    "max": "prediction_revel_max"
+                  },
+                  "search": {
+                    "prediction_revel": "consequences.predictions.REVEL_score"
+                  },
+                  "facet": [
+                    {
+                      "id": "prediction_revel_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.predictions.REVEL_score"
+                        }
+                      }
+                    },
+                    {
+                      "id": "prediction_revel_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.predictions.REVEL_score"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "conservation_phylop",
+                  "label": "filter_conservation_phylop",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "conservation_phylop_min",
+                    "max": "conservation_phylop_max"
+                  },
+                  "search": {
+                    "conservation_phylop": "consequences.conservationsScores.PhyloP17Way"
+                  },
+                  "facet": [
+                    {
+                      "id": "conservation_phylop_min",
+                      "query": {
+                        "min": {
+                          "field": "consequences.conservationsScores.PhyloP17Way"
+                        }
+                      }
+                    },
+                    {
+                      "id": "conservation_phylop_max",
+                      "query": {
+                        "max": {
+                          "field": "consequences.conservationsScores.PhyloP17Way"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "cohort",
+              "label": "category_cohort",
+              "filters": [
+                {
+                  "id": "cohort_rqdm",
+                  "label": "filter_cohort_rqdm",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "cohort_rqdm_min",
+                    "max": "cohort_rqdm_max"
+                  },
+                  "search": {
+                    "cohort_rqdm": "frequencies.interne.AF"
+                  },
+                  "facet": [
+                    {
+                      "id": "cohort_rqdm_min",
+                      "query": {
+                        "min": {
+                          "field": "frequencies.interne.AF"
+                        }
+                      }
+                    },
+                    {
+                      "id": "cohort_rqdm_max",
+                      "query": {
+                        "max": {
+                          "field": "frequencies.interne.AF"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "cohort_gnomad_exomes",
+                  "label": "filter_cohort_gnomad_exomes",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "cohort_gnomad_exomes_min",
+                    "max": "cohort_gnomad_exomes_max"
+                  },
+                  "search": {
+                    "cohort_gnomad_exomes": "frequencies.gnomAD_exomes.AF"
+                  },
+                  "facet": [
+                    {
+                      "id": "cohort_gnomad_exomes_min",
+                      "query": {
+                        "min": {
+                          "field": "frequencies.gnomAD_exomes.AF"
+                        }
+                      }
+                    },
+                    {
+                      "id": "cohort_gnomad_exomes_max",
+                      "query": {
+                        "max": {
+                          "field": "frequencies.gnomAD_exomes.AF"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "cohort_gnomad_genomes",
+                  "label": "filter_cohort_gnomad_genomes",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "cohort_gnomad_genomes_min",
+                    "max": "cohort_gnomad_genomes_max"
+                  },
+                  "search": {
+                    "cohort_gnomad_genomes": "frequencies.gnomAD_genomes.AF"
+                  },
+                  "facet": [
+                    {
+                      "id": "cohort_gnomad_genomes_min",
+                      "query": {
+                        "min": {
+                          "field": "frequencies.gnomAD_genomes.AF"
+                        }
+                      }
+                    },
+                    {
+                      "id": "cohort_gnomad_genomes_max",
+                      "query": {
+                        "max": {
+                          "field": "frequencies.gnomAD_genomes.AF"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "cohort_exac",
+                  "label": "filter_cohort_exac",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "cohort_exac_min",
+                    "max": "cohort_exac_max"
+                  },
+                  "search": {
+                    "cohort_exac": "frequencies.ExAc.AF"
+                  },
+                  "facet": [
+                    {
+                      "id": "cohort_exac_min",
+                      "query": {
+                        "min": {
+                          "field": "frequencies.ExAc.AF"
+                        }
+                      }
+                    },
+                    {
+                      "id": "cohort_exac_max",
+                      "query": {
+                        "max": {
+                          "field": "frequencies.ExAc.AF"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "cohort_uk10k",
+                  "label": "filter_cohort_uk10k",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "cohort_uk10k_min",
+                    "max": "cohort_uk10k_max"
+                  },
+                  "search": {
+                    "cohort_uk10k": "frequencies.Uk10k.AF"
+                  },
+                  "facet": [
+                    {
+                      "id": "cohort_uk10k_min",
+                      "query": {
+                        "min": {
+                          "field": "frequencies.Uk10k.AF"
+                        }
+                      }
+                    },
+                    {
+                      "id": "cohort_uk10k_max",
+                      "query": {
+                        "max": {
+                          "field": "frequencies.Uk10k.AF"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "cohort_1000gp3",
+                  "label": "filter_cohort_1000gp3",
+                  "type": "numcomparison",
+                  "config": {
+                    "min": "cohort_1000gp3_min",
+                    "max": "cohort_1000gp3_max"
+                  },
+                  "search": {
+                    "cohort_1000gp3": "frequencies.1000Gp3.AF"
+                  },
+                  "facet": [
+                    {
+                      "id": "cohort_1000gp3_min",
+                      "query": {
+                        "min": {
+                          "field": "frequencies.1000Gp3.AF"
+                        }
+                      }
+                    },
+                    {
+                      "id": "cohort_1000gp3_max",
+                      "query": {
+                        "max": {
+                          "field": "frequencies.1000Gp3.AF"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "zygosity",
+              "label": "category_zygosity",
+              "filters": [
+                {
+                  "id": "transmission",
+                  "label": "filter_transmission",
+                  "type": "generic",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "search": {
+                    "transmission": "donors.transmission.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "transmission",
+                      "query": {
+                        "terms": {
+                          "field": "donors.transmission.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 9
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "zygosity",
+                  "label": "filter_zygosity",
+                  "type": "generic",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "search": {
+                    "zygosity": "donors.zygosity.keyword"
+                  },
+                  "facet": [
+                    {
+                      "id": "zygosity",
+                      "query": {
+                        "terms": {
+                          "field": "donors.zygosity.keyword",
+                          "order": {
+                            "_count": "desc"
+                          },
+                          "size": 9
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "metric",
+              "label": "category_metric",
+              "filters": [
+                {
+                  "id": "metric_depth_quality",
+                  "label": "filter_metric_depth_quality",
+                  "type": "numcomparison",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "config": {
+                    "min": "metric_depth_quality_min",
+                    "max": "metric_depth_quality_max"
+                  },
+                  "search": {
+                    "metric_depth_quality": "donors.qd"
+                  },
+                  "facet": [
+                    {
+                      "id": "metric_depth_quality_min",
+                      "query": {
+                        "min": {
+                          "field": "donors.qd"
+                        }
+                      }
+                    },
+                    {
+                      "id": "metric_depth_quality_max",
+                      "query": {
+                        "max": {
+                          "field": "donors.qd"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "metric_allelic_alt_depth",
+                  "label": "filter_allelic_alt_depth",
+                  "type": "numcomparison",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "config": {
+                    "min": "metric_allelic_alt_depth_min",
+                    "max": "metric_allelic_alt_depth_max"
+                  },
+                  "search": {
+                    "metric_allelic_alt_depth": "donors.adAlt"
+                  },
+                  "facet": [
+                    {
+                      "id": "metric_allelic_alt_depth_min",
+                      "query": {
+                        "min": {
+                          "field": "donors.adAlt"
+                        }
+                      }
+                    },
+                    {
+                      "id": "metric_allelic_alt_depth_max",
+                      "query": {
+                        "max": {
+                          "field": "donors.adAlt"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "metric_total_depth",
+                  "label": "filter_total_depth",
+                  "type": "numcomparison",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "config": {
+                    "min": "metric_total_depth_min",
+                    "max": "metric_total_depth_max"
+                  },
+                  "search": {
+                    "metric_total_depth": "donors.adTotal"
+                  },
+                  "facet": [
+                    {
+                      "id": "metric_total_depth_min",
+                      "query": {
+                        "min": {
+                          "field": "donors.adTotal"
+                        }
+                      }
+                    },
+                    {
+                      "id": "metric_total_depth_max",
+                      "query": {
+                        "max": {
+                          "field": "donors.adTotal"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "metric_ratio",
+                  "label": "filter_ratio",
+                  "type": "numcomparison",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "config": {
+                    "min": "metric_ratio_min",
+                    "max": "metric_ratio_max"
+                  },
+                  "search": {
+                    "metric_ratio": "donors.adFreq"
+                  },
+                  "facet": [
+                    {
+                      "id": "metric_ratio_min",
+                      "query": {
+                        "min": {
+                          "field": "donors.adFreq"
+                        }
+                      }
+                    },
+                    {
+                      "id": "metric_ratio_max",
+                      "query": {
+                        "max": {
+                          "field": "donors.adFreq"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "metric_genotype_quality",
+                  "label": "filter_genotype_quality",
+                  "type": "numcomparison",
+                  "subtype": {
+                    "type": "nested",
+                    "config": {
+                      "path": "donors",
+                      "field": "patientId.keyword"
+                    }
+                  },
+                  "config": {
+                    "min": "metric_genotype_quality_min",
+                    "max": "metric_genotype_quality_max"
+                  },
+                  "search": {
+                    "metric_genotype_quality": "donors.gq"
+                  },
+                  "facet": [
+                    {
+                      "id": "metric_genotype_quality_min",
+                      "query": {
+                        "min": {
+                          "field": "donors.gq"
+                        }
+                      }
+                    },
+                    {
+                      "id": "metric_genotype_quality_max",
+                      "query": {
+                        "max": {
+                          "field": "donors.gq"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "variant": {
+        "title": "variant",
+        "description": "a complete variant",
+        "type": "object",
+        "properties": {
+          "genes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Gene"
+            }
+          },
+          "annotationTool": {
+            "type": "string"
+          },
+          "start": {
+            "type": "integer"
+          },
+          "altAllele": {
+            "type": "string"
+          },
+          "refAllele": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "bdExt": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "pubmed": {
+                "nullable": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "clinvar": {
+                "nullable": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "omim": {
+                "nullable": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "dbSNP": {
+                "nullable": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "orphanet": {
+                "nullable": true,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "chrom": {
+            "type": "string"
+          },
+          "dnaChange": {
+            "type": "string"
+          },
+          "availableDbExt": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "pubmed": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "clinvar": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "omim": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "dbSNP": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "orphanet": {
+                "nullable": true,
+                "type": "boolean"
+              },
+              "radboudumc": {
+                "nullable": true,
+                "type": "boolean"
+              }
+            }
+          },
+          "lastAnnotationUpdate": {
+            "type": "string",
+            "format": "date"
+          },
+          "clinvar": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "clinvar_id": {
+                "type": "string"
+              },
+              "clinvar_clinsig": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "clinvar_trait": {
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "consequences": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "biotype": {
+                  "type": "string"
+                },
+                "conservationsScores": {
+                  "nullable": true,
+                  "type": "object",
+                  "properties": {
+                    "PhyloP17Way": {
+                      "type": "number",
+                      "format": "double"
+                    }
+                  }
+                },
+                "consequence": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "transcripts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "pick": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "featureType": {
+                        "type": "string"
+                      },
+                      "canonical": {
+                        "type": "boolean"
+                      },
+                      "refSeqId": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "clinvar_OMIM_id": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "featureId": {
+                        "type": "string"
+                      },
+                      "clinvar_Orphanet_id": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    }
+                  }
+                },
+                "impact": {
+                  "type": "string"
+                },
+                "geneAffectedSymbol": {
+                  "type": "string"
+                },
+                "canonical": {
+                  "type": "boolean",
+                  "nullable": true
+                },
+                "predictions": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "FATHMM": {
+                      "type": "string"
+                    },
+                    "CADD_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "SIFT": {
+                      "type": "string"
+                    },
+                    "DANN_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "SIFT_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "Polyphen2_HVAR_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "REVEL_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "Polyphen2_HVAR_pred": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "geneAffectedId": {
+                  "type": "string"
+                },
+                "strand": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "pick": {
+                  "type": "integer",
+                  "nullable": true
+                },
+                "aaChange": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "cdnaChange": {
+                  "type": "string",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "donors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "adAlt": {
+                  "type": "integer"
+                },
+                "patientId": {
+                  "type": "string"
+                },
+                "specimenId": {
+                  "type": "string"
+                },
+                "gq": {
+                  "type": "integer"
+                },
+                "gt": {
+                  "type": "string"
+                },
+                "practitionerId": {
+                  "type": "string"
+                },
+                "relation": {
+                  "type": "string"
+                },
+                "familyId": {
+                  "type": "string"
+                },
+                "organizationId": {
+                  "type": "string"
+                },
+                "adFreq": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "qd": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "zygosity": {
+                  "type": "string"
+                },
+                "adTotal": {
+                  "type": "integer"
+                },
+                "lastUpdate": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "sequencingStrategy": {
+                  "type": "string"
+                },
+                "studyId": {
+                  "type": "string"
+                },
+                "genotypeFamily": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "transmission": {
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "filter": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "exomiserScore": {
+                  "type": "number",
+                  "format": "double",
+                  "nullable": true
+                }
+              }
+            }
+          },
+          "mutationId": {
+            "type": "string"
+          },
+          "impactScore": {
+            "type": "integer"
+          },
+          "specimenList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assemblyVersion": {
+            "type": "string"
+          },
+          "frequencies": {
+            "type": "object",
+            "properties": {
+              "gnomAD_exomes": {
+                "$ref": "#/components/schemas/shortFreq",
+                "nullable": true
+              },
+              "gnomAD_genomes": {
+                "$ref": "#/components/schemas/shortFreq",
+                "nullable": true
+              },
+              "ExAc": {
+                "$ref": "#/components/schemas/shortFreq",
+                "nullable": true
+              },
+              "Uk10k": {
+                "$ref": "#/components/schemas/shortFreq",
+                "nullable": true
+              },
+              "1000Gp3": {
+                "$ref": "#/components/schemas/shortFreq",
+                "nullable": true
+              },
+              "interne": {
+                "$ref": "#/components/schemas/internalFreq"
+              },
+              "LDx-XXXXX": {
+                "$ref": "#/components/schemas/internalFreq",
+                "nullable": true
+              }
+            }
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "variantResponse": {
+        "title": "variantResponse",
+        "description": "a complete variant response",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/variant"
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {
+            "genes": [
+              {
+                "biotype": "protein_coding",
+                "ensemblId": "ENSG00000197561",
+                "hgnc": "3309",
+                "geneId": "1991",
+                "hpo": [
+                  "Gingivitis (HP:0000230)",
+                  "Neutropenia (HP:0001875)",
+                  "Carious teeth (HP:0000670)",
+                  "Premature loss of teeth (HP:0006480)",
+                  "Recurrent aphthous stomatitis (HP:0011107)",
+                  "Fever (HP:0001945)"
+                ],
+                "omim": [
+                  "130130"
+                ],
+                "name": "elastase, neutrophil expressed",
+                "orphanet": [
+                  {
+                    "dataId": "822",
+                    "panel": "Autosomal dominant severe congenital neutropenia (Orph:486)"
+                  },
+                  {
+                    "dataId": "5534",
+                    "panel": "Cyclic neutropenia (Orph:2686)"
+                  }
+                ],
+                "alias": [
+                  "HLE",
+                  "PMNE",
+                  "SCN1",
+                  "NE",
+                  "ELA2",
+                  "HNE",
+                  "GE"
+                ],
+                "location": "19p13.3",
+                "geneSymbol": "ELANE",
+                "radboudumc": [
+                  "Hereditary Bone Marrow Failure",
+                  "Hereditary Cancer",
+                  "Mendeloime Gene",
+                  "Primary Immunodeficiencies"
+                ]
+              }
+            ],
+            "annotationTool": "VEP 97",
+            "start": 856130,
+            "altAllele": "T",
+            "refAllele": "C",
+            "type": "SNV",
+            "bdExt": {
+              "pubmed": [
+                "25741868"
+              ],
+              "clinvar": [
+                "258501"
+              ],
+              "omim": [
+                "162800",
+                "202700"
+              ],
+              "dbSNP": [
+                "rs17216663"
+              ],
+              "orphanet": [
+                "ORPHA2686"
+              ]
+            },
+            "chrom": "19",
+            "dnaChange": "C>T",
+            "availableDbExt": {
+              "pubmed": true,
+              "hpo": true,
+              "clinvar": true,
+              "omim": true,
+              "orphanet": true,
+              "dbSNP": true,
+              "radboudumc": true
+            },
+            "lastAnnotationUpdate": "2020-05-13",
+            "clinvar": {
+              "clinvar_id": "258501",
+              "clinvar_clinsig": [
+                "Benign/Likely_benign"
+              ],
+              "clinvar_trait": [
+                "not_provided",
+                "Severe_congenital_neutropenia_autosomal_dominant",
+                "not_specified",
+                "Cyclical_neutropenia"
+              ]
+            },
+            "consequences": [
+              {
+                "biotype": "protein_coding",
+                "conservationsScores": {
+                  "PhyloP17Way": 0.21965
+                },
+                "consequence": [
+                  "missense_variant"
+                ],
+                "transcripts": [
+                  {
+                    "featureType": "Transcript",
+                    "canonical": false,
+                    "refSeqId": "NM_001972.4",
+                    "clinvar_OMIM_id": "162800&202700",
+                    "featureId": "ENST00000263621",
+                    "clinvar_Orphanet_id": "ORPHA2686"
+                  },
+                  {
+                    "pick": "1",
+                    "featureType": "Transcript",
+                    "canonical": true,
+                    "clinvar_OMIM_id": "162800&202700",
+                    "featureId": "ENST00000590230",
+                    "clinvar_Orphanet_id": "ORPHA2686"
+                  }
+                ],
+                "impact": "MODERATE",
+                "geneAffectedSymbol": "ELANE",
+                "canonical": true,
+                "predictions": {
+                  "FATHMM": "DAMAGING",
+                  "CADD_score": 0.16696,
+                  "SIFT": "DAMAGING",
+                  "DANN_score": 0.19385,
+                  "FATHMM_score": 0.88997,
+                  "SIFT_score": 0.58626,
+                  "Polyphen2_HVAR_score": 0.06944,
+                  "REVEL_score": 0.34263,
+                  "Polyphen2_HVAR_pred": "BENIGN"
+                },
+                "geneAffectedId": "ENSG00000197561",
+                "strand": 1,
+                "pick": true,
+                "aaChange": "P257L",
+                "cdnaChange": "770C>T"
+              }
+            ],
+            "donors": [
+              {
+                "adAlt": 54,
+                "patientId": "PA00002",
+                "specimenId": "SP00011",
+                "gq": 47,
+                "gt": "0/1",
+                "practitionerId": "PR00202",
+                "relation": "Proband",
+                "filter": "PASS",
+                "familyId": "FA0002",
+                "organizationId": "OR00101",
+                "adFreq": 0.4390244,
+                "qd": 0.48,
+                "transmission": [
+                  "XR"
+                ],
+                "zygosity": "HET",
+                "adTotal": 123,
+                "lastUpdate": "2020-05-13",
+                "sequencingStrategy": "WXS",
+                "studyId": "ET00011",
+                "genotypeFamily": "FTH:0/0,MTH:0/1",
+                "exomiserScore": 0.00084
+              }
+            ],
+            "mutationId": "chr19:g.856130C>T",
+            "impactScore": 3,
+            "specimenList": [
+              "SP00036"
+            ],
+            "assemblyVersion": "GRCh38",
+            "frequencies": {
+              "gnomAD_exomes": {
+                "AC": 1596,
+                "AF": 0.006399102
+              },
+              "LDx-CHUSJ": {
+                "AC": 1,
+                "AF": 0.1666666716337204,
+                "HC": 0,
+                "AN": 6,
+                "PN": 1
+              },
+              "ExAc": {
+                "AC": 717,
+                "AF": 0.005908
+              },
+              "gnomAD_genomes": {
+                "AC": 171,
+                "AF": 0.005448636
+              },
+              "interne": {
+                "AC": 1,
+                "AF": 0.1666666716337204,
+                "HC": 0,
+                "AN": 6,
+                "PN": 1
+              },
+              "Uk10k": {
+                "AC": 73,
+                "AF": 0.00965353081195451
+              },
+              "1000Gp3": {
+                "AC": 26,
+                "AF": 0.005191693290734824
+              }
+            },
+            "id": "323EB74FCAFACB5FB324FBFD18E7C804"
+          }
+        }
+      },
+      "variantsResponse": {
+        "title": "variantsResponse",
+        "description": "a list of variant(s)",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              },
+              "dialect": {
+                "type": "string"
+              },
+              "total": {
+                "type": "integer"
+              },
+              "hits": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/variant"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {
+            "query": "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c",
+            "dialect": "es",
+            "total": 1,
+            "hits": [
+              {
+                "genes": [
+                  {
+                    "biotype": "protein_coding",
+                    "ensemblId": "ENSG00000197561",
+                    "hgnc": "3309",
+                    "geneId": "1991",
+                    "hpo": [
+                      "Gingivitis (HP:0000230)",
+                      "Neutropenia (HP:0001875)",
+                      "Carious teeth (HP:0000670)",
+                      "Premature loss of teeth (HP:0006480)",
+                      "Recurrent aphthous stomatitis (HP:0011107)",
+                      "Fever (HP:0001945)"
+                    ],
+                    "omim": [
+                      "130130"
+                    ],
+                    "name": "elastase, neutrophil expressed",
+                    "orphanet": [
+                      {
+                        "dataId": "822",
+                        "panel": "Autosomal dominant severe congenital neutropenia (Orph:486)"
+                      },
+                      {
+                        "dataId": "5534",
+                        "panel": "Cyclic neutropenia (Orph:2686)"
+                      }
+                    ],
+                    "alias": [
+                      "HLE",
+                      "PMNE",
+                      "SCN1",
+                      "NE",
+                      "ELA2",
+                      "HNE",
+                      "GE"
+                    ],
+                    "location": "19p13.3",
+                    "geneSymbol": "ELANE",
+                    "radboudumc": [
+                      "Hereditary Bone Marrow Failure",
+                      "Hereditary Cancer",
+                      "Mendeloime Gene",
+                      "Primary Immunodeficiencies"
+                    ]
+                  }
+                ],
+                "annotationTool": "VEP 97",
+                "start": 856130,
+                "altAllele": "T",
+                "refAllele": "C",
+                "type": "SNV",
+                "bdExt": {
+                  "pubmed": [
+                    "25741868"
+                  ],
+                  "clinvar": [
+                    "258501"
+                  ],
+                  "omim": [
+                    "162800",
+                    "202700"
+                  ],
+                  "dbSNP": [
+                    "rs17216663"
+                  ],
+                  "orphanet": [
+                    "ORPHA2686"
+                  ]
+                },
+                "chrom": "19",
+                "dnaChange": "C>T",
+                "availableDbExt": {
+                  "pubmed": true,
+                  "hpo": true,
+                  "clinvar": true,
+                  "omim": true,
+                  "orphanet": true,
+                  "dbSNP": true,
+                  "radboudumc": true
+                },
+                "lastAnnotationUpdate": "2020-05-13",
+                "clinvar": {
+                  "clinvar_id": "258501",
+                  "clinvar_clinsig": [
+                    "Benign/Likely_benign"
+                  ],
+                  "clinvar_trait": [
+                    "not_provided",
+                    "Severe_congenital_neutropenia_autosomal_dominant",
+                    "not_specified",
+                    "Cyclical_neutropenia"
+                  ]
+                },
+                "consequences": [
+                  {
+                    "biotype": "protein_coding",
+                    "conservationsScores": {
+                      "PhyloP17Way": 0.21965
+                    },
+                    "consequence": [
+                      "missense_variant"
+                    ],
+                    "transcripts": [
+                      {
+                        "featureType": "Transcript",
+                        "canonical": false,
+                        "refSeqId": "NM_001972.4",
+                        "clinvar_OMIM_id": "162800&202700",
+                        "featureId": "ENST00000263621",
+                        "clinvar_Orphanet_id": "ORPHA2686"
+                      },
+                      {
+                        "pick": "1",
+                        "featureType": "Transcript",
+                        "canonical": true,
+                        "clinvar_OMIM_id": "162800&202700",
+                        "featureId": "ENST00000590230",
+                        "clinvar_Orphanet_id": "ORPHA2686"
+                      }
+                    ],
+                    "impact": "MODERATE",
+                    "geneAffectedSymbol": "ELANE",
+                    "canonical": true,
+                    "predictions": {
+                      "FATHMM": "DAMAGING",
+                      "CADD_score": 0.16696,
+                      "SIFT": "DAMAGING",
+                      "DANN_score": 0.19385,
+                      "FATHMM_score": 0.88997,
+                      "SIFT_score": 0.58626,
+                      "Polyphen2_HVAR_score": 0.06944,
+                      "REVEL_score": 0.34263,
+                      "Polyphen2_HVAR_pred": "BENIGN"
+                    },
+                    "geneAffectedId": "ENSG00000197561",
+                    "strand": 1,
+                    "pick": true,
+                    "aaChange": "P257L",
+                    "cdnaChange": "770C>T"
+                  }
+                ],
+                "donors": [
+                  {
+                    "adAlt": 54,
+                    "patientId": "PA00002",
+                    "specimenId": "SP00011",
+                    "gq": 47,
+                    "gt": "0/1",
+                    "practitionerId": "PR00202",
+                    "relation": "Proband",
+                    "filter": "PASS",
+                    "familyId": "FA0002",
+                    "organizationId": "OR00101",
+                    "adFreq": 0.4390244,
+                    "qd": 0.48,
+                    "transmission": [
+                      "XR"
+                    ],
+                    "zygosity": "HET",
+                    "adTotal": 123,
+                    "lastUpdate": "2020-05-13",
+                    "sequencingStrategy": "WXS",
+                    "studyId": "ET00011",
+                    "genotypeFamily": "FTH:0/0,MTH:0/1",
+                    "exomiserScore": 0.00084
+                  }
+                ],
+                "mutationId": "chr19:g.856130C>T",
+                "impactScore": 3,
+                "specimenList": [
+                  "SP00036"
+                ],
+                "assemblyVersion": "GRCh38",
+                "frequencies": {
+                  "gnomAD_exomes": {
+                    "AC": 1596,
+                    "AF": 0.006399102
+                  },
+                  "LDx-CHUSJ": {
+                    "AC": 1,
+                    "AF": 0.1666666716337204,
+                    "HC": 0,
+                    "AN": 6,
+                    "PN": 1
+                  },
+                  "ExAc": {
+                    "AC": 717,
+                    "AF": 0.005908
+                  },
+                  "gnomAD_genomes": {
+                    "AC": 171,
+                    "AF": 0.005448636
+                  },
+                  "interne": {
+                    "AC": 1,
+                    "AF": 0.1666666716337204,
+                    "HC": 0,
+                    "AN": 6,
+                    "PN": 1
+                  },
+                  "Uk10k": {
+                    "AC": 73,
+                    "AF": 0.00965353081195451
+                  },
+                  "1000Gp3": {
+                    "AC": 26,
+                    "AF": 0.005191693290734824
+                  }
+                },
+                "id": "323EB74FCAFACB5FB324FBFD18E7C804"
+              }
+            ]
+          }
+        }
+      },
+      "variantCountResponse": {
+        "title": "variantCountResponse",
+        "description": "count with the respective query",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "queries": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "total": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1589485815669,
+          "message": "Ok",
+          "data": {
+            "queries": [
+              "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c"
+            ],
+            "total": {
+              "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c": 7
+            }
+          }
+        }
+      },
+      "variantFacetsResponse": {
+        "title": "variantFacetsResponse",
+        "description": "facets for variant's query",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              },
+              "dialect": {
+                "type": "string"
+              },
+              "facets": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1589485815669,
+          "message": "Ok",
+          "data": {
+            "query": "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c",
+            "dialect": "es",
+            "facets": [
+              {
+                "cohort_exac_min": [
+                  {
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "cohort_exac_max": [
+                  {
+                    "value": 0.1
+                  }
+                ]
+              },
+              {
+                "gene_hpo": [
+                  {
+                    "value": "Autosomal dominant inheritance (HP:0000006)",
+                    "count": 3
+                  },
+                  "..."
+                ]
+              },
+              "..."
+            ]
+          }
+        }
+      },
+      "Gene": {
+        "type": "object",
+        "properties": {
+          "biotype": {
+            "type": "string"
+          },
+          "ensemblId": {
+            "type": "string"
+          },
+          "hgnc": {
+            "type": "string"
+          },
+          "geneId": {
+            "type": "string"
+          },
+          "hpo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "omim": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "orphanet": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "dataId": {
+                  "type": "string"
+                },
+                "panel": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "alias": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "location": {
+            "type": "string"
+          },
+          "geneSymbol": {
+            "type": "string"
+          },
+          "radboudumc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "example": {
+          "biotype": "protein_coding",
+          "ensemblId": "ENSG00000197561",
+          "hgnc": "3309",
+          "geneId": "1991",
+          "hpo": [
+            "Gingivitis (HP:0000230)",
+            "Neutropenia (HP:0001875)",
+            "Carious teeth (HP:0000670)",
+            "Premature loss of teeth (HP:0006480)",
+            "Recurrent aphthous stomatitis (HP:0011107)",
+            "Fever (HP:0001945)"
+          ],
+          "omim": [
+            "130130"
+          ],
+          "name": "elastase, neutrophil expressed",
+          "orphanet": [
+            {
+              "dataId": "822",
+              "panel": "Autosomal dominant severe congenital neutropenia (Orph:486)"
+            },
+            {
+              "dataId": "5534",
+              "panel": "Cyclic neutropenia (Orph:2686)"
+            }
+          ],
+          "alias": [
+            "HLE",
+            "PMNE",
+            "SCN1",
+            "NE",
+            "ELA2",
+            "HNE",
+            "GE"
+          ],
+          "location": "19p13.3",
+          "geneSymbol": "ELANE",
+          "radboudumc": [
+            "Hereditary Bone Marrow Failure",
+            "Hereditary Cancer",
+            "Mendeloime Gene",
+            "Primary Immunodeficiencies"
+          ]
+        }
+      },
+      "internalFreq": {
+        "type": "object",
+        "properties": {
+          "AC": {
+            "type": "integer"
+          },
+          "AF": {
+            "type": "number",
+            "format": "float"
+          },
+          "HC": {
+            "type": "integer"
+          },
+          "AN": {
+            "type": "integer"
+          },
+          "PN": {
+            "type": "integer"
+          }
+        },
+        "example": {
+          "interne": {
+            "AC": 26,
+            "AF": 0.005191693290734824,
+            "HC": 0,
+            "AN": 6,
+            "PN": 1
+          }
+        }
+      },
+      "shortFreq": {
+        "type": "object",
+        "properties": {
+          "AC": {
+            "type": "integer"
+          },
+          "AF": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "example": {
+          "1000Gp3": {
+            "AC": 26,
+            "AF": 0.005191693290734824
+          }
+        }
+      },
+      "Error500": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "InternalError",
+          "data": {
+            "messages": [
+              "Halp! I has error."
+            ]
+          }
+        }
+      },
+      "Error401": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "Unauthorized",
+          "data": {
+            "messages": [
+              "Halp! I has the forgottenz."
+            ]
+          }
+        }
+      },
+      "Error404": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "NotFound",
+          "data": {
+            "messages": []
+          }
+        }
+      },
+      "SQON": {
+        "title": "Structured Query Object Notation",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "instructions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "index": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "values": {
+                      "type": "array",
+                      "nullable": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "operand": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "key": "a62358e0-2023-11ea-a4ec-97496af1912d",
+          "instructions": [
+            {
+              "type": "filter",
+              "data": {
+                "id": "variant_type",
+                "type": "generic",
+                "index": 1,
+                "values": [
+                  "deletion"
+                ],
+                "operand": "all"
+              }
+            }
+          ]
+        }
+      },
+      "statement": {
+        "title": "statement resource",
+        "properties": {
+          "statements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SQON"
+            }
+          }
+        },
+        "example": {
+          "statement": [
+            {
+              "key": "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c",
+              "title": "Requête 1",
+              "instructions": [
+                {
+                  "type": "filter",
+                  "data": {
+                    "id": "variant_type",
+                    "type": "generic",
+                    "operand": "one",
+                    "values": [
+                      "insertion"
+                    ],
+                    "index": 2
+                  }
+                },
+                {
+                  "type": "operator",
+                  "data": {
+                    "type": "and"
+                  }
+                },
+                {
+                  "type": "filter",
+                  "data": {
+                    "id": "consequence",
+                    "type": "generic",
+                    "operand": "one",
+                    "values": [
+                      "stop_gained"
+                    ],
+                    "index": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "variantQuery": {
+        "type": "object",
+        "properties": {
+          "patient": {
+            "type": "string"
+          },
+          "statement": {
+            "$ref": "#/components/schemas/statement"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "patient": "PA00002",
+          "statement": [
+            {
+              "key": "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c",
+              "title": "Requête 1",
+              "instructions": [
+                {
+                  "type": "filter",
+                  "data": {
+                    "id": "variant_type",
+                    "type": "generic",
+                    "operand": "one",
+                    "values": [
+                      "insertion"
+                    ],
+                    "index": 2
+                  }
+                },
+                {
+                  "type": "operator",
+                  "data": {
+                    "type": "and"
+                  }
+                },
+                {
+                  "type": "filter",
+                  "data": {
+                    "id": "consequence",
+                    "type": "generic",
+                    "operand": "one",
+                    "values": [
+                      "stop_gained"
+                    ],
+                    "index": 2
+                  }
+                }
+              ]
+            }
+          ],
+          "query": "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c"
+        }
+      },
+      "variantCount": {
+        "type": "object",
+        "properties": {
+          "patient": {
+            "type": "string"
+          },
+          "statement": {
+            "$ref": "#/components/schemas/statement"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "patient": "PA00002",
+          "statement": [
+            {
+              "key": "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c",
+              "title": "Requête 1",
+              "instructions": [
+                {
+                  "type": "filter",
+                  "data": {
+                    "id": "variant_type",
+                    "type": "generic",
+                    "operand": "one",
+                    "values": [
+                      "insertion"
+                    ],
+                    "index": 2
+                  }
+                },
+                {
+                  "type": "operator",
+                  "data": {
+                    "type": "and"
+                  }
+                },
+                {
+                  "type": "filter",
+                  "data": {
+                    "id": "consequence",
+                    "type": "generic",
+                    "operand": "one",
+                    "values": [
+                      "stop_gained"
+                    ],
+                    "index": 2
+                  }
+                }
+              ]
+            }
+          ],
+          "query": [
+            "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c"
+          ]
         }
       }
     }

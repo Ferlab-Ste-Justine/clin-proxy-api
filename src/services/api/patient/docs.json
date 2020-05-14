@@ -290,6 +290,13 @@
               "type": "string"
             }
           },
+          "suffix": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
           "use": {
             "type": "string"
           }
@@ -715,6 +722,73 @@
               },
               "alias": {
                 "type": "string"
+              }
+            }
+          },
+          "serviceRequests": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "intent": {
+                  "type": "string"
+                },
+                "authoredOn": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "code": {
+                  "type": "object",
+                  "properties": {
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "subject": {
+                  "$ref": "#/components/schemas/subject"
+                },
+                "specimen": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/subject"
+                  }
+                },
+                "ci_ref": {
+                  "type": "string"
+                },
+                "requester_role_id": {
+                  "type": "string"
+                },
+                "ci_status": {
+                  "type": "string"
+                },
+                "role_id": {
+                  "type": "string"
+                },
+                "requester_name": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/name"
+                  }
+                },
+                "requester_org_name": {
+                  "type": "string"
+                },
+                "requester_org_alias": {
+                  "type": "string"
+                },
+                "requester_org_id": {
+                  "type": "string"
+                },
+                "requester_id": {
+                  "type": "string"
+                }
               }
             }
           },
@@ -1336,6 +1410,47 @@
             "name": "Hôpital de Rouyn-Noranda",
             "alias": "HRN"
           },
+          "serviceRequests": [
+            {
+              "id": "SR00001",
+              "status": "active",
+              "intent": "order",
+              "authoredOn": "2018-09-12T03:08:56-07:00",
+              "code": {
+                "text": "WXS"
+              },
+              "subject": {
+                "id": "PA00002",
+                "resourceType": "Patient"
+              },
+              "specimen": [
+                {
+                  "id": "SP00011",
+                  "resourceType": "Specimen"
+                }
+              ],
+              "ci_ref": "CI00401",
+              "requester_role_id": "PRR00202",
+              "ci_status": "completed",
+              "role_id": "PRR00202",
+              "requester_name": [
+                {
+                  "family": "Hamdan",
+                  "given": [
+                    "Fadi"
+                  ],
+                  "suffix": [
+                    "PhD."
+                  ],
+                  "use": "official"
+                }
+              ],
+              "requester_org_name": "LDx CHU Ste-Justine",
+              "requester_org_alias": "LDx-CHUSJ",
+              "requester_org_id": "OR00101",
+              "requester_id": "PR00202"
+            }
+          ],
           "studies": [
             {
               "id": "ET00011",
@@ -1470,21 +1585,659 @@
               {
                 "_index": "patient",
                 "_type": "_doc",
-                "_id": "patient",
-                "_score": 2.2191052,
+                "_id": "PA00002",
+                "_score": 1,
                 "_source": {
-                  "identifier": {
-                    "JHN": "BÉDC 8405 1775"
-                  },
+                  "id": "PA00002",
+                  "active": true,
+                  "gender": "male",
+                  "birthDate": "2016-12-23",
                   "name": [
                     {
+                      "family": "Roy",
                       "given": [
-                        "Camille"
+                        "Leon"
                       ],
-                      "family": "Bédard"
+                      "use": "official"
                     }
                   ],
-                  "id": "PA14931"
+                  "generalPractitioner": [
+                    {
+                      "id": "PRR00102",
+                      "resourceType": "PractitionerRole"
+                    }
+                  ],
+                  "managingOrganization": {
+                    "id": "OR00202",
+                    "resourceType": "Organization"
+                  },
+                  "identifier": {
+                    "MR": "49832779",
+                    "JHN": "ROYL 1612 2360"
+                  },
+                  "link": [
+                    {
+                      "relationship": "FTH",
+                      "id": "PA00052"
+                    },
+                    {
+                      "relationship": "MTH",
+                      "id": "PA00027"
+                    }
+                  ],
+                  "familyId": "FA0002",
+                  "ethnicity": "Canadien-Français",
+                  "familyComposition": "trio",
+                  "isProband": true,
+                  "status": true,
+                  "practitioners": [
+                    {
+                      "role_id": "PRR00102",
+                      "role_org_id": "OR00202",
+                      "id": "PR00102",
+                      "name": [
+                        {
+                          "family": "Vallée",
+                          "given": [
+                            "Juliette"
+                          ],
+                          "prefix": [
+                            "Dre."
+                          ],
+                          "use": "official"
+                        }
+                      ],
+                      "identifier": {
+                        "MD": "37500"
+                      },
+                      "org_name": "Hôpital de Rouyn-Noranda",
+                      "org_alias": "HRN",
+                      "org_id": "OR00202"
+                    }
+                  ],
+                  "samples": [
+                    {
+                      "id": "SP00011",
+                      "subject": {
+                        "id": "PA00002",
+                        "resourceType": "Patient"
+                      },
+                      "status": "available",
+                      "request": [
+                        "SR00001"
+                      ],
+                      "container": [
+                        "DNA054265"
+                      ],
+                      "type": {
+                        "coding": [
+                          {
+                            "code": "24851008",
+                            "display": "Deoxyribonucleic acid (substance)",
+                            "system": "http://snomed.info/sct"
+                          }
+                        ],
+                        "text": "Deoxyribonucleic acid"
+                      },
+                      "parent": {
+                        "id": "SP14955",
+                        "subject": {
+                          "id": "PA00002",
+                          "resourceType": "Patient"
+                        },
+                        "status": "available",
+                        "request": [
+                          "SR00001"
+                        ],
+                        "container": [
+                          "DNA154265"
+                        ],
+                        "type": {
+                          "coding": [
+                            {
+                              "code": "119297000",
+                              "display": "Blood specimen",
+                              "system": "http://snomed.info/sct"
+                            }
+                          ],
+                          "text": "Blood specimen"
+                        }
+                      }
+                    }
+                  ],
+                  "specimens": [
+                    {
+                      "id": "SP14955",
+                      "subject": {
+                        "id": "PA00002",
+                        "resourceType": "Patient"
+                      },
+                      "status": "available",
+                      "request": [
+                        "SR00001"
+                      ],
+                      "container": [
+                        "DNA154265"
+                      ],
+                      "type": {
+                        "coding": [
+                          {
+                            "code": "119297000",
+                            "display": "Blood specimen",
+                            "system": "http://snomed.info/sct"
+                          }
+                        ],
+                        "text": "Blood specimen"
+                      }
+                    }
+                  ],
+                  "clinicalImpressions": [
+                    {
+                      "id": "CI00401",
+                      "subject": {
+                        "id": "PA00002",
+                        "resourceType": "Patient"
+                      },
+                      "status": "completed",
+                      "ci_consultation_date": {
+                        "dateTime": "2018-09-12T03:08:56-07:00"
+                      },
+                      "runtimePatientAge": 628,
+                      "assessor_role_id": "PRR00102",
+                      "iiu": [
+                        {
+                          "uri": "OB00002"
+                        },
+                        {
+                          "uri": "OB00003"
+                        },
+                        {
+                          "uri": "OB00004"
+                        },
+                        {
+                          "uri": "OB00005"
+                        },
+                        {
+                          "uri": "FMH00042"
+                        }
+                      ],
+                      "role_id": "PRR00102",
+                      "assessor_name": [
+                        {
+                          "family": "Vallée",
+                          "given": [
+                            "Juliette"
+                          ],
+                          "prefix": [
+                            "Dre."
+                          ],
+                          "use": "official"
+                        }
+                      ],
+                      "assessor_org_name": "Hôpital de Rouyn-Noranda",
+                      "assessor_org_id": "OR00202",
+                      "assessor_id": "PR00102",
+                      "observations": [
+                        {
+                          "id": "OB00005",
+                          "status": "final",
+                          "code": {
+                            "text": "Indications"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:00"
+                          },
+                          "note": [
+                            {
+                              "text": "Syndrome de microdélétion"
+                            }
+                          ],
+                          "obs_id": "OB00005",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        },
+                        {
+                          "id": "OB00004",
+                          "status": "final",
+                          "code": {
+                            "text": "Medicale note"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:00"
+                          },
+                          "note": [
+                            {
+                              "text": "Précédente fausse couche de la mère"
+                            }
+                          ],
+                          "obs_id": "OB00004",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        },
+                        {
+                          "id": "OB00003",
+                          "status": "final",
+                          "code": {
+                            "text": "phenotype observation"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:00"
+                          },
+                          "phenotype": [
+                            {
+                              "code": "HP:0001197",
+                              "display": "Anomalie du développement prénatal ou de naissance"
+                            }
+                          ],
+                          "observed": "NEG",
+                          "obs_id": "OB00003",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        },
+                        {
+                          "id": "OB00002",
+                          "status": "final",
+                          "code": {
+                            "text": "phenotype observation"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:00"
+                          },
+                          "phenotype": [
+                            {
+                              "code": "HP:0001197",
+                              "display": "Anomalie du développement prénatal ou de naissance"
+                            }
+                          ],
+                          "observed": "NEG",
+                          "obs_id": "OB00002",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        }
+                      ],
+                      "familyMemberHistory": [
+                        {
+                          "fmh_id": "FMH00042",
+                          "status": "completed",
+                          "patient": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "relationship": {
+                            "coding": [
+                              {
+                                "code": "72705000",
+                                "display": "Mother",
+                                "system": "http://snomed.info/sct"
+                              }
+                            ],
+                            "text": "Mère"
+                          },
+                          "date": "2018-09-12T03:08:56-07:00",
+                          "note": [
+                            {
+                              "text": "Cas similaires dans la famille maternelle"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "CI00402",
+                      "subject": {
+                        "id": "PA00002",
+                        "resourceType": "Patient"
+                      },
+                      "status": "completed",
+                      "ci_consultation_date": {
+                        "dateTime": "2018-09-12T03:08:56-07:00"
+                      },
+                      "runtimePatientAge": 628,
+                      "assessor_role_id": "PRR00102",
+                      "iiu": [
+                        {
+                          "uri": "OB00006"
+                        },
+                        {
+                          "uri": "OB00007"
+                        },
+                        {
+                          "uri": "OB00008"
+                        },
+                        {
+                          "uri": "OB00009"
+                        },
+                        {
+                          "uri": "OB00010"
+                        }
+                      ],
+                      "role_id": "PRR00102",
+                      "assessor_name": [
+                        {
+                          "family": "Vallée",
+                          "given": [
+                            "Juliette"
+                          ],
+                          "prefix": [
+                            "Dre."
+                          ],
+                          "use": "official"
+                        }
+                      ],
+                      "assessor_org_name": "Hôpital de Rouyn-Noranda",
+                      "assessor_org_id": "OR00202",
+                      "assessor_id": "PR00102",
+                      "observations": [
+                        {
+                          "id": "OB00010",
+                          "status": "final",
+                          "code": {
+                            "text": "phenotype observation"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:04"
+                          },
+                          "phenotype": [
+                            {
+                              "code": "HP:0000268",
+                              "display": "Dolichocephaly"
+                            }
+                          ],
+                          "observed": "POS",
+                          "obs_id": "OB00010",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        },
+                        {
+                          "id": "OB00009",
+                          "status": "final",
+                          "code": {
+                            "text": "phenotype observation"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:03"
+                          },
+                          "phenotype": [
+                            {
+                              "code": "HP:0008947",
+                              "display": "Infantile muscular hypotonia"
+                            }
+                          ],
+                          "observed": "POS",
+                          "obs_id": "OB00009",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        },
+                        {
+                          "id": "OB00008",
+                          "status": "final",
+                          "code": {
+                            "text": "phenotype observation"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:02"
+                          },
+                          "phenotype": [
+                            {
+                              "code": "HP:0001290",
+                              "display": "Generalized hypotonia"
+                            }
+                          ],
+                          "observed": "POS",
+                          "obs_id": "OB00008",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        },
+                        {
+                          "id": "OB00007",
+                          "status": "final",
+                          "code": {
+                            "text": "phenotype observation"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:01"
+                          },
+                          "phenotype": [
+                            {
+                              "code": "HP:0001252",
+                              "display": "Muscular hypotonia"
+                            }
+                          ],
+                          "observed": "POS",
+                          "obs_id": "OB00007",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        },
+                        {
+                          "id": "OB00006",
+                          "status": "final",
+                          "code": {
+                            "text": "phenotype observation"
+                          },
+                          "subject": {
+                            "id": "PA00002",
+                            "resourceType": "Patient"
+                          },
+                          "effective": {
+                            "dateTime": "2018-09-12T03:08:56-07:00"
+                          },
+                          "phenotype": [
+                            {
+                              "code": "HP:0012736",
+                              "display": "Profound global developmental delay"
+                            }
+                          ],
+                          "observed": "POS",
+                          "obs_id": "OB00006",
+                          "performer_id": "PR00102",
+                          "perf_id": "PR00102",
+                          "performer_name": [
+                            {
+                              "family": "Vallée",
+                              "given": [
+                                "Juliette"
+                              ],
+                              "prefix": [
+                                "Dre."
+                              ],
+                              "use": "official"
+                            }
+                          ],
+                          "performer_org_name": "Hôpital de Rouyn-Noranda"
+                        }
+                      ],
+                      "familyMemberHistory": []
+                    }
+                  ],
+                  "organization": {
+                    "id": "OR00202",
+                    "name": "Hôpital de Rouyn-Noranda",
+                    "alias": "HRN"
+                  },
+                  "serviceRequests": [
+                    {
+                      "id": "SR00001",
+                      "status": "active",
+                      "intent": "order",
+                      "authoredOn": "2018-09-12T03:08:56-07:00",
+                      "code": {
+                        "text": "WXS"
+                      },
+                      "subject": {
+                        "id": "PA00002",
+                        "resourceType": "Patient"
+                      },
+                      "specimen": [
+                        {
+                          "id": "SP00011",
+                          "resourceType": "Specimen"
+                        }
+                      ],
+                      "ci_ref": "CI00401",
+                      "requester_role_id": "PRR00202",
+                      "ci_status": "completed",
+                      "role_id": "PRR00202",
+                      "requester_name": [
+                        {
+                          "family": "Hamdan",
+                          "given": [
+                            "Fadi"
+                          ],
+                          "suffix": [
+                            "PhD."
+                          ],
+                          "use": "official"
+                        }
+                      ],
+                      "requester_org_name": "LDx CHU Ste-Justine",
+                      "requester_org_alias": "LDx-CHUSJ",
+                      "requester_org_id": "OR00101",
+                      "requester_id": "PR00202"
+                    }
+                  ],
+                  "studies": [
+                    {
+                      "id": "ET00011",
+                      "title": "Rapidomics",
+                      "patient": "PA00002"
+                    }
+                  ]
                 }
               }
             ]
