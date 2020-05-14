@@ -4,7 +4,7 @@ dependencies:
   '@babel/node': 7.8.7_@babel+core@7.9.0
   '@babel/plugin-transform-runtime': 7.9.0_@babel+core@7.9.0
   '@babel/preset-env': 7.9.5_@babel+core@7.9.0
-  '@babel/register': 7.9.0_@babel+core@7.9.0
+  '@babel/register': 7.9.0
   '@babel/runtime': 7.9.2
   '@elastic/elasticsearch': 7.6.1
   '@hapi/joi': 15.1.1
@@ -36,7 +36,7 @@ dependencies:
   restify-jwt-community: 1.0.13_restify@8.5.1
   uniqid: 5.2.0
   yargs: 13.3.2
-lockfileVersion: 5.1
+lockfileVersion: 5
 packages:
   /@babel/cli/7.8.4_@babel+core@7.9.0:
     dependencies:
@@ -874,6 +874,18 @@ packages:
       '@babel/core': ^7.0.0-0
     resolution:
       integrity: sha512-Ra3JXOHBq2xd56xSF7lMKXdjBn3T772Y1Wet3yWnkDly9zHvJki029tAFzvAAK5cf4YV3yoxuP61crYRol6SVg==
+  /@babel/register/7.9.0:
+    dependencies:
+      find-cache-dir: 2.1.0
+      lodash: 4.17.15
+      make-dir: 2.1.0
+      pirates: 4.0.1
+      source-map-support: 0.5.19
+    dev: false
+    peerDependencies:
+      '@babel/core': ^7.0.0-0
+    resolution:
+      integrity: sha512-Tv8Zyi2J2VRR8g7pC5gTeIN8Ihultbmk0ocyNz8H2nEZbmhp1N6q0A1UGsQbDvGP/sNinQKUHf3SqXwqjtFv4Q==
   /@babel/register/7.9.0_@babel+core@7.9.0:
     dependencies:
       '@babel/core': 7.9.0
@@ -4991,6 +5003,13 @@ packages:
     dev: false
     resolution:
       integrity: sha512-9luZr/BZ2QeU6tO2uG8N2aZpVSli4TSAOAqFOyTO51AJcD9P99c0K1h6dD6r6qo5dyT44BR5exweOaLLeldTkQ==
+  /source-map-support/0.5.19:
+    dependencies:
+      buffer-from: 1.1.1
+      source-map: 0.6.1
+    dev: false
+    resolution:
+      integrity: sha512-Wonm7zOCIJzBGQdB+thsPar0kYuCIzYvxZwlBa87yi/Mdjv7Tip2cyVbLj5o0cFPN4EVkuTwb3GDDyUx2DGnGw==
   /source-map-url/0.4.0:
     dev: false
     resolution:
@@ -5747,7 +5766,7 @@ specifiers:
   '@babel/node': ^7.2.2
   '@babel/plugin-transform-runtime': ^7.4.4
   '@babel/preset-env': ^7.4.1
-  '@babel/register': ^7.6.0
+  '@babel/register': ^7.9.0
   '@babel/runtime': ^7.4.5
   '@elastic/elasticsearch': ^7.1.0
   '@hapi/joi': ^15.0.3
