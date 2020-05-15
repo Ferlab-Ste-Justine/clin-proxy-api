@@ -60,7 +60,7 @@
         }
       }
     },
-    "/variant/{uid}": {
+    "/variant/{vid}": {
       "get": {
         "security": [
           {
@@ -74,7 +74,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "uid",
+            "name": "vid",
             "schema": {
               "type": "string"
             },
@@ -2540,6 +2540,17 @@
                   },
                   "..."
                 ]
+              },
+              {
+                "extdb_pubmed": [
+                  {
+                    "value": 1,
+                    "count": 1
+                  }
+                ]
+              },
+              {
+                "extdb_clinvar": []
               },
               "..."
             ]
