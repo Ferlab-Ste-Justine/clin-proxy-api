@@ -6,3 +6,5 @@ RUN npm run build
 CMD ["npm", "run", "service-gene"]
 
 HEALTHCHECK --interval=20s CMD wget --no-check-certificate -qO- https://localhost:5002/gene/health
+
+ENV MEMORY_LIMIT 256
