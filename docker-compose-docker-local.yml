@@ -7,6 +7,19 @@ services:
       - "11211:11211"
     networks:
       - clinnet
+    deploy:
+      mode: replicated
+      #Given that memcached is a stateful application and this is not a cluster, keep this value at 1
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2.00'
+          memory: 256M
+        reservations:
+          cpus: '1.00'
+          memory: 128M
+    #https://docs.oracle.com/cd/E17952_01/mysql-5.1-en/ha-memcached-cmdline-options.html
+    command: "memcached -m 128 -t 4"
   auth:
     image: localhost:5000/clin-proxy-api-auth-service
     volumes:
@@ -18,6 +31,13 @@ services:
       - "3000:3000"
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
     networks:
       - clinnet
       - proxy
@@ -35,6 +55,13 @@ services:
       - "4000:4000"
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
     networks:
       - clinnet
       - proxy
@@ -53,6 +80,13 @@ services:
       - "5001:5001"
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
     networks:
       - clinnet
       - proxy
@@ -70,6 +104,13 @@ services:
       - "7000:7000"
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
     networks:
       - clinnet
       - proxy
@@ -85,6 +126,13 @@ services:
       - "5002:5002"
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
     networks:
       - clinnet
       - proxy
