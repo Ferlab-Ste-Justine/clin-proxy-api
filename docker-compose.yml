@@ -43,6 +43,7 @@ services:
       placement:
         constraints: [node.labels.node_role == devops]
     networks:
+      - aidbox
       - clinnet
       - proxy
     env_file:
@@ -109,6 +110,8 @@ services:
 
 
 networks:
+  aidbox:
+    external: true
   clinnet:
     external: true
   proxy:
