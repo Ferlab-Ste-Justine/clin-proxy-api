@@ -7,4 +7,4 @@ CMD ["npm", "run", "service-variant"]
 
 HEALTHCHECK --interval=20s CMD wget --no-check-certificate -qO- https://localhost:5001/variant/health
 
-ENV MEMORY_LIMIT 256
+ENV MEMORY_LIMIT 512

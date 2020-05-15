@@ -82,11 +82,11 @@ services:
       replicas: 1
       resources:
         limits:
+          cpus: '1.00'
+          memory: 512M
+        reservations:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy

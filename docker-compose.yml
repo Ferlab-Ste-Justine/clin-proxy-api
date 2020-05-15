@@ -87,16 +87,16 @@ services:
     ports:
       - "5001:5001"
     deploy:
-      replicas: 2
+      replicas: 3
       placement:
         constraints: [node.labels.node_role == devops]
       resources:
         limits:
+          cpus: '1.00'
+          memory: 512M
+        reservations:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
