@@ -1,17 +1,26 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "1.0.0",
+    "version": "1.x",
     "title": "Gene API Service",
-    "description": "Gene API Service\n"
+    "description": "Gene API Service; This service is available to everyone that have a valid JWT token from the Auth Service.\n",
+    "license": {
+      "name": "GNU Affero General Public License v3.0",
+      "url": "https://github.com/cr-ste-justine/clin-proxy-api/blob/master/LICENSE"
+    }
   },
   "servers": [
-  {
-    "url": "https://localhost:5002"
-  }
+    {
+      "url": "https://localhost:5002",
+      "description": "Localhost"
+    },
+    {
+      "url": "https://clin.cr-ste-justine.xyz/api",
+      "description": "QA"
+    }
   ],
   "paths": {
-    "/query/health": {
+    "/gene/health": {
       "get": {
         "tags": [
           "Service Health Check"
@@ -30,9 +39,101 @@
           }
         }
       }
+    },
+    "/gene/autocomplete": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "Gene Query"
+        ],
+        "summary": "Returns the result of the gene query with highligh",
+        "description": "execute query on gene index based on geneSymbol, alias, ensemblId, name, omim, hgnc and NCBI's geneId.",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultSuccess"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "the 'Query' parameter",
+            "schema": {
+              "type": "string",
+              "minimum": 2
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "return simpler, i.e. 'partial' result or default",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "return the page number based on size of result",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "description": "return the quantity from the result",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token"
+      }
+    },
     "schemas": {
       "Health": {
         "title": "Health Check",
@@ -52,6 +153,133 @@
           "timestamp": 1553284037677,
           "message": "Ok",
           "data": {}
+        }
+      },
+      "ResultSuccess": {
+        "title": "Gene result",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              }
+            }
+          },
+          "hits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_index": {
+                  "type": "string"
+                },
+                "_type": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "_score": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "_source": {
+                  "type": "object",
+                  "items": {
+                    "properties": {
+                      "geneSymbol": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "highlight": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {
+            "total": 49,
+            "hits": [
+              {
+                "_index": "genes",
+                "_type": "_doc",
+                "_id": "ENSG00000157764",
+                "_score": 86.49973,
+                "_source": {
+                  "geneSymbol": "BRAF"
+                },
+                "highlight": {
+                  "alias": [
+                    "{{Braf}}",
+                    "{{BRAF1}}"
+                  ],
+                  "geneSymbol": [
+                    "{{BRAF}}"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Error500": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "InternalError",
+          "data": {
+            "messages": [
+              "Halp! I has error."
+            ]
+          }
+        }
+      },
+      "Error401": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "Unauthorized",
+          "data": {
+            "messages": [
+              "Halp! I has the forgottenz."
+            ]
+          }
         }
       }
     }

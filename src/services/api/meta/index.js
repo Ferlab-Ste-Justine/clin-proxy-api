@@ -136,9 +136,32 @@ export default class MetaService extends ApiService {
 
         } ) )
 
-        // Register updateStatement
+        // Register deleteStatement with requestBody (old form)
+        // TODO To remove after changes in Frontend --  Kept to preserve backward compatibility
         this.instance.del( {
             path: `${this.config.endpoint}/statement`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                await getFunctionForApiVersion( req.version, 'deleteStatement' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( 204 )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register deleteStatement with query param (new form) to conform with openApi
+        this.instance.del( {
+            path: `${this.config.endpoint}/:uid`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 await getFunctionForApiVersion( req.version, 'deleteStatement' )(
@@ -229,9 +252,32 @@ export default class MetaService extends ApiService {
 
         } ) )
 
-        // Register deleteProfile
+        // Register deleteProfile  (old form)
+        // TODO To remove after changes in Frontend --  Kept to preserve backward compatibility
         this.instance.del( {
             path: `${this.config.endpoint}/profile`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                await getFunctionForApiVersion( req.version, 'deleteProfile' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.send( 204 )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        // Register deleteProfile (new form) conform to OpenApi 3.0
+        this.instance.del( {
+            path: `${this.config.endpoint}/profile/:uid`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 await getFunctionForApiVersion( req.version, 'deleteProfile' )(

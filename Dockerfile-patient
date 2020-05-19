@@ -6,3 +6,5 @@ RUN npm run build
 CMD ["npm", "run", "service-patient"]
 
 HEALTHCHECK --interval=20s CMD wget --no-check-certificate -qO- https://localhost:4000/patient/health
+
+ENV MEMORY_LIMIT 256

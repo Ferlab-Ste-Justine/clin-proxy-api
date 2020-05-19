@@ -1,0 +1,20 @@
+name: Build Images
+
+on: [push]
+
+jobs:
+  build:
+    name: Build Images
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Ensure we can build the auth service
+      run: docker build -t test:test -f Dockerfile-auth .
+    - name: Ensure we can build the patient service
+      run: docker build -t test:test -f Dockerfile-patient .
+    - name: Ensure we can build the meta service
+      run: docker build -t test:test -f Dockerfile-meta .
+    - name: Ensure we can build the variant service
+      run: docker build -t test:test -f Dockerfile-variant .
+    - name: Ensure we can build the gene service
+      run: docker build -t test:test -f Dockerfile-gene .
