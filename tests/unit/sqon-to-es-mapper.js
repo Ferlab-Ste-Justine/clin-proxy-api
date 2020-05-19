@@ -24,7 +24,6 @@ const DEFAULT_LIMIT = 25;
 
 describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => {
 
-    /*
     it( 'should return a broad translation for a valid SQON', () => {
         const translatedQuery = translate( EMPTY_STATEMENT, EMPTY_STATEMENT_QUERY, ELASTIC_SEARCH_SCHEMA_V1, DIALECT_LANGUAGE_ELASTIC_SEARCH )
         expect( translatedQuery ).to.eql(
@@ -797,9 +796,7 @@ describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => 
         } )
 
     } )
-    */
 
-    /* @NOTE Does not appear implemented or SQON structure is incorrect. To investigate. */
     describe( 'Solo Composite (Score)', () => {
         const statementLowerThanOrEqualQueryKey = uniqid();
         const statementLowerThanOrEqual = [
@@ -937,7 +934,6 @@ describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => 
 
     } )
 
-    /*
     describe( 'Solo Composite (Call)', () => {
         const statementInclusionQueryKey = uniqid();
         const statementInclusion = [
@@ -983,7 +979,6 @@ describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => 
         } )
 
     } )
-    */
 
 
 } )
