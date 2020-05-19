@@ -142,10 +142,10 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
         }
     } )
 
+    // @NOTE Either one or the other but not both at the same time!
     if ( termComparisons.length > 0 ) {
         query.should = termComparisons
-    }
-    if ( numericalComparisons.length > 0 ) {
+    } else if ( numericalComparisons.range !== undefined ) {
         query.must = numericalComparisons
     }
 

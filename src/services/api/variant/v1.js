@@ -1,7 +1,6 @@
 import errors from 'restify-errors'
 import { readFileSync } from 'fs'
 
-import translate, { denormalize, getQueryByKey } from './sqon'
 import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from './sqon/dialect/es'
 import { DIALECT_LANGUAGE_GRAPHQL } from './sqon/dialect/gql'
 
@@ -38,7 +37,6 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const dialect = params.dialect || DIALECT_LANGUAGE_ELASTIC_SEARCH
         const schema = schemas[ dialect ]
-        const translatedQuery = translate( statement, query, schema, dialect )
 
         let response = {}
         let totalFromResponse = 0
@@ -50,7 +48,7 @@ const getVariants = async ( req, res, cacheService, elasticService, logService )
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.searchVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group, index, limit )
+                response = await elasticService.searchVariantsForPatient( patient, statement, query, sessionData.acl.fhir, schema, group, index, limit )
                 totalFromResponse = response.hits.total
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {
                     const result = hit._source
@@ -84,11 +82,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
         const statement = params.statement
         const query = params.query
         const dialect = params.dialect || DIALECT_LANGUAGE_ELASTIC_SEARCH
-        const facets = params.facets || []
         const schema = schemas[ dialect ]
-        const denormalizedStatement = denormalize( statement )
-        const denormalizedQuery = getQueryByKey( denormalizedStatement, query )
-        const translatedQuery = translate( statement, query, schema, dialect )
         let response = {}
         let facetsFromResponse = {}
 
@@ -98,7 +92,7 @@ const getFacets = async ( req, res, cacheService, elasticService, logService ) =
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForVariant( patient, translatedQuery, denormalizedQuery, sessionData.acl.fhir, schema, facets )
+                response = await elasticService.getFacetsForVariant( patient, statement, query, sessionData.acl.fhir, schema )
 
                 // Filtered Non-Nested
                 if ( response.aggregations.filtered ) {
@@ -232,8 +226,7 @@ const countVariants = async ( req, res, cacheService, elasticService, logService
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 await Promise.all(
                     queries.map( async( query ) => {
-                        const translatedQuery = translate( statement, query, schema, dialect )
-                        const response = await elasticService.countVariantsForPatient( patient, translatedQuery, sessionData.acl.fhir, schema, group )
+                        const response = await elasticService.countVariantsForPatient( patient, statement, query, sessionData.acl.fhir, schema, group )
 
                         totalFromResponse[ query ] = response.count
                         await logService.debug( `Elastic countVariants in ${dialect} dialect resolved query ${patient}/${query} found ${response.count} matches` )
