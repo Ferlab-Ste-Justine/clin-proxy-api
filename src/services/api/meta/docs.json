@@ -57,7 +57,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Statement"
+                  "$ref": "#/components/schemas/statementResponse"
                 }
               }
             }
@@ -110,7 +110,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Statement"
+                  "$ref": "#/components/schemas/statementResponse"
                 }
               }
             }
@@ -163,7 +163,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Statement"
+                  "$ref": "#/components/schemas/statementResponse"
                 }
               }
             }
@@ -174,6 +174,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404"
                 }
               }
             }
@@ -257,7 +267,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Health"
+                  "$ref": "#/components/schemas/profileResponse"
                 }
               }
             }
@@ -298,7 +308,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Profile"
+                "$ref": "#/components/schemas/profileRequest"
               }
             }
           },
@@ -310,7 +320,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Health"
+                  "$ref": "#/components/schemas/profileResponse"
                 }
               }
             }
@@ -351,7 +361,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Profile"
+                "$ref": "#/components/schemas/profileRequest"
               }
             }
           },
@@ -363,7 +373,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Health"
+                  "$ref": "#/components/schemas/profileResponse"
                 }
               }
             }
@@ -374,6 +384,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NotFound",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error404"
                 }
               }
             }
@@ -543,10 +563,15 @@
             "items": {
               "$ref": "#/components/schemas/SQON"
             }
+          },
+          "uid": {
+            "type": "string",
+            "nullable": true
           }
         },
         "example": {
           "title": "My one statement",
+          "uid": "Gc3hLXIBtsRakoBUb88l",
           "description": "My one statement",
           "queries": [
             {
@@ -573,6 +598,80 @@
         "title": "Profile resource",
         "type": "object",
         "properties": {
+          "defaultStatement": {
+            "type": "string"
+          },
+          "patientTableConfig": {
+            "type": "string"
+          },
+          "variantTableConfig": {
+            "type": "string"
+          },
+          "lastUpdatedOn": {
+            "type": "integer"
+          },
+          "practitionerId": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "example": {
+          "defaultStatement": "",
+          "patientTableConfig": "{}",
+          "variantTableConfig": "{}",
+          "lastUpdatedOn": 1589920914967,
+          "practitionerId": "PR00610",
+          "organizationId": "OR00202",
+          "uid": "hUG7LnIB2vbrMnq1AppV"
+        }
+      },
+      "profileRequest": {
+        "title": "Profile resource",
+        "type": "object",
+        "properties": {
+          "defaultStatement": {
+            "type": "string"
+          },
+          "patientTableConfig": {
+            "type": "string"
+          },
+          "variantTableConfig": {
+            "type": "string"
+          },
+          "lastUpdatedOn": {
+            "type": "integer"
+          },
+          "practitionerId": {
+            "type": "object"
+          },
+          "organizationId": {
+            "type": "object"
+          },
+          "uid": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "example": {
+          "defaultStatement": "",
+          "patientTableConfig": {},
+          "variantTableConfig": {},
+          "lastUpdatedOn": 1589920914967,
+          "practitionerId": "PR00610",
+          "organizationId": "OR00202",
+          "uid": "hUG7LnIB2vbrMnq1AppV"
+        }
+      },
+      "profileResponse": {
+        "title": "Profile response",
+        "type": "object",
+        "properties": {
           "timestamp": {
             "type": "integer"
           },
@@ -580,13 +679,103 @@
             "type": "string"
           },
           "data": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "hits": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "_index": {
+                      "type": "string"
+                    },
+                    "_type": {
+                      "type": "string"
+                    },
+                    "_id": {
+                      "type": "string"
+                    },
+                    "_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "_source": {
+                      "$ref": "#/components/schemas/Profile"
+                    }
+                  }
+                }
+              }
+            }
           }
         },
         "example": {
           "timestamp": 1553284037677,
           "message": "Ok",
-          "data": {}
+          "data": {
+            "total": 1,
+            "hits": [
+              {
+                "_index": "profile",
+                "_type": "_doc",
+                "_id": "hEGrLnIB2vbrMnq13pod",
+                "_score": 0.6931472,
+                "_source": {
+                  "defaultStatement": "",
+                  "patientTableConfig": "{}",
+                  "variantTableConfig": "{}",
+                  "lastUpdatedOn": 1589920914967,
+                  "practitionerId": "PR00610",
+                  "organizationId": "OR00202"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "statementResponse": {
+        "title": "Statement response",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Statement"
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {
+            "title": "My one statement",
+            "description": "My one statement",
+            "uid": "Gc3hLXIBtsRakoBUb88l",
+            "queries": [
+              {
+                "key": "a62358e0-2023-11ea-a4ec-97496af1912d",
+                "instructions": [
+                  {
+                    "type": "filter",
+                    "data": {
+                      "id": "variant_type",
+                      "type": "generic",
+                      "index": 1,
+                      "values": [
+                        "deletion"
+                      ],
+                      "operand": "all"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
         }
       },
       "Error500": {
@@ -632,6 +821,30 @@
             "messages": [
               "Halp! I has the forgottenz."
             ]
+          }
+        }
+      },
+      "Error404": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "NotFound",
+          "data": {
+            "messages": []
           }
         }
       }

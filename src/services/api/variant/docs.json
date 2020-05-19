@@ -52,7 +52,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Schema"
+                  "$ref": "#/components/schemas/schemaResponse"
                 }
               }
             }
@@ -3014,6 +3014,1153 @@
           "query": [
             "f6a3fcf0-5e23-11ea-b1d8-474c1f19d47c"
           ]
+        }
+      },
+      "schemaResponse": {
+        "title": "schema response",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Schema"
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {
+            "version": "1.0",
+            "dialect": "es",
+            "index": "clin-mutation-centric",
+            "path": "/mutations",
+            "fields": {
+              "patient": "donors.patientId.keyword",
+              "practitioner": "donors.practitionerId.keyword",
+              "organization": "donors.organizationId.keyword"
+            },
+            "groups": {
+              "impact": {
+                "sort": [
+                  {
+                    "donors.exomiserScore": {
+                      "order": "desc",
+                      "nested": {
+                        "path": "donors"
+                      }
+                    }
+                  },
+                  {
+                    "impactScore": {
+                      "order": "desc"
+                    }
+                  }
+                ],
+                "postprocess": "context.sort[0]['donors.exomiserScore'].nested.filter = { term: { 'donors.patientId.keyword': context.patient } }; return context.sort"
+              }
+            },
+            "defaultGroup": "impact",
+            "categories": [
+              {
+                "id": "variant",
+                "label": "category_variant",
+                "filters": [
+                  {
+                    "id": "variant_type",
+                    "label": "filter_variant_type",
+                    "type": "generic",
+                    "search": {
+                      "variant_type": "type.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "variant_type",
+                        "query": {
+                          "terms": {
+                            "field": "type.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 999
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "consequence",
+                    "label": "filter_consequence",
+                    "type": "generic",
+                    "search": {
+                      "consequence": "consequences.consequence.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "consequence",
+                        "query": {
+                          "terms": {
+                            "field": "consequences.consequence.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 999
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "extdb",
+                    "label": "filter_extdb",
+                    "type": "genericbool",
+                    "search": {
+                      "extdb_pubmed": "availableDbExt.pubmed",
+                      "extdb_clinvar": "availableDbExt.clinvar",
+                      "extdb_dbsnp": "availableDbExt.dbSNP"
+                    },
+                    "facet": [
+                      {
+                        "id": "extdb_pubmed",
+                        "label": "filter_extdb_pubmed",
+                        "query": {
+                          "terms": {
+                            "field": "availableDbExt.pubmed",
+                            "size": 1
+                          }
+                        }
+                      },
+                      {
+                        "id": "extdb_clinvar",
+                        "label": "filter_extdb_clinvar",
+                        "query": {
+                          "terms": {
+                            "field": "availableDbExt.clinvar",
+                            "size": 1
+                          }
+                        }
+                      },
+                      {
+                        "id": "extdb_dbsnp",
+                        "label": "filter_extdb_dbsnp",
+                        "query": {
+                          "terms": {
+                            "field": "availableDbExt.dbSNP",
+                            "size": 1
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "chromosome",
+                    "label": "filter_chromosome",
+                    "type": "generic",
+                    "search": {
+                      "chromosome": "chrom.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "chromosome",
+                        "query": {
+                          "terms": {
+                            "field": "chrom.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 24
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "genomic",
+                "label": "category_genomic",
+                "filters": [
+                  {
+                    "id": "gene_type",
+                    "label": "filter_gene_type",
+                    "type": "generic",
+                    "search": {
+                      "gene_type": "genes.biotype.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "gene_type",
+                        "query": {
+                          "terms": {
+                            "field": "genes.biotype.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 999
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "extref",
+                    "label": "filter_extref",
+                    "type": "genericbool",
+                    "search": {
+                      "extref_hpo": "availableDbExt.hpo",
+                      "extref_orphanet": "availableDbExt.orphanet",
+                      "extref_radboudumc": "availableDbExt.radboudumc",
+                      "extref_omim": "availableDbExt.omim"
+                    },
+                    "facet": [
+                      {
+                        "id": "extref_hpo",
+                        "label": "filter_extref_hpo",
+                        "query": {
+                          "terms": {
+                            "field": "availableDbExt.hpo",
+                            "size": 1
+                          }
+                        }
+                      },
+                      {
+                        "id": "extref_orphanet",
+                        "label": "filter_extref_orphanet",
+                        "query": {
+                          "terms": {
+                            "field": "availableDbExt.orphanet",
+                            "size": 1
+                          }
+                        }
+                      },
+                      {
+                        "id": "extref_radboudumc",
+                        "label": "filter_extref_radboudumc",
+                        "query": {
+                          "terms": {
+                            "field": "availableDbExt.radboudumc",
+                            "size": 1
+                          }
+                        }
+                      },
+                      {
+                        "id": "extref_omim",
+                        "label": "filter_extref_omim",
+                        "query": {
+                          "terms": {
+                            "field": "availableDbExt.omim",
+                            "size": 1
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "gene_hpo",
+                    "label": "filter_gene_hpo",
+                    "type": "specific",
+                    "config": {
+                      "gene_hpo": {
+                        "operands": [
+                          "all",
+                          "one",
+                          "none"
+                        ]
+                      }
+                    },
+                    "search": {
+                      "gene_hpo": "genes.hpo.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "gene_hpo",
+                        "query": {
+                          "terms": {
+                            "field": "genes.hpo.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 9999
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "genegroup_radboud",
+                    "label": "filter_genegroup_radboud",
+                    "type": "generic",
+                    "search": {
+                      "genegroup_radboud": "genes.radboudumc.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "genegroup_radboud",
+                        "query": {
+                          "terms": {
+                            "field": "genes.radboudumc.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 999
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "genegroup_orphanet",
+                    "label": "filter_genegroup_orphanet",
+                    "type": "generic",
+                    "search": {
+                      "genegroup_orphanet": "genes.orphanet.panel.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "genegroup_orphanet",
+                        "query": {
+                          "terms": {
+                            "field": "genes.orphanet.panel.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 999
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "impacts",
+                "label": "category_impacts",
+                "filters": [
+                  {
+                    "id": "exomiser_score",
+                    "label": "filter_exomiser_score",
+                    "type": "numcomparison",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "config": {
+                      "min": "exomiser_score_min",
+                      "max": "exomiser_score_max"
+                    },
+                    "search": {
+                      "exomiser_score": "donors.exomiserScore"
+                    },
+                    "facet": [
+                      {
+                        "id": "exomiser_score_min",
+                        "query": {
+                          "min": {
+                            "field": "donors.exomiserScore"
+                          }
+                        }
+                      },
+                      {
+                        "id": "exomiser_score_max",
+                        "query": {
+                          "max": {
+                            "field": "donors.exomiserScore"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "clinvar_clinsig",
+                    "label": "filter_clinvar_clinsig",
+                    "type": "generic",
+                    "search": {
+                      "clinvar_clinsig": "clinvar.clinvar_clinsig.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "clinvar_clinsig",
+                        "query": {
+                          "terms": {
+                            "field": "clinvar.clinvar_clinsig.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 999
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "impact",
+                    "label": "filter_impacts",
+                    "type": "generic",
+                    "search": {
+                      "impact": "consequences.impact.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "impact",
+                        "query": {
+                          "terms": {
+                            "field": "consequences.impact.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 999
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "prediction_fathmm",
+                    "label": "filter_prediction_fathmm",
+                    "type": "composite",
+                    "config": {
+                      "min": "prediction_fathmm_min",
+                      "max": "prediction_fathmm_max"
+                    },
+                    "search": {
+                      "prediction_fathmm": {
+                        "score": "consequences.predictions.FATHMM_score",
+                        "quality": "consequences.predictions.FATHMM.keyword"
+                      }
+                    },
+                    "facet": [
+                      {
+                        "id": "prediction_fathmm",
+                        "query": {
+                          "terms": {
+                            "field": "consequences.predictions.FATHMM.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 9
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_fathmm_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.predictions.SIFT_score"
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_fathmm_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.predictions.SIFT_score"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "prediction_sift",
+                    "label": "filter_prediction_sift",
+                    "type": "composite",
+                    "search": {
+                      "prediction_sift": {
+                        "score": "consequences.predictions.SIFT_score",
+                        "quality": "consequences.predictions.SIFT.keyword"
+                      }
+                    },
+                    "facet": [
+                      {
+                        "id": "prediction_sift",
+                        "query": {
+                          "terms": {
+                            "field": "consequences.predictions.SIFT.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 9
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_sift_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.predictions.SIFT_score"
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_sift_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.predictions.SIFT_score"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "prediction_polyphen2_hvar",
+                    "label": "filter_prediction_polyphen2_hvar",
+                    "type": "composite",
+                    "config": {
+                      "min": "prediction_polyphen2_hvar_min",
+                      "max": "prediction_polyphen2_hvar_max"
+                    },
+                    "search": {
+                      "prediction_polyphen2_hvar": {
+                        "score": "consequences.predictions.Polyphen2_HVAR_score",
+                        "quality": "consequences.predictions.Polyphen2_HVAR_pred.keyword"
+                      }
+                    },
+                    "facet": [
+                      {
+                        "id": "prediction_polyphen2_hvar",
+                        "query": {
+                          "terms": {
+                            "field": "consequences.predictions.Polyphen2_HVAR_pred.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 9
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_polyphen2_hvar_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.predictions.Polyphen2_HVAR_score"
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_polyphen2_hvar_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.predictions.Polyphen2_HVAR_score"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "prediction_lrt",
+                    "label": "filter_prediction_lrt",
+                    "type": "composite",
+                    "config": {
+                      "min": "prediction_lrt_min",
+                      "max": "prediction_lrt_max"
+                    },
+                    "search": {
+                      "prediction_lrt": {
+                        "score": "consequences.predictions.LRT_score",
+                        "quality": "consequences.predictions.LRT_pred.keyword"
+                      }
+                    },
+                    "facet": [
+                      {
+                        "id": "prediction_lrt",
+                        "query": {
+                          "terms": {
+                            "field": "consequences.predictions.LRT_pred.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 9
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_lrt_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.predictions.LRT_score"
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_lrt_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.predictions.LRT_score"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "prediction_dann",
+                    "label": "filter_prediction_dann",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "prediction_dann_min",
+                      "max": "prediction_dann_max"
+                    },
+                    "search": {
+                      "prediction_dann": "consequences.predictions.DANN_score"
+                    },
+                    "facet": [
+                      {
+                        "id": "prediction_dann_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.predictions.DANN_score"
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_dann_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.predictions.DANN_score"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "prediction_cadd",
+                    "label": "filter_prediction_cadd",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "prediction_cadd_min",
+                      "max": "prediction_cadd_max"
+                    },
+                    "search": {
+                      "prediction_cadd": "consequences.predictions.CADD_score"
+                    },
+                    "facet": [
+                      {
+                        "id": "prediction_cadd_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.predictions.CADD_score"
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_cadd_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.predictions.CADD_score"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "prediction_revel",
+                    "label": "filter_prediction_revel",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "prediction_revel_min",
+                      "max": "prediction_revel_max"
+                    },
+                    "search": {
+                      "prediction_revel": "consequences.predictions.REVEL_score"
+                    },
+                    "facet": [
+                      {
+                        "id": "prediction_revel_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.predictions.REVEL_score"
+                          }
+                        }
+                      },
+                      {
+                        "id": "prediction_revel_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.predictions.REVEL_score"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "conservation_phylop",
+                    "label": "filter_conservation_phylop",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "conservation_phylop_min",
+                      "max": "conservation_phylop_max"
+                    },
+                    "search": {
+                      "conservation_phylop": "consequences.conservationsScores.PhyloP17Way"
+                    },
+                    "facet": [
+                      {
+                        "id": "conservation_phylop_min",
+                        "query": {
+                          "min": {
+                            "field": "consequences.conservationsScores.PhyloP17Way"
+                          }
+                        }
+                      },
+                      {
+                        "id": "conservation_phylop_max",
+                        "query": {
+                          "max": {
+                            "field": "consequences.conservationsScores.PhyloP17Way"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "cohort",
+                "label": "category_cohort",
+                "filters": [
+                  {
+                    "id": "cohort_rqdm",
+                    "label": "filter_cohort_rqdm",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "cohort_rqdm_min",
+                      "max": "cohort_rqdm_max"
+                    },
+                    "search": {
+                      "cohort_rqdm": "frequencies.interne.AF"
+                    },
+                    "facet": [
+                      {
+                        "id": "cohort_rqdm_min",
+                        "query": {
+                          "min": {
+                            "field": "frequencies.interne.AF"
+                          }
+                        }
+                      },
+                      {
+                        "id": "cohort_rqdm_max",
+                        "query": {
+                          "max": {
+                            "field": "frequencies.interne.AF"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "cohort_gnomad_exomes",
+                    "label": "filter_cohort_gnomad_exomes",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "cohort_gnomad_exomes_min",
+                      "max": "cohort_gnomad_exomes_max"
+                    },
+                    "search": {
+                      "cohort_gnomad_exomes": "frequencies.gnomAD_exomes.AF"
+                    },
+                    "facet": [
+                      {
+                        "id": "cohort_gnomad_exomes_min",
+                        "query": {
+                          "min": {
+                            "field": "frequencies.gnomAD_exomes.AF"
+                          }
+                        }
+                      },
+                      {
+                        "id": "cohort_gnomad_exomes_max",
+                        "query": {
+                          "max": {
+                            "field": "frequencies.gnomAD_exomes.AF"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "cohort_gnomad_genomes",
+                    "label": "filter_cohort_gnomad_genomes",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "cohort_gnomad_genomes_min",
+                      "max": "cohort_gnomad_genomes_max"
+                    },
+                    "search": {
+                      "cohort_gnomad_genomes": "frequencies.gnomAD_genomes.AF"
+                    },
+                    "facet": [
+                      {
+                        "id": "cohort_gnomad_genomes_min",
+                        "query": {
+                          "min": {
+                            "field": "frequencies.gnomAD_genomes.AF"
+                          }
+                        }
+                      },
+                      {
+                        "id": "cohort_gnomad_genomes_max",
+                        "query": {
+                          "max": {
+                            "field": "frequencies.gnomAD_genomes.AF"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "cohort_exac",
+                    "label": "filter_cohort_exac",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "cohort_exac_min",
+                      "max": "cohort_exac_max"
+                    },
+                    "search": {
+                      "cohort_exac": "frequencies.ExAc.AF"
+                    },
+                    "facet": [
+                      {
+                        "id": "cohort_exac_min",
+                        "query": {
+                          "min": {
+                            "field": "frequencies.ExAc.AF"
+                          }
+                        }
+                      },
+                      {
+                        "id": "cohort_exac_max",
+                        "query": {
+                          "max": {
+                            "field": "frequencies.ExAc.AF"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "cohort_uk10k",
+                    "label": "filter_cohort_uk10k",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "cohort_uk10k_min",
+                      "max": "cohort_uk10k_max"
+                    },
+                    "search": {
+                      "cohort_uk10k": "frequencies.Uk10k.AF"
+                    },
+                    "facet": [
+                      {
+                        "id": "cohort_uk10k_min",
+                        "query": {
+                          "min": {
+                            "field": "frequencies.Uk10k.AF"
+                          }
+                        }
+                      },
+                      {
+                        "id": "cohort_uk10k_max",
+                        "query": {
+                          "max": {
+                            "field": "frequencies.Uk10k.AF"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "cohort_1000gp3",
+                    "label": "filter_cohort_1000gp3",
+                    "type": "numcomparison",
+                    "config": {
+                      "min": "cohort_1000gp3_min",
+                      "max": "cohort_1000gp3_max"
+                    },
+                    "search": {
+                      "cohort_1000gp3": "frequencies.1000Gp3.AF"
+                    },
+                    "facet": [
+                      {
+                        "id": "cohort_1000gp3_min",
+                        "query": {
+                          "min": {
+                            "field": "frequencies.1000Gp3.AF"
+                          }
+                        }
+                      },
+                      {
+                        "id": "cohort_1000gp3_max",
+                        "query": {
+                          "max": {
+                            "field": "frequencies.1000Gp3.AF"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "zygosity",
+                "label": "category_zygosity",
+                "filters": [
+                  {
+                    "id": "transmission",
+                    "label": "filter_transmission",
+                    "type": "generic",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "search": {
+                      "transmission": "donors.transmission.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "transmission",
+                        "query": {
+                          "terms": {
+                            "field": "donors.transmission.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 9
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "zygosity",
+                    "label": "filter_zygosity",
+                    "type": "generic",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "search": {
+                      "zygosity": "donors.zygosity.keyword"
+                    },
+                    "facet": [
+                      {
+                        "id": "zygosity",
+                        "query": {
+                          "terms": {
+                            "field": "donors.zygosity.keyword",
+                            "order": {
+                              "_count": "desc"
+                            },
+                            "size": 9
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "metric",
+                "label": "category_metric",
+                "filters": [
+                  {
+                    "id": "metric_depth_quality",
+                    "label": "filter_metric_depth_quality",
+                    "type": "numcomparison",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "config": {
+                      "min": "metric_depth_quality_min",
+                      "max": "metric_depth_quality_max"
+                    },
+                    "search": {
+                      "metric_depth_quality": "donors.qd"
+                    },
+                    "facet": [
+                      {
+                        "id": "metric_depth_quality_min",
+                        "query": {
+                          "min": {
+                            "field": "donors.qd"
+                          }
+                        }
+                      },
+                      {
+                        "id": "metric_depth_quality_max",
+                        "query": {
+                          "max": {
+                            "field": "donors.qd"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "metric_allelic_alt_depth",
+                    "label": "filter_allelic_alt_depth",
+                    "type": "numcomparison",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "config": {
+                      "min": "metric_allelic_alt_depth_min",
+                      "max": "metric_allelic_alt_depth_max"
+                    },
+                    "search": {
+                      "metric_allelic_alt_depth": "donors.adAlt"
+                    },
+                    "facet": [
+                      {
+                        "id": "metric_allelic_alt_depth_min",
+                        "query": {
+                          "min": {
+                            "field": "donors.adAlt"
+                          }
+                        }
+                      },
+                      {
+                        "id": "metric_allelic_alt_depth_max",
+                        "query": {
+                          "max": {
+                            "field": "donors.adAlt"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "metric_total_depth",
+                    "label": "filter_total_depth",
+                    "type": "numcomparison",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "config": {
+                      "min": "metric_total_depth_min",
+                      "max": "metric_total_depth_max"
+                    },
+                    "search": {
+                      "metric_total_depth": "donors.adTotal"
+                    },
+                    "facet": [
+                      {
+                        "id": "metric_total_depth_min",
+                        "query": {
+                          "min": {
+                            "field": "donors.adTotal"
+                          }
+                        }
+                      },
+                      {
+                        "id": "metric_total_depth_max",
+                        "query": {
+                          "max": {
+                            "field": "donors.adTotal"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "metric_ratio",
+                    "label": "filter_ratio",
+                    "type": "numcomparison",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "config": {
+                      "min": "metric_ratio_min",
+                      "max": "metric_ratio_max"
+                    },
+                    "search": {
+                      "metric_ratio": "donors.adFreq"
+                    },
+                    "facet": [
+                      {
+                        "id": "metric_ratio_min",
+                        "query": {
+                          "min": {
+                            "field": "donors.adFreq"
+                          }
+                        }
+                      },
+                      {
+                        "id": "metric_ratio_max",
+                        "query": {
+                          "max": {
+                            "field": "donors.adFreq"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "metric_genotype_quality",
+                    "label": "filter_genotype_quality",
+                    "type": "numcomparison",
+                    "subtype": {
+                      "type": "nested",
+                      "config": {
+                        "path": "donors",
+                        "field": "patientId.keyword"
+                      }
+                    },
+                    "config": {
+                      "min": "metric_genotype_quality_min",
+                      "max": "metric_genotype_quality_max"
+                    },
+                    "search": {
+                      "metric_genotype_quality": "donors.gq"
+                    },
+                    "facet": [
+                      {
+                        "id": "metric_genotype_quality_min",
+                        "query": {
+                          "min": {
+                            "field": "donors.gq"
+                          }
+                        }
+                      },
+                      {
+                        "id": "metric_genotype_quality_max",
+                        "query": {
+                          "max": {
+                            "field": "donors.gq"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
         }
       }
     }
