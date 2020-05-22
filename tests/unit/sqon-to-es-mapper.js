@@ -1082,8 +1082,6 @@ describe( 'SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => 
                                 "type": "generic",
                                 "operand": "one",
                             },
-                            "query": "BRA",
-                            "matches": ["BRAA", "BRAF", "BRAZ"],
                             "selection": ["BRAF"]
                         }
                     }

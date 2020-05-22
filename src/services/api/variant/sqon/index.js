@@ -92,8 +92,6 @@ export const FILTER_TYPE_AUTOCOMPLETE = 'autocomplete'
             type: 'generic',
             operand: 'one'
         }
-        query: 'BRA',
-        matches: ['BRAA', 'BRAF', 'BRAZ'],
         selection: ['BRAF']
     }
 } */
