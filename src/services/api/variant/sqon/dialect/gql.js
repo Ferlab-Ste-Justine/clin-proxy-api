@@ -5,14 +5,26 @@
 import { isArray } from 'lodash'
 
 import {
-    OPERATOR_TYPE_AND, OPERATOR_TYPE_OR, OPERATOR_TYPE_AND_NOT,
-    OPERAND_TYPE_ALL, OPERATOR_TYPE_ONE_OF, OPERATOR_TYPE_NONE,
-    COMPARATOR_TYPE_GREATER_THAN, COMPARATOR_TYPE_GREATER_THAN_OR_EQUAL, COMPARATOR_TYPE_LOWER_THAN, COMPARATOR_TYPE_LOWER_THAN_OR_EQUAL,
+    OPERATOR_TYPE_AND,
+    OPERATOR_TYPE_OR,
+    OPERATOR_TYPE_AND_NOT,
+    OPERAND_TYPE_ALL,
+    OPERATOR_TYPE_ONE_OF,
+    OPERATOR_TYPE_NONE,
+    COMPARATOR_TYPE_GREATER_THAN,
+    COMPARATOR_TYPE_GREATER_THAN_OR_EQUAL,
+    COMPARATOR_TYPE_LOWER_THAN,
+    COMPARATOR_TYPE_LOWER_THAN_OR_EQUAL,
     findAllOperatorInstructions,
     instructionIsOperator,
-    FILTER_TYPE_GENERIC_BOOLEAN, FILTER_TYPE_COMPOSITE, FILTER_TYPE_NUMERICAL_COMPARISON, FILTER_TYPE_SPECIFIC, FILTER_TYPE_GENERIC,
+    FILTER_TYPE_GENERIC_BOOLEAN,
+    FILTER_TYPE_COMPOSITE,
+    FILTER_TYPE_NUMERICAL_COMPARISON,
+    FILTER_TYPE_SPECIFIC,
+    FILTER_TYPE_GENERIC,
     instructionIsFilter,
-    getInstructionType
+    getInstructionType,
+    FILTER_TYPE_AUTOCOMPLETE
 } from '../index'
 
 
@@ -85,6 +97,10 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap, facetMap, subtype
     return {}
 }
 
+const mapAutocompleteFilterInstruction = ( instruction, fieldMap, facetMap, subtypeMap ) => {
+    return {}
+}
+
 
 const translateToGraphQl = ( query, options, getFieldSearchNameFromId, getFieldFacetNameFromId, getFieldSubtypeFromId ) => {
 
@@ -106,6 +122,8 @@ const translateToGraphQl = ( query, options, getFieldSearchNameFromId, getFieldF
                 return mapGenericBooleanFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
             case FILTER_TYPE_COMPOSITE:
                 return mapCompositeFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
+            case FILTER_TYPE_AUTOCOMPLETE:
+                return mapAutocompleteFilterInstruction( instruction, fieldMap, facetMap, subtypeMap )
         }
     }
 
