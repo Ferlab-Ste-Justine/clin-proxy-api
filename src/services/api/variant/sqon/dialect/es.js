@@ -6,7 +6,7 @@ import {
     COMPARATOR_TYPE_GREATER_THAN, COMPARATOR_TYPE_GREATER_THAN_OR_EQUAL, COMPARATOR_TYPE_LOWER_THAN, COMPARATOR_TYPE_LOWER_THAN_OR_EQUAL,
     findAllOperatorInstructions,
     instructionIsOperator,
-    FILTER_TYPE_GENERIC_BOOLEAN, FILTER_TYPE_COMPOSITE, FILTER_TYPE_NUMERICAL_COMPARISON, FILTER_TYPE_SPECIFIC, FILTER_TYPE_GENERIC,
+    FILTER_TYPE_GENERIC_BOOLEAN, FILTER_TYPE_COMPOSITE, FILTER_TYPE_NUMERICAL_COMPARISON, FILTER_TYPE_SPECIFIC, FILTER_TYPE_GENERIC, FILTER_TYPE_AUTOCOMPLETE,
     instructionIsFilter,
     traverseObjectAndApplyFunc,
     getInstructionType
@@ -152,6 +152,23 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
     return query
 }
 
+const mapAutocompleteFilterInstruction = ( instruction, fieldMap ) => {
+    // @NOTE Subtype only supports type FILTER_TYPE_GENERIC for now.
+    switch ( instruction.data.subtype ) {
+        default:
+            return null
+        case FILTER_TYPE_GENERIC:
+            // @NOTE Need to mutate an autocomplete instruction into a generic instruction
+            // @TODO Refactor this when we add more subtypes.
+            return mapGenericFilterInstruction( {
+                data: {
+                    operand: instruction.data.subtype.operand,
+                    values: instruction.data.selection
+                }
+            }, fieldMap )
+    }
+}
+
 const translateToElasticSearch = ( query, options, getFieldSearchNameFromId, getFieldFacetNameFromId, getFieldSubtypeFromId ) => {
 
     const mapPartFromFilter = ( instruction, fieldId ) => {
@@ -177,6 +194,9 @@ const translateToElasticSearch = ( query, options, getFieldSearchNameFromId, get
                 break
             case FILTER_TYPE_COMPOSITE:
                 translatedInstruction = mapCompositeFilterInstruction( instruction, fieldMap )
+                break
+            case FILTER_TYPE_AUTOCOMPLETE:
+                translatedInstruction = mapAutocompleteFilterInstruction( instruction, fieldMap )
                 break
         }
 
