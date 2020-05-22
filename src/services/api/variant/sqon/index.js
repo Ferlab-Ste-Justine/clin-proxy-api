@@ -81,15 +81,32 @@ export const FILTER_TYPE_COMPOSITE = 'composite'
         ]
     }
 } */
+export const FILTER_TYPE_AUTOCOMPLETE = 'autocomplete'
+// @NOTE Data Structure Example
+/*
+{
+    type: 'autocomplete',
+    data: {
+        id: 'gene_symbol',
+        subtype: {
+            type: 'generic',
+            operand: 'one'
+        }
+        selection: ['BRAF']
+    }
+} */
 
+// @NOTE Used by INSTRUCTION_TYPE_OPERATOR and INSTRUCTION_TYPE_SUBQUERY
 export const OPERATOR_TYPE_AND = 'and'
 export const OPERATOR_TYPE_OR = 'or'
 export const OPERATOR_TYPE_AND_NOT = 'and not'
 
+// @NOTE Used by INSTRUCTION_TYPE_FILTER
 export const OPERAND_TYPE_ALL = 'all'
 export const OPERATOR_TYPE_ONE_OF = 'one'
 export const OPERATOR_TYPE_NONE = 'none'
 
+// @NOTE Used by INSTRUCTION_TYPE_FILTER
 export const COMPARATOR_TYPE_GREATER_THAN = '>'
 export const COMPARATOR_TYPE_GREATER_THAN_OR_EQUAL = '>='
 export const COMPARATOR_TYPE_LOWER_THAN = '<'
