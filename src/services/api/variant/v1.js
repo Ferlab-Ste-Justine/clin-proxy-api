@@ -4,10 +4,21 @@ import { readFileSync } from 'fs'
 import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from './sqon/dialect/es'
 import { DIALECT_LANGUAGE_GRAPHQL } from './sqon/dialect/gql'
 
-const schemas = {
-    [ DIALECT_LANGUAGE_ELASTIC_SEARCH ]: JSON.parse( readFileSync( `${__dirname}/schema/${DIALECT_LANGUAGE_ELASTIC_SEARCH}/1.json`, 'utf8' ) ),
-    [ DIALECT_LANGUAGE_GRAPHQL ]: JSON.parse( readFileSync( `${__dirname}/schema/${DIALECT_LANGUAGE_GRAPHQL}/1.json`, 'utf8' ) )
+const readSchemaAndAttachEnvironmentVariables = ( dialects, variables ) => {
+    return dialects.reduce( ( accumulator, dialect ) => {
+        let schema = readFileSync( `${__dirname}/schema/${dialect}/1.json`, 'utf8' )
+
+        Object.keys( variables ).forEach( ( variable ) => {
+            schema = schema.replace( `%%${variable}%%`, variables[ variable ] )
+        } )
+
+        accumulator[ dialect ] = JSON.parse( schema )
+        return accumulator
+    }, {} )
 }
+
+const schemaVariables = JSON.parse( process.env.VARIANT_API_SERVICE ).schemaVariables || {}
+const schemas = readSchemaAndAttachEnvironmentVariables( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ], schemaVariables )
 
 const getSessionDataFromToken = async ( token, cacheService ) => {
     return await cacheService.read( token.uid )
