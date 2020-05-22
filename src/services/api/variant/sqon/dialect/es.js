@@ -154,7 +154,7 @@ const mapCompositeFilterInstruction = ( instruction, fieldMap ) => {
 
 const mapAutocompleteFilterInstruction = ( instruction, fieldMap ) => {
     // @NOTE Subtype only supports type FILTER_TYPE_GENERIC for now.
-    switch ( instruction.data.subtype ) {
+    switch ( instruction.data.subtype.type ) {
         default:
             return null
         case FILTER_TYPE_GENERIC:
