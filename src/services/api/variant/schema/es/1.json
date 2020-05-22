@@ -149,6 +149,27 @@
       "label": "category_genomic",
       "filters": [
         {
+          "id": "gene_symbol",
+          "label": "filter_gene_symbol",
+          "type": "autocomplete",
+          "subtype": {
+            "type": "generic",
+            "config": {
+              "gene_symbol": {
+                "operands": [
+                  "one"
+                ]
+              }
+            }
+          },
+          "config": {
+            "url": "%%GENE_API_SEARCH_ENDPOINT%%"
+          },
+          "search": {
+            "gene_symbol": "genes.geneSymbol.keyword"
+          }
+        },
+        {
           "id": "gene_type",
           "label": "filter_gene_type",
           "type": "generic",
