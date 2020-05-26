@@ -1,691 +1,792 @@
 {
-  "info": {
-    "_postman_id": "e436ddc8-0abc-4436-a56d-ea467aacf370",
-    "name": "CLIN-PROXY-API Variant",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "Service Health Check",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "b91e899e-7f46-4314-823f-8bbbb34a9a1f",
-            "exec": [
-              "pm.test(\"Should be able to retrieve service health status\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData.message).to.eql('Ok');",
-              "});",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "formdata",
-          "formdata": []
-        },
-        "url": {
-          "raw": "{{hostname}}:{{port}}/{{path}}/health",
-          "host": [
-            "{{hostname}}"
-          ],
-          "port": "{{port}}",
-          "path": [
-            "{{path}}",
-            "health"
-          ]
-        }
-      },
-      "response": [
-        {
-          "name": "API Version",
-          "originalRequest": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{hostname}}:{{port}}/{{path}}/health",
-              "host": [
-                "{{hostname}}"
-              ],
-              "port": "{{port}}",
-              "path": [
-                "{{path}}",
-                "health"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Server",
-              "value": "restify"
-            },
-            {
-              "key": "API-Version",
-              "value": "1"
-            },
-            {
-              "key": "Access-Control-Allow-Credentials",
-              "value": "true"
-            },
-            {
-              "key": "Content-Encoding",
-              "value": "gzip"
-            },
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Date",
-              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "key": "Transfer-Encoding",
-              "value": "chunked"
-            }
-          ],
-          "cookie": [],
-          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
-        }
-      ]
-    },
-    {
-      "name": "Service Documentation",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "5050b7c1-2465-4204-a974-5d1188f75124",
-            "exec": [
-              "pm.test(\"Should be able to retrieve service documentation\", function () {",
-              "    var htmlDoc = pm.response.text();",
-              "    pm.expect(htmlDoc).to.contain('Redoc.init');",
-              "    pm.expect(htmlDoc).to.contain(environment['port']);",
-              "});",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "formdata",
-          "formdata": []
-        },
-        "url": {
-          "raw": "{{hostname}}:{{port}}/{{path}}/docs",
-          "host": [
-            "{{hostname}}"
-          ],
-          "port": "{{port}}",
-          "path": [
-            "{{path}}",
-            "docs"
-          ]
-        }
-      },
-      "response": [
-        {
-          "name": "API Version",
-          "originalRequest": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{hostname}}:{{port}}/{{path}}/health",
-              "host": [
-                "{{hostname}}"
-              ],
-              "port": "{{port}}",
-              "path": [
-                "{{path}}",
-                "health"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Server",
-              "value": "restify"
-            },
-            {
-              "key": "API-Version",
-              "value": "1"
-            },
-            {
-              "key": "Access-Control-Allow-Credentials",
-              "value": "true"
-            },
-            {
-              "key": "Content-Encoding",
-              "value": "gzip"
-            },
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Date",
-              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "key": "Transfer-Encoding",
-              "value": "chunked"
-            }
-          ],
-          "cookie": [],
-          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
-        }
-      ]
-    },
-    {
-      "name": "Set-up: Authenticate",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "ad5b945c-2938-40d1-8fdb-0867c0ab2008",
-            "exec": [
-              "pm.test(\"Should be able to login to complete the remaining tests\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData.message).to.eql('Ok');",
-              "    pm.expect(jsonData.data.user.username).to.eql(environment['authUsername']);",
-              "});",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "username",
-              "value": "{{authUsername}}",
-              "type": "text"
-            },
-            {
-              "key": "password",
-              "value": "{{authPassword}}",
-              "type": "text"
-            }
-          ]
-        },
-        "url": {
-          "raw": "{{authHostname}}:{{authPort}}/{{authPath}}",
-          "host": [
-            "{{authHostname}}"
-          ],
-          "port": "{{authPort}}",
-          "path": [
-            "{{authPath}}"
-          ]
-        }
-      },
-      "response": [
-        {
-          "name": "API Version",
-          "originalRequest": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{hostname}}:{{port}}/{{path}}/health",
-              "host": [
-                "{{hostname}}"
-              ],
-              "port": "{{port}}",
-              "path": [
-                "{{path}}",
-                "health"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Server",
-              "value": "restify"
-            },
-            {
-              "key": "API-Version",
-              "value": "1"
-            },
-            {
-              "key": "Access-Control-Allow-Credentials",
-              "value": "true"
-            },
-            {
-              "key": "Content-Encoding",
-              "value": "gzip"
-            },
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Date",
-              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "key": "Transfer-Encoding",
-              "value": "chunked"
-            }
-          ],
-          "cookie": [],
-          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
-        }
-      ]
-    },
-    {
-      "name": "Count Endpoint",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "b06fddfa-4ee7-4736-a0fb-3969044356f9",
-            "exec": [
-              "pm.test(\"Should return correct status code\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "patient",
-              "value": "{{allowedPatientId}}",
-              "type": "text"
-            },
-            {
-              "key": "queries",
-              "value": "[\"7e4287b0-8b08-11ea-860e-9d5d6843987d\"]",
-              "type": "text"
-            },
-            {
-              "key": "statement",
-              "value": "[{\"key\":\"7e4287b0-8b08-11ea-860e-9d5d6843987d\",\"title\":\"Requête 1\",\"instructions\":[{\"type\":\"filter\",\"data\":{\"id\":\"variant_type\",\"type\":\"generic\",\"operand\":\"one\",\"values\":[\"SNV\"],\"index\":2}}]}]",
-              "type": "text"
-            }
-          ],
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{hostname}}:{{port}}/{{path}}/count",
-          "host": [
-            "{{hostname}}"
-          ],
-          "port": "{{port}}",
-          "path": [
-            "{{path}}",
-            "count"
-          ]
-        }
-      },
-      "response": [
-        {
-          "name": "API Version",
-          "originalRequest": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{hostname}}:{{port}}/{{path}}/health",
-              "host": [
-                "{{hostname}}"
-              ],
-              "port": "{{port}}",
-              "path": [
-                "{{path}}",
-                "health"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Server",
-              "value": "restify"
-            },
-            {
-              "key": "API-Version",
-              "value": "1"
-            },
-            {
-              "key": "Access-Control-Allow-Credentials",
-              "value": "true"
-            },
-            {
-              "key": "Content-Encoding",
-              "value": "gzip"
-            },
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Date",
-              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "key": "Transfer-Encoding",
-              "value": "chunked"
-            }
-          ],
-          "cookie": [],
-          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
-        }
-      ]
-    },
-    {
-      "name": "Search Endpoint",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "ab15218e-aceb-4f7c-b37b-5c2571bf2699",
-            "exec": [
-              "pm.test(\"Should return correct status code\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "patient",
-              "value": "{{allowedPatientId}}",
-              "type": "text"
-            },
-            {
-              "key": "query",
-              "value": "7e4287b0-8b08-11ea-860e-9d5d6843987d",
-              "type": "text"
-            },
-            {
-              "key": "statement",
-              "value": "[{\"key\":\"7e4287b0-8b08-11ea-860e-9d5d6843987d\",\"title\":\"Requête 1\",\"instructions\":[{\"type\":\"filter\",\"data\":{\"id\":\"variant_type\",\"type\":\"generic\",\"operand\":\"one\",\"values\":[\"SNV\"],\"index\":2}}]}]",
-              "type": "text"
-            }
-          ],
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{hostname}}:{{port}}/{{path}}/search",
-          "host": [
-            "{{hostname}}"
-          ],
-          "port": "{{port}}",
-          "path": [
-            "{{path}}",
-            "search"
-          ]
-        }
-      },
-      "response": [
-        {
-          "name": "API Version",
-          "originalRequest": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{hostname}}:{{port}}/{{path}}/health",
-              "host": [
-                "{{hostname}}"
-              ],
-              "port": "{{port}}",
-              "path": [
-                "{{path}}",
-                "health"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Server",
-              "value": "restify"
-            },
-            {
-              "key": "API-Version",
-              "value": "1"
-            },
-            {
-              "key": "Access-Control-Allow-Credentials",
-              "value": "true"
-            },
-            {
-              "key": "Content-Encoding",
-              "value": "gzip"
-            },
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Date",
-              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "key": "Transfer-Encoding",
-              "value": "chunked"
-            }
-          ],
-          "cookie": [],
-          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
-        }
-      ]
-    },
-    {
-      "name": "Facet Endpoint",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "122b4a30-0856-4e63-a00b-f8b3593dbcab",
-            "exec": [
-              "pm.test(\"Should return correct status code\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "patient",
-              "value": "{{allowedPatientId}}",
-              "type": "text"
-            },
-            {
-              "key": "query",
-              "value": "7e4287b0-8b08-11ea-860e-9d5d6843987d",
-              "type": "text"
-            },
-            {
-              "key": "statement",
-              "value": "[{\"key\":\"7e4287b0-8b08-11ea-860e-9d5d6843987d\",\"title\":\"Requête 1\",\"instructions\":[{\"type\":\"filter\",\"data\":{\"id\":\"variant_type\",\"type\":\"generic\",\"operand\":\"one\",\"values\":[\"SNV\"],\"index\":2}}]}]",
-              "type": "text"
-            }
-          ],
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{hostname}}:{{port}}/{{path}}/facet",
-          "host": [
-            "{{hostname}}"
-          ],
-          "port": "{{port}}",
-          "path": [
-            "{{path}}",
-            "facet"
-          ]
-        }
-      },
-      "response": [
-        {
-          "name": "API Version",
-          "originalRequest": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{hostname}}:{{port}}/{{path}}/health",
-              "host": [
-                "{{hostname}}"
-              ],
-              "port": "{{port}}",
-              "path": [
-                "{{path}}",
-                "health"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": [
-            {
-              "key": "Server",
-              "value": "restify"
-            },
-            {
-              "key": "API-Version",
-              "value": "1"
-            },
-            {
-              "key": "Access-Control-Allow-Credentials",
-              "value": "true"
-            },
-            {
-              "key": "Content-Encoding",
-              "value": "gzip"
-            },
-            {
-              "key": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "key": "Date",
-              "value": "Wed, 24 Apr 2019 18:47:31 GMT"
-            },
-            {
-              "key": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "key": "Transfer-Encoding",
-              "value": "chunked"
-            }
-          ],
-          "cookie": [],
-          "body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
-        }
-      ]
-    }
-  ],
-  "protocolProfileBehavior": {}
+	"info": {
+		"_postman_id": "e436ddc8-0abc-4436-a56d-ea467aacf370",
+		"name": "CLIN-PROXY-API Variant",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Service Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b91e899e-7f46-4314-823f-8bbbb34a9a1f",
+						"exec": [
+							"pm.test(\"Should be able to retrieve service health status\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql('Ok');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/health",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"health"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Service Documentation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5050b7c1-2465-4204-a974-5d1188f75124",
+						"exec": [
+							"pm.test(\"Should be able to retrieve service documentation\", function () {",
+							"    var htmlDoc = pm.response.text();",
+							"    pm.expect(htmlDoc).to.contain('Redoc.init');",
+							"    pm.expect(htmlDoc).to.contain(environment['port']);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/docs",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"docs"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Set-up: Authenticate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ad5b945c-2938-40d1-8fdb-0867c0ab2008",
+						"exec": [
+							"pm.test(\"Should be able to login to complete the remaining tests\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql('Ok');",
+							"    pm.expect(jsonData.data.user.username).to.eql(environment['authUsername']);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "{{authUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{authPassword}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{authHostname}}:{{authPort}}/{{authPath}}",
+					"host": [
+						"{{authHostname}}"
+					],
+					"port": "{{authPort}}",
+					"path": [
+						"{{authPath}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Schema",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "989d8f51-ec7d-444d-a8bb-ad8701cf66a0",
+						"exec": [
+							"pm.test(\"Should be able to retrieve service documentation\", function () {",
+							"    var htmlDoc = pm.response.text();",
+							"    pm.expect(htmlDoc).to.contain('Redoc.init');",
+							"    pm.expect(htmlDoc).to.contain(environment['port']);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/docs",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"docs"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Count Endpoint",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b06fddfa-4ee7-4736-a0fb-3969044356f9",
+						"exec": [
+							"pm.test(\"Should return correct status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "patient",
+							"value": "{{allowedPatientId}}",
+							"type": "text"
+						},
+						{
+							"key": "queries",
+							"value": "[\"7e4287b0-8b08-11ea-860e-9d5d6843987d\"]",
+							"type": "text"
+						},
+						{
+							"key": "statement",
+							"value": "[{\"key\":\"7e4287b0-8b08-11ea-860e-9d5d6843987d\",\"title\":\"Requête 1\",\"instructions\":[{\"type\":\"filter\",\"data\":{\"id\":\"variant_type\",\"type\":\"generic\",\"operand\":\"one\",\"values\":[\"SNV\"],\"index\":2}}]}]",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/count",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"count"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Search Endpoint",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ab15218e-aceb-4f7c-b37b-5c2571bf2699",
+						"exec": [
+							"pm.test(\"Should return correct status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "patient",
+							"value": "{{allowedPatientId}}",
+							"type": "text"
+						},
+						{
+							"key": "query",
+							"value": "7e4287b0-8b08-11ea-860e-9d5d6843987d",
+							"type": "text"
+						},
+						{
+							"key": "statement",
+							"value": "[{\"key\":\"7e4287b0-8b08-11ea-860e-9d5d6843987d\",\"title\":\"Requête 1\",\"instructions\":[{\"type\":\"filter\",\"data\":{\"id\":\"variant_type\",\"type\":\"generic\",\"operand\":\"one\",\"values\":[\"SNV\"],\"index\":2}}]}]",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/search",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"search"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Facet Endpoint",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "122b4a30-0856-4e63-a00b-f8b3593dbcab",
+						"exec": [
+							"pm.test(\"Should return correct status code\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"warning": "This is a duplicate header and will be overridden by the Content-Type header generated by Postman.",
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "patient",
+							"value": "{{allowedPatientId}}",
+							"type": "text"
+						},
+						{
+							"key": "query",
+							"value": "7e4287b0-8b08-11ea-860e-9d5d6843987d",
+							"type": "text"
+						},
+						{
+							"key": "statement",
+							"value": "[{\"key\":\"7e4287b0-8b08-11ea-860e-9d5d6843987d\",\"title\":\"Requête 1\",\"instructions\":[{\"type\":\"filter\",\"data\":{\"id\":\"variant_type\",\"type\":\"generic\",\"operand\":\"one\",\"values\":[\"SNV\"],\"index\":2}}]}]",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{hostname}}:{{port}}/{{path}}/facet",
+					"host": [
+						"{{hostname}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{path}}",
+						"facet"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "API Version",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostname}}:{{port}}/{{path}}/health",
+							"host": [
+								"{{hostname}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"{{path}}",
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Server",
+							"value": "restify"
+						},
+						{
+							"key": "API-Version",
+							"value": "1"
+						},
+						{
+							"key": "Access-Control-Allow-Credentials",
+							"value": "true"
+						},
+						{
+							"key": "Content-Encoding",
+							"value": "gzip"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 24 Apr 2019 18:47:31 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"timestamp\": 1556131651911,\n    \"message\": \"Ok\",\n    \"data\": {\n        \"uid\": \"33vecfmgrojuvki5jb\",\n        \"cuid\": \"33vecfmgrojuvki5j8\",\n        \"packageVersion\": \"1.1.0\",\n        \"defaultApiVersion\": 1,\n        \"currentApiVersion\": 1,\n        \"apiVersions\": [\n            1\n        ],\n        \"uptime\": 172918,\n        \"served\": 4\n    }\n}"
+				}
+			]
+		}
+	],
+	"protocolProfileBehavior": {}
 }
