@@ -11,6 +11,8 @@ services:
       mode: replicated
       #Given that memcached is a stateful application and this is not a cluster, keep this value at 1
       replicas: 1
+      placement:
+        constraints: [node.labels.app_role == generic]
       resources:
         limits:
           cpus: '2.00'
@@ -34,7 +36,9 @@ services:
     deploy:
       replicas: 2
       placement:
-        constraints: [node.labels.node_role == devops]
+        constraints:
+        - node.labels.app_role == generic
+        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
@@ -61,7 +65,9 @@ services:
     deploy:
       replicas: 2
       placement:
-        constraints: [node.labels.node_role == devops]
+        constraints:
+        - node.labels.app_role == generic
+        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
@@ -89,7 +95,9 @@ services:
     deploy:
       replicas: 3
       placement:
-        constraints: [node.labels.node_role == devops]
+        constraints:
+        - node.labels.app_role == generic
+        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '1.00'
@@ -116,7 +124,9 @@ services:
     deploy:
       replicas: 2
       placement:
-        constraints: [node.labels.node_role == devops]
+        constraints:
+        - node.labels.app_role == generic
+        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
@@ -142,7 +152,9 @@ services:
     deploy:
       replicas: 2
       placement:
-        constraints: [node.labels.node_role == devops]
+        constraints:
+        - node.labels.app_role == generic
+        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
