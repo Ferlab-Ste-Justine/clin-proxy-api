@@ -49,6 +49,11 @@ module.exports = {
             key: 'authPassword',
             value: authPassword,
             enabled: true
+        },
+        {
+            key: 'geneQuery',
+            value: 'BRA',
+            enabled: true
         }
     ]
 }
