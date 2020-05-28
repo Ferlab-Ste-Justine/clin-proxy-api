@@ -116,7 +116,7 @@
 							"pm.test(\"Should be able to retrieve service documentation\", function () {",
 							"    var htmlDoc = pm.response.text();",
 							"    pm.expect(htmlDoc).to.contain('Redoc.init');",
-							"    pm.expect(htmlDoc).to.contain(environment['port']);",
+							"    pm.expect(htmlDoc).to.contain(environment['hostname']);",
 							"});",
 							""
 						],
