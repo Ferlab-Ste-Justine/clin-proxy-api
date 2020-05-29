@@ -1612,7 +1612,7 @@
                   "type": "string"
                 }
               },
-              "omim": {
+              "geneMim": {
                 "nullable": true,
                 "type": "array",
                 "items": {
@@ -1751,6 +1751,10 @@
                       "clinvar_Orphanet_id": {
                         "type": "string",
                         "nullable": true
+                      },
+                      "exon": {
+                        "type": "string",
+                        "nullable": true
                       }
                     }
                   }
@@ -1882,7 +1886,18 @@
                   "type": "string",
                   "nullable": true
                 },
+                "origin": {
+                  "type": "string",
+                  "nullable": true
+                },
                 "transmission": {
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "phenotypes": {
                   "type": "array",
                   "nullable": true,
                   "items": {
@@ -1986,8 +2001,17 @@
                   "Recurrent aphthous stomatitis (HP:0011107)",
                   "Fever (HP:0001945)"
                 ],
-                "omim": [
+                "geneMim": [
                   "130130"
+                ],
+                "omim": [
+                  {
+                    "phenotype": "?Glucocorticoid deficiency 5",
+                    "phenotypeMim": "617825",
+                    "inheritance": [
+                      "AR"
+                    ]
+                  }
                 ],
                 "name": "elastase, neutrophil expressed",
                 "orphanet": [
@@ -2090,7 +2114,8 @@
                     "canonical": true,
                     "clinvar_OMIM_id": "162800&202700",
                     "featureId": "ENST00000590230",
-                    "clinvar_Orphanet_id": "ORPHA2686"
+                    "clinvar_Orphanet_id": "ORPHA2686",
+                    "exon": "1/12"
                   }
                 ],
                 "impact": "MODERATE",
@@ -2131,12 +2156,20 @@
                 "transmission": [
                   "XR"
                 ],
+                "phenotypes": [
+                  "Dolichocephaly (HP:0000268)",
+                  "Infantile muscular hypotonia (HP:0008947)",
+                  "Generalized hypotonia (HP:0001290)",
+                  "Muscular hypotonia (HP:0001252)",
+                  "Profound global developmental delay (HP:0012736)"
+                ],
                 "zygosity": "HET",
                 "adTotal": 123,
                 "lastUpdate": "2020-05-13",
                 "sequencingStrategy": "WXS",
                 "studyId": "ET00011",
                 "genotypeFamily": "FTH:0/0,MTH:0/1",
+                "origin": "MTH",
                 "exomiserScore": 0.00084
               }
             ],
@@ -2241,8 +2274,17 @@
                       "Recurrent aphthous stomatitis (HP:0011107)",
                       "Fever (HP:0001945)"
                     ],
-                    "omim": [
+                    "geneMim": [
                       "130130"
+                    ],
+                    "omim": [
+                      {
+                        "phenotype": "?Glucocorticoid deficiency 5",
+                        "phenotypeMim": "617825",
+                        "inheritance": [
+                          "AR"
+                        ]
+                      }
                     ],
                     "name": "elastase, neutrophil expressed",
                     "orphanet": [
@@ -2337,7 +2379,8 @@
                         "refSeqId": "NM_001972.4",
                         "clinvar_OMIM_id": "162800&202700",
                         "featureId": "ENST00000263621",
-                        "clinvar_Orphanet_id": "ORPHA2686"
+                        "clinvar_Orphanet_id": "ORPHA2686",
+                        "exon": "1/12"
                       },
                       {
                         "pick": "1",
@@ -2386,12 +2429,20 @@
                     "transmission": [
                       "XR"
                     ],
+                    "phenotypes": [
+                      "Dolichocephaly (HP:0000268)",
+                      "Infantile muscular hypotonia (HP:0008947)",
+                      "Generalized hypotonia (HP:0001290)",
+                      "Muscular hypotonia (HP:0001252)",
+                      "Profound global developmental delay (HP:0012736)"
+                    ],
                     "zygosity": "HET",
                     "adTotal": 123,
                     "lastUpdate": "2020-05-13",
                     "sequencingStrategy": "WXS",
                     "studyId": "ET00011",
                     "genotypeFamily": "FTH:0/0,MTH:0/1",
+                    "origin": "MTH",
                     "exomiserScore": 0.00084
                   }
                 ],
@@ -2578,7 +2629,7 @@
               "type": "string"
             }
           },
-          "omim": {
+          "geneMim": {
             "type": "array",
             "items": {
               "type": "string"
@@ -2618,6 +2669,28 @@
             "items": {
               "type": "string"
             }
+          },
+          "omim": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "phenotype": {
+                  "type": "string"
+                },
+                "phenotypeMim": {
+                  "type": "string"
+                },
+                "inheritance": {
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         },
         "example": {
@@ -2633,8 +2706,17 @@
             "Recurrent aphthous stomatitis (HP:0011107)",
             "Fever (HP:0001945)"
           ],
-          "omim": [
+          "geneMim": [
             "130130"
+          ],
+          "omim": [
+            {
+              "phenotype": "?Glucocorticoid deficiency 5",
+              "phenotypeMim": "617825",
+              "inheritance": [
+                "AR"
+              ]
+            }
           ],
           "name": "elastase, neutrophil expressed",
           "orphanet": [
