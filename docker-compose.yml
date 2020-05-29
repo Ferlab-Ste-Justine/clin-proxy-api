@@ -24,11 +24,6 @@ services:
     command: "memcached -m 128 -t 4"
   auth:
     image: chusj/clin-proxy-api-auth-service:$DEFAULT_PROD_VERSION
-    volumes:
-#      -for local dev only:
-#      - ./data/certbot/conf:/etc/letsencrypt
-#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-      - "sshvolume:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -38,7 +33,6 @@ services:
       placement:
         constraints:
         - node.labels.app_role == generic
-        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
@@ -51,13 +45,11 @@ services:
       - proxy
     env_file:
       - auth.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
   patient:
     image: chusj/clin-proxy-api-patient-service:$DEFAULT_PROD_VERSION
-    volumes:
-#      --for local dev only:
-#      - ./data/certbot/conf:/etc/letsencrypt
-#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-      - "sshvolume:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -67,7 +59,6 @@ services:
       placement:
         constraints:
         - node.labels.app_role == generic
-        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
@@ -81,13 +72,11 @@ services:
       - proxy
     env_file:
       - patient.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
   variant:
     image: chusj/clin-proxy-api-variant-service:$DEFAULT_PROD_VERSION
-    volumes:
-#      --for local dev only:
-#      - ./data/certbot/conf:/etc/letsencrypt
-#      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-      - "sshvolume:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -97,7 +86,6 @@ services:
       placement:
         constraints:
         - node.labels.app_role == generic
-        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '1.00'
@@ -110,13 +98,11 @@ services:
       - proxy
     env_file:
       - variant.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
   meta:
     image: chusj/clin-proxy-api-meta-service:$DEFAULT_PROD_VERSION
-    volumes:
-      #      --for local dev only:
-      #      - ./data/certbot/conf:/etc/letsencrypt
-      #      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-      - "sshvolume:/etc/letsencrypt"
     depends_on:
       - memcached
     ports:
@@ -126,7 +112,6 @@ services:
       placement:
         constraints:
         - node.labels.app_role == generic
-        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
@@ -139,14 +124,11 @@ services:
       - proxy
     env_file:
       - meta.env
-
+    secrets:
+      - certificate_certificate
+      - certificate_key
   gene:
     image: chusj/clin-proxy-api-gene-service:$DEFAULT_PROD_VERSION
-    volumes:
-      #      --for local dev only:
-      #      - ./data/certbot/conf:/etc/letsencrypt
-      #      - /home/ubuntu/data/certbot/conf:/etc/letsencrypt
-      - "sshvolume:/etc/letsencrypt"
     ports:
       - "5002:5002"
     deploy:
@@ -154,7 +136,6 @@ services:
       placement:
         constraints:
         - node.labels.app_role == generic
-        - node.labels.state_anchor == true
       resources:
         limits:
           cpus: '0.50'
@@ -167,7 +148,15 @@ services:
       - proxy
     env_file:
       - gene.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
 
+secrets:
+  certificate_certificate:
+    external: true
+  certificate_key:
+    external: true
 
 networks:
   aidbox:
@@ -175,8 +164,4 @@ networks:
   clinnet:
     external: true
   proxy:
-    external: true
-
-volumes:
-  sshvolume:
     external: true

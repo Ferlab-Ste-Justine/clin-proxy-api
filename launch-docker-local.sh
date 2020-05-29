@@ -1,4 +1,3 @@
-(cd certificate-generation; docker-compose run ca-certificate-generator; docker-compose run certificate-generator)
 cp docker.local.env auth.env;
 cp docker.local.env patient.env;
 cp docker.local.env variant.env;
