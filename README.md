@@ -42,6 +42,8 @@ pnpm start
 
 #### Dockerized Version
 
+If you haven't done so already, generate self-signed certificates for the **dev.chusj-clin-dev.org** domain: https://github.com/cr-ste-justine/devops/tree/dev/certificates
+
 Run the following to launch:
 
 ```
@@ -52,14 +54,6 @@ Run the following to tear down:
 
 ```
 ./teardown-docker-local.sh
-```
-
-If your browser is giving you issues with https on localhost:
-
-Note that the clin resulting services will also have certificates for the **dev.chusj-clin-dev.org** domain. You just have to add the following entry in your **/etc/hosts** file:
-
-```
-127.0.1.1       dev.chusj-clin-dev.org
 ```
 
 ##### Keycloak Set-up

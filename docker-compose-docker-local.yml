@@ -15,15 +15,11 @@ services:
         limits:
           cpus: '2.00'
           memory: 256M
-        reservations:
-          cpus: '1.00'
-          memory: 128M
     #https://docs.oracle.com/cd/E17952_01/mysql-5.1-en/ha-memcached-cmdline-options.html
     command: "memcached -m 128 -t 4"
   auth:
     image: localhost:5000/clin-proxy-api-auth-service
     volumes:
-      - ./certificate-generation:/etc/letsencrypt
       - ./src:/code/src
     depends_on:
       - memcached
@@ -35,19 +31,18 @@ services:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
     env_file:
       - auth.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
     command: ["npm", "run", "dev-service-auth"]
   patient:
     image: localhost:5000/clin-proxy-api-patient-service
     volumes:
-      - ./certificate-generation:/etc/letsencrypt
       - ./src:/code/src
     depends_on:
       - memcached
@@ -59,20 +54,19 @@ services:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
       - aidbox
     env_file:
       - patient.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
     command: ["npm", "run", "dev-service-patient"]
   variant:
     image: localhost:5000/clin-proxy-api-variant-service
     volumes:
-      - ./certificate-generation:/etc/letsencrypt
       - ./src:/code/src
     depends_on:
       - memcached
@@ -84,19 +78,18 @@ services:
         limits:
           cpus: '1.00'
           memory: 512M
-        reservations:
-          cpus: '0.50'
-          memory: 256M
     networks:
       - clinnet
       - proxy
     env_file:
       - variant.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
     command: ["npm", "run", "dev-service-variant"]
   meta:
     image: localhost:5000/clin-proxy-api-meta-service
     volumes:
-      - ./certificate-generation:/etc/letsencrypt
       - ./src:/code/src
     depends_on:
       - memcached
@@ -108,19 +101,18 @@ services:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
     env_file:
       - meta.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
     command: ["npm", "run", "dev-service-meta"]
   gene:
     image: localhost:5000/clin-proxy-api-gene-service
     volumes:
-      - ./certificate-generation:/etc/letsencrypt
       - ./src:/code/src
     ports:
       - "5002:5002"
@@ -130,15 +122,21 @@ services:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
     env_file:
       - gene.env
+    secrets:
+      - certificate_certificate
+      - certificate_key
     command: ["npm", "run", "dev-service-gene"]
+
+secrets:
+  certificate_certificate:
+    external: true
+  certificate_key:
+    external: true
 
 networks:
   clinnet:
