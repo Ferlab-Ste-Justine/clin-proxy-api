@@ -52,7 +52,7 @@ module.exports = {
         },
         {
             key: 'geneQuery',
-            value: 'BRA',
+            value: 'BRAF',
             enabled: true
         }
     ]
