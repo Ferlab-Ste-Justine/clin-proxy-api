@@ -68,13 +68,15 @@ const searchPatientsByAutoComplete = async ( req, res, cacheService, elasticServ
                     type: 'phrase_prefix',
                     fields: [
                         'id',
+                        'familyId',
                         'name.family',
                         'name.given',
                         'studies.title',
                         'specimens.id',
                         'identifier.MR',
                         'identifier.JHN',
-                        'studies.title'
+                        'studies.title',
+                        'samples.id'
                     ]
                 }
             }
