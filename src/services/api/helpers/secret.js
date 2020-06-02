@@ -7,7 +7,7 @@ import fs from 'fs'
 const getStandaloneSecret = (secretPath, secretEnvVar, failureCall) => {
     if(fs.existsSync(secretPath)) {
         return fs.readFileSync(secretPath, 'utf8')
-    } else if( process.env[secretEnvVar] !== undefined ) {
+    } else if( process.env[secretEnvVar] ) {
         return process.env[secretEnvVar]
     } else {
         failureCall()
@@ -21,7 +21,7 @@ const getStandaloneSecret = (secretPath, secretEnvVar, failureCall) => {
 const embedSecret = (secretPath, obj, key, failureCall) => {
     if(fs.existsSync(secretPath)) {
         obj[key] = fs.readFileSync(secretPath, 'utf8')
-    } else if(obj[key] === undefined) {
+    } else if(!obj[key]) {
         failureCall()
     }
 }
