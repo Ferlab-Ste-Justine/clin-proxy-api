@@ -1,2 +1,2 @@
-export DEFAULT_PROD_VERSION=1.3.14
+export DEFAULT_PROD_VERSION=1.4.0
 docker stack deploy --prune -c docker-compose.yml qa-proxy-api
