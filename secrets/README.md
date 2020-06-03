@@ -6,7 +6,7 @@ This script is currently executed manually.  In the future, it should be automat
 
 # Usage
 
-- Create a file called **jwt_secret** and put clin's jwt secret in it
+- Create a file called **clin_proxy_api_jwt_secret** and put clin's jwt secret in it
 
 - Run:
 
@@ -14,4 +14,4 @@ This script is currently executed manually.  In the future, it should be automat
 ./store.sh
 ```
 
-- Delete the **jwt_secret** file. Do not leave it laying around on the server
+- Delete the **clin_proxy_api_jwt_secret** file. Do not leave it laying around on the server
