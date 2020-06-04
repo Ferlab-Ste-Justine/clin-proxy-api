@@ -107,7 +107,7 @@ export default class PatientService extends ApiService {
         // Register Search Route with SQON
         this.instance.post( {
             path: `${this.config.endpoint}/search`,
-            validation: validators.searchVariantsForPatient
+            validation: validators.searchVariantsWithSQON
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
                 const response = await getFunctionForApiVersion( req.version, 'getPatients' )(

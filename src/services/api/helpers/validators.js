@@ -39,6 +39,18 @@ export default {
             } ).required()
         }
     },
+    searchVariantsWithSQON: {
+        schema: {
+            body: Joi.object( {
+                statement: Joi.array().min( 1 ).required(),
+                query: Joi.string().min( 1 ).max( 256 ).required(),
+                dialect: Joi.string().valid( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ] ),
+                group: Joi.string(),
+                page: Joi.number().integer().min( 0 ),
+                size: Joi.number().integer().min( 1 ).max( 1000 )
+            } ).required()
+        }
+    },
     searchVariantsForPatient: {
         schema: {
             body: Joi.object( {
