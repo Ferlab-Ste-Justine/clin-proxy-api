@@ -8,8 +8,8 @@ import translate, {
     getFieldSearchNameFromFieldIdMappingFunction,
     getFieldFacetNameFromFieldIdMappingFunction,
     getFieldSubtypeFromFieldIdMappingFunction, denormalize, getQueryByKey
-} from './api/variant/sqon'
-import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
+} from './api/helpers/sqonMapper'
+import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH, FILTER_SUBTYPE_NESTED } from './api/helpers/sqonMapper/dialect/es'
 
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
     return JSON.parse(
@@ -89,6 +89,45 @@ export const generateVariantQuery = ( patient, statement, query, acl, schema, gr
         sort
     }
 }
+
+export const generatePatientQuery = ( patient, statement, query, acl, schema, group, index, limit ) => {
+    console.log( `++++ schema = ${JSON.stringify( schema )}` )
+    console.log( `++++ group = ${JSON.stringify( group )}` )
+    console.log( `++++ index = ${JSON.stringify( index )}` )
+    const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
+    const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
+    const filter = generateAclFilters( acl, SERVICE_TYPE_PATIENT, schema )
+    let sort = sortDefinition.sort
+
+    console.log( `++++ filter = ${JSON.stringify( filter )}` )
+
+    if ( sortDefinition.postprocess ) {
+        // eslint-disable-next-line no-new-func
+        const postprocess = new Function( 'context', sortDefinition.postprocess )
+        const context = {
+            sort,
+            acl,
+            patient,
+            index,
+            limit
+        }
+
+        sort = postprocess( context )
+    }
+    if ( filter.length > 0 ) {
+        request.query.bool.filter.push( filter )
+    }
+
+    request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
+
+    return {
+        from: index,
+        size: limit,
+        query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient ),
+        sort
+    }
+}
+
 
 export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) => {
     const denormalizedStatement = denormalize( statement )
@@ -363,6 +402,30 @@ export default class ElasticClient {
             json: true,
             body
         } )
+    }
+
+    async searchPatientsWithSQON( patient, statement, query, acl, schema, group, index, limit ) {
+        console.log( '+++ entering searchPatientsWithSQON' )
+        const uri = `${this.host}${schema.path}/_search`
+        const body = generatePatientQuery( patient, statement, query, acl, schema, group, index, limit )
+
+        console.debug( `searchPatientsWithSQON: ${JSON.stringify( body )}` )
+
+        return {
+            method: 'POST',
+            uri,
+            json: true,
+            body
+        }
+        /*
+        return rp( {
+            method: 'POST',
+            uri,
+            json: true,
+            body
+        } )
+
+         */
     }
 
     async getFacetsForVariant( patient, statement, query, acl, schema ) {

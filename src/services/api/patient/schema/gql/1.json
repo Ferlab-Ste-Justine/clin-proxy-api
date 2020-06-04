@@ -1,0 +1,46 @@
+{
+  "version": "1.0",
+  "dialect": "gql",
+  "index": "",
+  "path": "",
+  "fields": {
+    "patient": "",
+    "practitioner": "",
+    "organization": ""
+  },
+  "groups": {
+    "score": {
+      "sort": [],
+      "postprocess": ""
+    }
+  },
+  "defaultGroup": "score",
+  "categories": [
+    {
+      "id": "variant",
+      "label": "category_variant",
+      "filters": [
+        {
+          "id": "variant_type",
+          "label": "filter_variant_type",
+          "type": "generic",
+          "subtype": {
+            "type": "nested",
+            "config": {
+              "path": "pathname"
+            }
+          },
+          "config": {},
+          "search": {},
+          "facet": []
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+

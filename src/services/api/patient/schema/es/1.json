@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "dialect": "es",
+  "index": "clin-patient-centric",
+  "path": "/patient",
+  "fields": {
+    "patient": "id.keyword",
+    "practitioner": "practitioners.id.keyword",
+    "organization": "serviceRequests.requester_org_id.keyword"
+  },
+  "groups": {
+    "patient": {
+      "sort": [
+        {
+          "id": {
+            "order": "desc"
+          }
+        }
+      ],
+      "postprocess": ""
+    }
+  },
+  "defaultGroup": "patient",
+  "categories": [
+    {
+      "id": "patient",
+      "label": "category_patient",
+      "filters": [
+        {
+          "id": "status",
+          "label": "filter_status",
+          "type": "generic",
+          "search": {
+            "status": "serviceRequests.status"
+          },
+          "facet": [
+            {
+              "id": "status",
+              "query": {
+                "terms": {
+                  "field": "serviceRequests.status.keyword",
+                  "order": {
+                    "_count": "desc"
+                  },
+                  "size": 999
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+

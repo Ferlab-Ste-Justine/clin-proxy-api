@@ -103,6 +103,32 @@ export default class PatientService extends ApiService {
 
         } ) )
 
+
+        // Register Search Route with SQON
+        this.instance.post( {
+            path: `${this.config.endpoint}/search`,
+            validation: validators.searchVariantsForPatient
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getPatients' )(
+                    req,
+                    res,
+                    this.cacheService,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+
         // Register searchPatientsByAutoComplete Route
         this.instance.get( {
             path: `${this.config.endpoint}/autocomplete`,

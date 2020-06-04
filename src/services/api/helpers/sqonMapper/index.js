@@ -263,12 +263,30 @@ const translate = ( statement, queryKey, schema, dialect, dialectOptions ) => {
             return cloneDeep( translator.emptyTranslation )
         }
         const denormalizedStatement = denormalize( statement )
+
+        console.log( `++++ denormalizedStatement=${JSON.stringify( denormalizedStatement )}` )
+
         const denormalizedQuery = getQueryByKey( denormalizedStatement, queryKey )
+
+        console.log( `++++ denormalizedQuery=${JSON.stringify( denormalizedQuery )}` )
+
         const getFieldSearchNameFromFieldId = getFieldSearchNameFromFieldIdMappingFunction( schema )
+
+        console.log( `++++ getFieldSearchNameFromFieldId=${JSON.stringify( getFieldSearchNameFromFieldId )}` )
+
         const getFieldFacetNameFromFieldId = getFieldFacetNameFromFieldIdMappingFunction( schema )
+
+        console.log( `++++ getFieldFacetNameFromFieldId=${JSON.stringify( getFieldFacetNameFromFieldId )}` )
+
         const getFieldSubtypeFromFieldId = getFieldSubtypeFromFieldIdMappingFunction( schema )
 
-        return translator.translate( denormalizedQuery, options, getFieldSearchNameFromFieldId, getFieldFacetNameFromFieldId, getFieldSubtypeFromFieldId )
+        console.log( `++++ getFieldSubtypeFromFieldId=${JSON.stringify( getFieldSubtypeFromFieldId )}` )
+
+        const translated = translator.translate( denormalizedQuery, options, getFieldSearchNameFromFieldId, getFieldFacetNameFromFieldId, getFieldSubtypeFromFieldId )
+
+        console.log( `++++ translated=${JSON.stringify( translated )}` )
+
+        return translated
     }
 
     return null
