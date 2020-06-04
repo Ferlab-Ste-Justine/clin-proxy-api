@@ -6,8 +6,8 @@ import uniqid from 'uniqid'
 
 import { generateVariantQuery, generateFacetQuery, generateCountQuery } from '../../src/services/elastic'
 
-import { DIALECT_LANGUAGE_ELASTIC_SEARCH, elasticSearchTranslator } from '../../src/services/api/variant/sqon/dialect/es'
-import translate from '../../src/services/api/variant/sqon'
+import { DIALECT_LANGUAGE_ELASTIC_SEARCH, elasticSearchTranslator } from '../../src/services/api/helpers/sqonMapper/dialect/es'
+import translate from '../../src/services/api/helpers/sqonMapper'
 
 const ELASTIC_SEARCH_SCHEMA_V1 = JSON.parse( readFileSync( `${__dirname}/../../src/services/api/variant/schema/${DIALECT_LANGUAGE_ELASTIC_SEARCH}/1.json`, 'utf8' ) )
 
