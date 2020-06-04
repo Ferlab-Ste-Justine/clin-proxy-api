@@ -67,7 +67,6 @@ const getPatients = async ( req, res, cacheService, elasticService, logService )
         console.log( '++ entering getPatients' )
         const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.body
-        const patient = params.patient
         const statement = params.statement
         const query = params.query
         const group = params.group || null
@@ -86,7 +85,7 @@ const getPatients = async ( req, res, cacheService, elasticService, logService )
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.searchPatientsWithSQON( patient, statement, query, sessionData.acl.fhir, schema, group, index, limit )
+                response = await elasticService.searchPatientsWithSQON( statement, query, sessionData.acl.fhir, schema, group, index, limit )
                 /*
                 totalFromResponse = response.hits.total
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {

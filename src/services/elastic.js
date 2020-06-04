@@ -90,12 +90,18 @@ export const generateVariantQuery = ( patient, statement, query, acl, schema, gr
     }
 }
 
-export const generatePatientQuery = ( patient, statement, query, acl, schema, group, index, limit ) => {
+export const generatePatientQuery = ( statement, query, acl, schema, group, index, limit ) => {
     console.log( `++++ schema = ${JSON.stringify( schema )}` )
     console.log( `++++ group = ${JSON.stringify( group )}` )
     console.log( `++++ index = ${JSON.stringify( index )}` )
     const request = translate( statement, query, schema, DIALECT_LANGUAGE_ELASTIC_SEARCH )
+
+    console.log( `++++ request = ${JSON.stringify( request )}` )
+
     const sortDefinition = schema.groups[ ( !group ? schema.defaultGroup : group ) ]
+
+    console.log( `++++ sortDefinition = ${JSON.stringify( sortDefinition )}` )
+
     const filter = generateAclFilters( acl, SERVICE_TYPE_PATIENT, schema )
     let sort = sortDefinition.sort
 
@@ -107,7 +113,6 @@ export const generatePatientQuery = ( patient, statement, query, acl, schema, gr
         const context = {
             sort,
             acl,
-            patient,
             index,
             limit
         }
@@ -118,12 +123,11 @@ export const generatePatientQuery = ( patient, statement, query, acl, schema, gr
         request.query.bool.filter.push( filter )
     }
 
-    request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
-
     return {
         from: index,
         size: limit,
-        query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient ),
+        // query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient ),
+        query: request.query,
         sort
     }
 }
@@ -404,10 +408,10 @@ export default class ElasticClient {
         } )
     }
 
-    async searchPatientsWithSQON( patient, statement, query, acl, schema, group, index, limit ) {
+    async searchPatientsWithSQON( statement, query, acl, schema, group, index, limit ) {
         console.log( '+++ entering searchPatientsWithSQON' )
         const uri = `${this.host}${schema.path}/_search`
-        const body = generatePatientQuery( patient, statement, query, acl, schema, group, index, limit )
+        const body = generatePatientQuery( statement, query, acl, schema, group, index, limit )
 
         console.debug( `searchPatientsWithSQON: ${JSON.stringify( body )}` )
 

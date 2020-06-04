@@ -12,7 +12,7 @@
     "patient": {
       "sort": [
         {
-          "id": {
+          "id.keyword": {
             "order": "desc"
           }
         }
@@ -31,7 +31,7 @@
           "label": "filter_status",
           "type": "generic",
           "search": {
-            "status": "serviceRequests.status"
+            "status": "serviceRequests.status.keyword"
           },
           "facet": [
             {
