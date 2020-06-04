@@ -10,6 +10,8 @@ function bufferToStream(buffer) {
   return stream;
 }
 
+const HEADER_HEIGHT = 30;
+
 export const sendDataAsExcel = (req, res) => {
   const {
     sheet, style
@@ -51,6 +53,7 @@ export const sendDataAsExcel = (req, res) => {
           .style(style);
     }
   };
+  ws.row(1).setHeight(HEADER_HEIGHT);
   const writeRow = (row, rowIndex) => {
     row.forEach((cell, colIndex) => writeCell(ws, cell, rowIndex, colIndex));
   };
