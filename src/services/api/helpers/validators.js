@@ -1,7 +1,7 @@
 import Joi from '@hapi/joi'
 
-import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from '../variant/sqon/dialect/es'
-import { DIALECT_LANGUAGE_GRAPHQL } from '../variant/sqon/dialect/gql'
+import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from '../helpers/sqonMapper/dialect/es'
+import { DIALECT_LANGUAGE_GRAPHQL } from '../helpers/sqonMapper/dialect/gql'
 
 export default {
     login: {
