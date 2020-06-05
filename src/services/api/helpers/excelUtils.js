@@ -1,5 +1,6 @@
 import { Readable, Duplex } from 'stream'; 
 import { Base64Encode } from 'base64-stream';
+import errors from 'restify-errors'
 
 import xl from 'excel4node';
 
@@ -16,7 +17,15 @@ export const sendDataAsExcel = (req, res) => {
   const {
     sheet, style
   } = req.body;
+
+  if (!sheet || ! style) {
+    return new errors.BadRequestError()
+  }
   const { data } = sheet;
+
+  if (!data) {
+    return new errors.BadRequestError()
+  }
 
   var wb = new xl.Workbook();
   var ws = wb.addWorksheet('Sheet 1', {
@@ -53,15 +62,23 @@ export const sendDataAsExcel = (req, res) => {
           .style(style);
     }
   };
-  ws.row(1).setHeight(HEADER_HEIGHT);
-  const writeRow = (row, rowIndex) => {
-    row.forEach((cell, colIndex) => writeCell(ws, cell, rowIndex, colIndex));
+
+  try {
+    ws.row(1).setHeight(HEADER_HEIGHT);
+    const writeRow = (row, rowIndex) => {
+      row.forEach((cell, colIndex) => writeCell(ws, cell, rowIndex, colIndex));
+    };
+  
+    data.forEach((row, rowIndex) => writeRow(row, rowIndex));
+  
+    wb.writeToBuffer().then(function(buffer) {
+      const stream = bufferToStream(buffer);
+      stream.pipe(new Base64Encode()).pipe(res);
+    });
+  } catch (e) {
+    res.status(400);
+    res.send({
+      error: e
+    });
   };
-
-  data.forEach((row, rowIndex) => writeRow(row, rowIndex));
-
-  wb.writeToBuffer().then(function(buffer) {
-    const stream = bufferToStream(buffer);
-    stream.pipe(new Base64Encode()).pipe(res);
-  });
 };
