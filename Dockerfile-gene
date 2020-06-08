@@ -1,10 +1,11 @@
 FROM node:10.14.1-alpine
+RUN apk add curl
 ADD . /code
 WORKDIR /code
 RUN npm install
 RUN npm run build
 CMD ["npm", "run", "service-gene"]
 
-HEALTHCHECK --interval=20s CMD wget --no-check-certificate -qO- https://localhost:5002/gene/health
+HEALTHCHECK --interval=20s CMD curl -kf https://localhost:5002/gene/health
 
 ENV MEMORY_LIMIT 256
