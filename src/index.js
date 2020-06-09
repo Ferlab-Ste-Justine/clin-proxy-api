@@ -12,6 +12,7 @@ import jwt from 'jsonwebtoken'
 
 import payloadFormatter from './services/api/helpers/payload'
 import { refreshTokenMiddlewareGenerator } from './services/api/auth'
+import { getStandaloneSecret, embedSecret } from './services/api/helpers/secret'
 
 
 if ( !process.env.LOGGER ) {
@@ -46,11 +47,14 @@ try {
     process.exit( 1 )
 }
 
-if ( !process.env.JWT_SECRET ) {
-    launcherLog.error( 'No JWT_SECRET specified in environment' )
-    process.exit( 1 )
-}
-const serviceJwtSecret = process.env.JWT_SECRET
+const serviceJwtSecret = getStandaloneSecret(
+    '/run/secrets/clin_proxy_api_jwt_secret', 
+    'JWT_SECRET', 
+    () => {
+        launcherLog.error( 'No JWT_SECRET specified in environment' )
+        process.exit( 1 )
+    }
+)
 
 let cacheServiceConfig = null
 
@@ -70,6 +74,16 @@ try {
     process.exit( 1 )
 }
 
+embedSecret(
+    '/run/secrets/keycloak_clin_client_secret',
+    keycloakServiceConfig,
+    'clientSecret',
+    () => {
+        launcherLog.error( 'Client secret is not defined in keycloak configuration' )
+        process.exit( 1 )
+    }
+)
+
 let aidboxServiceConfig = null
 
 try {
@@ -78,6 +92,26 @@ try {
     launcherLog.error( 'Invalid JSON value or missing AIDBOX_SERVICE in environment.' )
     process.exit( 1 )
 }
+
+embedSecret(
+    '/run/secrets/aidbox_root_user',
+    aidboxServiceConfig,
+    'username',
+    () => {
+        launcherLog.error( 'The user is not defined in aidbox configuration' )
+        process.exit( 1 )
+    }
+)
+
+embedSecret(
+    '/run/secrets/aidbox_root_password',
+    aidboxServiceConfig,
+    'password',
+    () => {
+        launcherLog.error( 'The password is not defined in aidbox configuration' )
+        process.exit( 1 )
+    }
+)
 
 let elasticServiceConfig = null
 
