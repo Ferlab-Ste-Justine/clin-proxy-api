@@ -13,14 +13,16 @@ function bufferToStream(buffer) {
 
 const HEADER_HEIGHT = 30;
 
-export const sendDataAsExcel = (req, res) => {
+export const sendDataAsExcel = (req, res, next) => {
   const {
     sheet, style
   } = req.body;
 
+
   if (!sheet || ! style) {
     return new errors.BadRequestError()
   }
+
   const { data } = sheet;
 
   if (!data) {
@@ -39,8 +41,7 @@ export const sendDataAsExcel = (req, res) => {
     },
   });
    
-  // Create a reusable style
-  var wbStyle = wb.createStyle(style);
+  wb.createStyle(style);
 
   const writeCell = (ws, cell, rowIndex, colIndex) => {
     const row = rowIndex + 1;
@@ -63,22 +64,16 @@ export const sendDataAsExcel = (req, res) => {
     }
   };
 
-  try {
-    ws.row(1).setHeight(HEADER_HEIGHT);
-    const writeRow = (row, rowIndex) => {
-      row.forEach((cell, colIndex) => writeCell(ws, cell, rowIndex, colIndex));
-    };
-  
-    data.forEach((row, rowIndex) => writeRow(row, rowIndex));
-  
-    wb.writeToBuffer().then(function(buffer) {
-      const stream = bufferToStream(buffer);
-      stream.pipe(new Base64Encode()).pipe(res);
-    });
-  } catch (e) {
-    res.status(400);
-    res.send({
-      error: e
-    });
+  ws.row(1).setHeight(HEADER_HEIGHT);
+  const writeRow = (row, rowIndex) => {
+    row.forEach((cell, colIndex) => writeCell(ws, cell, rowIndex, colIndex));
   };
+
+  data.forEach((row, rowIndex) => writeRow(row, rowIndex));
+
+  wb.writeToBuffer().then(function(buffer) {
+    const stream = bufferToStream(buffer);
+    stream.pipe(new Base64Encode()).pipe(res);
+    stream.on('finish', next)
+  });
 };

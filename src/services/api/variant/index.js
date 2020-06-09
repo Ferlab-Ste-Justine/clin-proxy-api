@@ -8,6 +8,7 @@ import ElasticClient from '../../elastic'
 import Apiv1 from './v1'
 import validators from '../helpers/validators'
 import restifyAsyncWrap from '../helpers/async'
+import { sendDataAsExcel } from '../helpers/excel'
 
 
 const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
@@ -179,6 +180,29 @@ export default class VariantService extends ApiService {
             }
 
         } ) )
+
+        // Generate excel file for list of variants
+        this.instance.post( {
+          path: `${this.config.endpoint}/xl`,
+        }, async (req, res, next) => {
+          try {
+            const response = await getFunctionForApiVersion( req.version, 'sendDataAsExcel' )(
+              req,
+              res,
+              this.cacheService,
+              this.elasticService,
+              this.logService
+            );
+            if (response) {
+              res.status( 400 )
+              res.end()
+            }
+          }
+          catch ( e ) {
+            await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+            ext( e )
+          }
+        });
 
         super.start()
     }
