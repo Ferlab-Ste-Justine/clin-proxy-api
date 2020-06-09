@@ -60,12 +60,7 @@ Run the following to tear down:
 
 To create the 'statement' and 'profile' indices, run the following command line where ElasticSearch is available (ssh -L or ssh thru environment)
 
-The delete is because the devops have decided to own elasticsearch and pre-configure settings which make the creation of the index crash
-
 ```
-curl -XDELETE "http://localhost:9200/statement"
-curl -XDELETE "http://localhost:9200/profile"
-
 curl -XPUT "http://localhost:9200/statement" -H 'Content-Type: application/json' -d @clin-statement-centric.json
 curl -XPUT "http://localhost:9200/profile" -H 'Content-Type: application/json' -d @clin-profile-centric.json
 ```
@@ -76,7 +71,7 @@ curl -XPUT "http://localhost:9200/profile" -H 'Content-Type: application/json' -
 
 Images are pushed by merging on dev. The version tag is taken from the version in the package.json file so make sure you increment it before merging to dev.
 
-If you add a new service, make sure to add the building and pushing of its image to the **push_images.sh** script and its orchestration in the **docker-compose.yml** file.
+If you add a new service, make sure to add it to the **build_images.yml** pipeline and to the **push_images.sh** script.
 
 ### Deploying
 
