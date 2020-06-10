@@ -11,35 +11,26 @@ services:
       mode: replicated
       #Given that memcached is a stateful application and this is not a cluster, keep this value at 1
       replicas: 1
-      placement:
-        constraints: [node.labels.app_role == generic]
       resources:
         limits:
           cpus: '2.00'
           memory: 256M
-        reservations:
-          cpus: '1.00'
-          memory: 128M
     #https://docs.oracle.com/cd/E17952_01/mysql-5.1-en/ha-memcached-cmdline-options.html
     command: "memcached -m 128 -t 4"
   auth:
-    image: chusj/clin-proxy-api-auth-service:$DEFAULT_PROD_VERSION
+    image: localhost:5000/clin-proxy-api-auth-service
+    volumes:
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "3000:3000"
     deploy:
-      replicas: 2
-      placement:
-        constraints:
-        - node.labels.app_role == generic
+      replicas: 1
       resources:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
@@ -48,51 +39,45 @@ services:
     secrets:
       - certificate_certificate
       - certificate_key
+    command: ["npm", "run", "dev-service-auth"]
   patient:
-    image: chusj/clin-proxy-api-patient-service:$DEFAULT_PROD_VERSION
+    image: localhost:5000/clin-proxy-api-patient-service
+    volumes:
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "4000:4000"
     deploy:
-      replicas: 2
-      placement:
-        constraints:
-        - node.labels.app_role == generic
+      replicas: 1
       resources:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
-      - aidbox
       - clinnet
       - proxy
+      - aidbox
     env_file:
       - patient.env
     secrets:
       - certificate_certificate
       - certificate_key
+    command: ["npm", "run", "dev-service-patient"]
   variant:
-    image: chusj/clin-proxy-api-variant-service:$DEFAULT_PROD_VERSION
+    image: localhost:5000/clin-proxy-api-variant-service
+    volumes:
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "5001:5001"
     deploy:
-      replicas: 3
-      placement:
-        constraints:
-        - node.labels.app_role == generic
+      replicas: 1
       resources:
         limits:
           cpus: '1.00'
           memory: 512M
-        reservations:
-          cpus: '0.50'
-          memory: 256M
     networks:
       - clinnet
       - proxy
@@ -101,24 +86,21 @@ services:
     secrets:
       - certificate_certificate
       - certificate_key
+    command: ["npm", "run", "dev-service-variant"]
   meta:
-    image: chusj/clin-proxy-api-meta-service:$DEFAULT_PROD_VERSION
+    image: localhost:5000/clin-proxy-api-meta-service
+    volumes:
+      - ./src:/code/src
     depends_on:
       - memcached
     ports:
       - "7000:7000"
     deploy:
-      replicas: 2
-      placement:
-        constraints:
-        - node.labels.app_role == generic
+      replicas: 1
       resources:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
@@ -127,22 +109,19 @@ services:
     secrets:
       - certificate_certificate
       - certificate_key
+    command: ["npm", "run", "dev-service-meta"]
   gene:
-    image: chusj/clin-proxy-api-gene-service:$DEFAULT_PROD_VERSION
+    image: localhost:5000/clin-proxy-api-gene-service
+    volumes:
+      - ./src:/code/src
     ports:
       - "5002:5002"
     deploy:
-      replicas: 2
-      placement:
-        constraints:
-        - node.labels.app_role == generic
+      replicas: 1
       resources:
         limits:
           cpus: '0.50'
           memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
     networks:
       - clinnet
       - proxy
@@ -151,6 +130,7 @@ services:
     secrets:
       - certificate_certificate
       - certificate_key
+    command: ["npm", "run", "dev-service-gene"]
 
 secrets:
   certificate_certificate:
@@ -159,9 +139,9 @@ secrets:
     external: true
 
 networks:
-  aidbox:
-    external: true
   clinnet:
     external: true
   proxy:
+    external: true
+  aidbox:
     external: true

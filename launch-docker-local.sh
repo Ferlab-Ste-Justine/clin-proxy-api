@@ -17,4 +17,4 @@ docker build -f Dockerfile-patient -t localhost:5000/clin-proxy-api-patient-serv
 docker build -f Dockerfile-variant -t localhost:5000/clin-proxy-api-variant-service .;
 docker build -f Dockerfile-meta -t localhost:5000/clin-proxy-api-meta-service .;
 docker build -f Dockerfile-gene -t localhost:5000/clin-proxy-api-gene-service .;
-docker stack deploy -c docker-compose-docker-local.yml clin-proxy;
+docker stack deploy -c docker-compose.yml clin-proxy;
