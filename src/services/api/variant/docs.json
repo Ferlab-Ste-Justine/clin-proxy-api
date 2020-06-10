@@ -20,6 +20,26 @@
     }
   ],
   "paths": {
+    "/variant/xl": {
+      "post": {
+        "description": "Generates an excel file from a json object send by the frontend and streams it back",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/xlObject"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/variant/health": {
       "get": {
         "tags": [
@@ -127,6 +147,7 @@
       }
     },
     "/variant/search": {
+
       "post": {
         "security": [
           {
@@ -2605,6 +2626,66 @@
               },
               "..."
             ]
+          }
+        }
+      },
+      "xlObject": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "style": {
+            "type": "object",
+            "properties": {
+              "font": {
+                "type": "object",
+                "properties": {
+                  "color": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "number"
+                  } 
+                }
+              },
+              "numberFormat": {
+                "type": "string"
+              },
+              "alignment": {
+                "type": "object",
+                "properties": {
+                  "wrapText": {
+                    "type": "boolean"
+                  },
+                  "vertical": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "sheet": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },

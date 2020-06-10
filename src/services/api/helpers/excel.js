@@ -74,6 +74,5 @@ export const sendDataAsExcel = (req, res, next) => {
   wb.writeToBuffer().then(function(buffer) {
     const stream = bufferToStream(buffer);
     stream.pipe(new Base64Encode()).pipe(res);
-    stream.on('finish', next)
   });
 };
