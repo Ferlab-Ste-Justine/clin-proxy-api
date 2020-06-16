@@ -9,6 +9,7 @@ import addQueryParserMiddleware from './middleware/queryParser'
 import addVersionMiddleware from './middleware/version'
 import addRefreshAccessTokenMiddleware from './middleware/refreshAccessToken'
 import restifyAsyncWrap from './helpers/async'
+import { sendDataAsExcel } from './helpers/excel'
 
 export default class ApiService {
     constructor( config ) {
@@ -100,7 +101,7 @@ export default class ApiService {
                   </body>
                 </html>` )
         } )
-
+ 
         await this.instance.listen( this.config.port )
         await this.logService.debug( `${this.config.name} API Service is ready.` )
     }
