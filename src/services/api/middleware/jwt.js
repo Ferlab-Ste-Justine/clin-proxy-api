@@ -1,7 +1,8 @@
 import Keycloak from '../helpers/keycloak'
 import errors from 'restify-errors'
 
-// TODO: Find an alternative for local
+// TODO: Find an alternative for local management of self-signed certificates
+// The following is required when using a local instance of KeyCloak which uses self-signed certificates
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 export default ( server, config ) => {
@@ -28,7 +29,7 @@ export default ( server, config ) => {
             next()
         } else {
             keycloak
-                .verifyOffline( accessToken.split( ' ' )[ 1 ] )
+                .verifyOffline( ( accessToken && accessToken.indexOf( ' ' ) > -1 ) ? accessToken.split( ' ' )[ 1 ] : '' )
                 .then( ( user ) => {
                     req.fhir = user.fhirPractitionerId
                     next()
