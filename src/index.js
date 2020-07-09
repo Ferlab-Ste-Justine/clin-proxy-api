@@ -1,5 +1,4 @@
 import fs from 'fs'
-import errors from 'restify-errors'
 
 try { require( 'babel-polyfill' ) } catch ( e ) {} /* eslint-disable-line */
 require( 'dotenv' ).config()
@@ -7,13 +6,7 @@ require( 'dotenv' ).config()
 const args = require( 'yargs' ).argv
 
 import uniqid from 'uniqid'
-import cookie from 'cookie'
-import jwt from 'jsonwebtoken'
-
 import payloadFormatter from './services/api/helpers/payload'
-import { refreshTokenMiddlewareGenerator } from './services/api/auth'
-import { getStandaloneSecret, embedSecret } from './services/api/helpers/secret'
-
 
 if ( !process.env.LOGGER ) {
     console.log( 'No LOGGER defined in environment, using default: console.' )
@@ -47,72 +40,6 @@ try {
     process.exit( 1 )
 }
 
-const serviceJwtSecret = getStandaloneSecret(
-    '/run/secrets/clin_proxy_api_jwt_secret', 
-    'JWT_SECRET', 
-    () => {
-        launcherLog.error( 'No JWT_SECRET specified in environment' )
-        process.exit( 1 )
-    }
-)
-
-let cacheServiceConfig = null
-
-try {
-    cacheServiceConfig = JSON.parse( process.env.MEMCACHE_SERVICE )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing MEMCACHE_SERVICE in environment.' )
-    process.exit( 1 )
-}
-
-let keycloakServiceConfig = null
-
-try {
-    keycloakServiceConfig = JSON.parse( process.env.KEYCLOAK_SERVICE )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing KEYCLOAK_SERVICE in environment.' )
-    process.exit( 1 )
-}
-
-embedSecret(
-    '/run/secrets/keycloak_clin_client_secret',
-    keycloakServiceConfig,
-    'clientSecret',
-    () => {
-        launcherLog.error( 'Client secret is not defined in keycloak configuration' )
-        process.exit( 1 )
-    }
-)
-
-let aidboxServiceConfig = null
-
-try {
-    aidboxServiceConfig = JSON.parse( process.env.AIDBOX_SERVICE )
-} catch ( e ) {
-    launcherLog.error( 'Invalid JSON value or missing AIDBOX_SERVICE in environment.' )
-    process.exit( 1 )
-}
-
-embedSecret(
-    '/run/secrets/aidbox_root_user',
-    aidboxServiceConfig,
-    'username',
-    () => {
-        launcherLog.error( 'The user is not defined in aidbox configuration' )
-        process.exit( 1 )
-    }
-)
-
-embedSecret(
-    '/run/secrets/aidbox_root_password',
-    aidboxServiceConfig,
-    'password',
-    () => {
-        launcherLog.error( 'The password is not defined in aidbox configuration' )
-        process.exit( 1 )
-    }
-)
-
 let elasticServiceConfig = null
 
 try {
@@ -127,13 +54,6 @@ if ( !process.env.CONTAINER_ID ) {
     launcherLog.warning( 'No CONTAINER_ID specified in environment, auto-generated.' )
 }
 const containerId = process.env.CONTAINER_ID
-
-if ( !process.env.JWT_PROPERTY_NAME ) {
-    launcherLog.warning( 'No JWT_PROPERTY_NAME defined in environment, using default: token.' )
-    process.env.JWT_PROPERTY_NAME = 'token'
-}
-const serviceJwtPropertyName = process.env.JWT_PROPERTY_NAME
-
 let sslCertificate = null
 let sslCertificateKey = null
 
@@ -151,22 +71,10 @@ if ( !process.env.SSL_CERTIFICATE_PATH || !process.env.SSL_CERTIFICATE_KEY_PATH 
 
 const serviceToLaunch = args.service || null
 
-let refreshTokenMiddleware = () => {
-    return null
-}
-
-try {
-    const authServiceConfig = JSON.parse( process.env.AUTH_API_SERVICE )
-
-    refreshTokenMiddleware = refreshTokenMiddlewareGenerator( authServiceConfig )
-} catch ( e ) {
-    launcherLog.warning( 'No Token Refresh Middleware will be available for API Services launched.' )
-}
-
 const generateApiConfig = ( serviceName ) => {
     const serviceConfig = JSON.parse( process.env[ `${serviceName.toUpperCase()}_API_SERVICE` ] )
     const logService = new LogService( `${serviceConfig.name} Service`, logLevel )
-    const jwtSecret = Buffer.from( serviceJwtSecret, 'base64' )
+    const jwtConfig = JSON.parse( process.env.KEYCLOAK_CONFIG )
 
     return {
         id: serviceName,
@@ -188,51 +96,11 @@ const generateApiConfig = ( serviceName ) => {
             preflightMaxAge: 5,
             origins: serviceCorsOrigins
         },
-        jwt: {
-            secret: jwtSecret,
-            credentialsRequired: true,
-            requestProperty: serviceJwtPropertyName,
-
-            getToken: ( req ) => {
-                if ( req.headers && req.headers.cookie ) {
-                    const cookieJar = cookie.parse( req.headers.cookie )
-                    let token = cookieJar[ serviceJwtPropertyName ] || null
-
-                    if ( token ) {
-                        req.jwt = jwt.decode( token, jwtSecret )
-
-                        // Signed JWT Token Version Should Match Package Version
-                        if ( req.jwt.version !== launcherVersion ) {
-                            return new errors.InvalidCredentialsError( 'The token version is outdated' )
-                        }
-
-                        // Signed JWT Token Is Expired
-                        const currentTimeInSeconds = Math.round( new Date().getTime() / 1000 )
-
-                        if ( req.jwt.expiry <= currentTimeInSeconds ) {
-                            const refreshPayload = refreshTokenMiddleware( req )
-
-                            if ( refreshPayload !== null ) {
-                                token = refreshPayload.data.token.value
-                                req.jwt = jwt.decode( token, jwtSecret )
-                                req.newAccessTokenIssued = token
-                            }
-                        }
-
-                        return token
-                    }
-                }
-                return null
-            }
-            // isRevoked: ( req, payload, done ) => {}
-        },
+        jwt: jwtConfig,
         serviceId: uniqid(),
         containerId,
         logService,
         parentLogService: launcherLog,
-        cacheConfig: cacheServiceConfig,
-        keycloakConfig: keycloakServiceConfig,
-        aidboxConfig: aidboxServiceConfig,
         elasticConfig: elasticServiceConfig
     }
 }

@@ -1,14 +1,8 @@
 import errors from 'restify-errors'
 
-
-const getSessionDataFromToken = async ( token, cacheService ) => {
-    return await cacheService.read( token.uid )
-}
-
-const getPatientById = async ( req, res, cacheService, elasticService, logService ) => {
+const getPatientById = async ( req, res, elasticService, logService ) => {
     try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
-        const response = await elasticService.searchPatients( sessionData.acl.fhir, [], [ { match: { id: req.params.uid } } ], [] )
+        const response = await elasticService.searchPatients( req.fhir, [], [ { match: { id: req.params.uid } } ], [] )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
@@ -22,14 +16,13 @@ const getPatientById = async ( req, res, cacheService, elasticService, logServic
     }
 }
 
-const searchPatients = async ( req, res, cacheService, elasticService, logService ) => {
+const searchPatients = async ( req, res, elasticService, logService ) => {
     try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params || req.body
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
 
-        const response = await elasticService.searchPatients( sessionData.acl.fhir, [], [], [], index, limit )
+        const response = await elasticService.searchPatients( req.fhir, [], [], [], index, limit )
 
         await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total} matches` )
         return {
@@ -42,9 +35,8 @@ const searchPatients = async ( req, res, cacheService, elasticService, logServic
     }
 }
 
-const searchPatientsByAutoComplete = async ( req, res, cacheService, elasticService, logService ) => {
+const searchPatientsByAutoComplete = async ( req, res, elasticService, logService ) => {
     try {
-        const sessionData = await getSessionDataFromToken( req.token, cacheService )
         const params = req.query || req.params
         const query = params.query
         const type = params.type || 'partial'

@@ -1,0 +1,34 @@
+### Test connection with clin-proxy-api client
+POST https://dev.chusj-clin-dev.org:8443/auth/realms/clin/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=clin-proxy-api&grant_type=password&client_secret=319cf843-e066-4760-9643-f1ca662fcaf5&scope=openid&username=plaplante@ferlab.bio&password=test123
+
+### Test connection with clin-proxy-api client
+POST https://clin.ferlab.bio:8443/auth/realms/clin/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=clin-proxy-api&grant_type=password&client_secret=7212999d-e3b1-4f54-b414-a3828987ee40&scope=openid&username=flavoie@ferlab.bio&password=flavoie123
+
+### Admin authentication
+POST https://dev.chusj-clin-dev.org:8443/auth/realms/master/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id=admin-cli&grant_type=password&scope=openid&username=admin&password=1q2w3e4r
+
+> {% client.global.set("access_token", response.body.access_token); %}
+
+### Retrieve the list of users
+GET https://dev.chusj-clin-dev.org:8443/auth/admin/realms/clin/users
+Authorization: Bearer {{access_token}}
+
+### Create a new user
+POST https://dev.chusj-clin-dev.org:8443/auth/admin/realms/clin/users
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{"username":"jcostanza","firstName":"Jeremy","lastName":"Costanza", "email":"jcostanza@ferlab.bio", "enabled":"true"}
+
+###
+GET https://localhost:4000/patient/search
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJZNWgzU0JvSU5kbVV2QWpkMVVtRmtCUXIxeXZ0dHIxQ1BaYmtVU2g0UVFBIn0.eyJleHAiOjE1OTQzMjI3NzQsImlhdCI6MTU5NDMxOTE3NCwianRpIjoiYjMxNjM2ZDktNDk5MC00NWZlLWFmZTgtMDZlNDNmNzYyNDljIiwiaXNzIjoiaHR0cHM6Ly9kZXYuY2h1c2otY2xpbi1kZXYub3JnOjg0NDMvYXV0aC9yZWFsbXMvY2xpbiIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJiZTAzN2VhZC01ZmVmLTQwMzItYjk2MC0yMzBkOTAwNmE3ZTQiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjbGluLXByb3h5LWFwaSIsInNlc3Npb25fc3RhdGUiOiI4MTYyMjgzZi1iYmI0LTQwNDgtOTg3My1lYjM3ZjIxOTA1MDUiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImNsaW5fYWRtaW5pc3RyYXRvciIsImNsaW5fcHJhY3RpdGlvbmVyIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoiUGF0cmljZSBMYXBsYW50ZSIsImZoaXJfcHJhY3RpdGlvbmVyX2lkIjoiUFIwMDYyMCIsInByZWZlcnJlZF91c2VybmFtZSI6InBsYXBsYW50ZSIsImdpdmVuX25hbWUiOiJQYXRyaWNlIiwiZmFtaWx5X25hbWUiOiJMYXBsYW50ZSIsImVtYWlsIjoicGxhcGxhbnRlQGZlcmxhYi5iaW8ifQ.Gc0EHNvkHcGIbnKLRcN_QDBP9KVhz-t5DI7-3zKMcS9_eJ8XKWZchTxR5V8HZJpz8dOvDVQI2Y4dk5rFOyA4qkwUqqJwCQ-kcwUfcXp92WK2tAYoEidRk4WEJrcp0kc62u4LCs4fZRwRIT0l5rI1YrGO5pVsS1YR67e22Dzsd_tgVpJ-zzwIzg4SbDuTZCR6v5522D5uPvCyn8clkCtzUEMQSylLiWz_f8LkLjoUXsmJfm1ucn8-67N-upyb2rBzXpJSFWYpz9Djf6INbEut_lR2337eQnNJZRySHvSe-1uEpdRmTurQIJlvPQev0Q9jah5Lyjc6YwsPRHARNZ0Wjw

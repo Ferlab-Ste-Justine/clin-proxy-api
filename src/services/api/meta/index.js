@@ -1,8 +1,5 @@
-import rjwt from 'restify-jwt-community'
-
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
-import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
@@ -22,13 +19,6 @@ export default class MetaService extends ApiService {
         this.config.elastic = config.elasticConfig
         this.runServicesHealthCheck = async () => {
             try {
-                try {
-                    await this.cacheService.ping()
-                } catch ( cacheException ) {
-                    throw new Error( `Cache Service Client health check failed with ${ cacheException.message}` )
-                }
-                await this.logService.debug( 'Cache Service is healthy.' )
-
                 try {
                     const elasticPingResult = await this.elasticService.ping()
 
@@ -51,21 +41,12 @@ export default class MetaService extends ApiService {
 
         await this.logService.debug( 'Initializing service dependencies...' )
 
-        this.cacheService = new CacheClient( this.config.cache )
         this.elasticService = new ElasticClient( this.config.elastic )
 
         await this.runServicesHealthCheck()
     }
 
     async start() {
-        // JWT Endpoint Exceptions
-        this.instance.use( rjwt( this.config.jwt ).unless( {
-            path: [
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` }
-            ]
-        } ) )
-
         // Register getStatements
         this.instance.get( {
             path: `${this.config.endpoint}/statement`
@@ -74,7 +55,6 @@ export default class MetaService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'getStatements' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -98,7 +78,6 @@ export default class MetaService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'createStatement' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -121,7 +100,6 @@ export default class MetaService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'updateStatement' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -145,7 +123,6 @@ export default class MetaService extends ApiService {
                 await getFunctionForApiVersion( req.version, 'deleteStatement' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -167,7 +144,6 @@ export default class MetaService extends ApiService {
                 await getFunctionForApiVersion( req.version, 'deleteStatement' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -190,7 +166,6 @@ export default class MetaService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'getProfile' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -214,7 +189,6 @@ export default class MetaService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'createProfile' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -237,7 +211,6 @@ export default class MetaService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'updateProfile' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -261,7 +234,6 @@ export default class MetaService extends ApiService {
                 await getFunctionForApiVersion( req.version, 'deleteProfile' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -283,7 +255,6 @@ export default class MetaService extends ApiService {
                 await getFunctionForApiVersion( req.version, 'deleteProfile' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
