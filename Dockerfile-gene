@@ -1,6 +1,6 @@
-FROM node:10.14.1-alpine
+FROM jboss/keycloak:latest
 RUN apk add curl
-ADD . /code
+ADD ./clin-keycloak-theme /code
 WORKDIR /code
 RUN npm config set unsafe-perm true
 RUN npm install

@@ -3,7 +3,7 @@ import errors from 'restify-errors'
 
 // TODO: Find an alternative for local management of self-signed certificates
 // The following is required when using a local instance of KeyCloak which uses self-signed certificates
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 export default ( server, config ) => {
     // eslint-disable-next-line new-cap
@@ -20,10 +20,12 @@ export default ( server, config ) => {
         const route = req.getRoute()
 
         let match = false
-
-        exclusions.forEach( ( exclusion ) => {
-            match = exclusion.methods.includes( route.method ) && exclusion.path === route.path
-        } )
+        
+        if ( route ) {
+            exclusions.forEach( ( exclusion ) => {
+                match = exclusion.methods.includes( route.method ) && exclusion.path === route.path
+            } )
+        }
 
         if ( match ){
             next()
