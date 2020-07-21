@@ -54,20 +54,6 @@ if ( !process.env.CONTAINER_ID ) {
     launcherLog.warning( 'No CONTAINER_ID specified in environment, auto-generated.' )
 }
 const containerId = process.env.CONTAINER_ID
-let sslCertificate = null
-let sslCertificateKey = null
-
-if ( !process.env.SSL_CERTIFICATE_PATH || !process.env.SSL_CERTIFICATE_KEY_PATH ) {
-    launcherLog.warning( 'No SSL_CERTIFICATE_PATH or SSL_CERTIFICATE_KEY_PATH defined in environment.' )
-} else {
-    try {
-        sslCertificate = fs.readFileSync( process.env.SSL_CERTIFICATE_PATH )
-        sslCertificateKey = fs.readFileSync( process.env.SSL_CERTIFICATE_KEY_PATH )
-    } catch ( e ) {
-        launcherLog.error( 'SSL_CERTIFICATE_PATH or SSL_CERTIFICATE_KEY_PATH could not be read.' )
-        process.exit( 1 )
-    }
-}
 
 const serviceToLaunch = args.service || null
 
@@ -88,9 +74,7 @@ const generateApiConfig = ( serviceName ) => {
             formatters: {
                 'application/json': payloadFormatter
             },
-            ignoreTrailingSlash: false,
-            certificate: sslCertificate,
-            key: sslCertificateKey
+            ignoreTrailingSlash: false
         },
         cors: {
             preflightMaxAge: 5,

@@ -2,7 +2,7 @@ import errors from 'restify-errors'
 
 const getPatientById = async ( req, res, elasticService, logService ) => {
     try {
-        const response = await elasticService.searchPatients( req.fhir, [], [ { match: { id: req.params.uid } } ], [] )
+        const response = await elasticService.searchPatients( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, [], [ { match: { id: req.params.uid } } ], [] )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()
@@ -22,7 +22,7 @@ const searchPatients = async ( req, res, elasticService, logService ) => {
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
 
-        const response = await elasticService.searchPatients( req.fhir, [], [], [], index, limit )
+        const response = await elasticService.searchPatients( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, [], [], [], index, limit )
 
         await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total} matches` )
         return {

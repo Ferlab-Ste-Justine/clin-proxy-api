@@ -19,7 +19,10 @@ const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
 
 const generateAclFilters = ( acl, service, schema = null ) => {
     const filters = []
+
     const practitionerId = acl.practitioner_id
+    // PLA: In Keycloak a user can be associated with multiple groups and each group could have a different organization id
+    // Shouldn't acl.organization_id be a list?  If so, in the Keycloak fhir organization mapper, activate the multi-value switch.
     const organizationId = acl.organization_id
 
     switch ( acl.role ) {

@@ -55,7 +55,7 @@ const getVariants = async ( req, res, elasticService, logService ) => {
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.searchVariantsForPatient( patient, statement, query, req.fhir, schema, group, index, limit )
+                response = await elasticService.searchVariantsForPatient( patient, statement, query, { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, schema, group, index, limit )
                 totalFromResponse = response.hits.total
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {
                     const result = hit._source
@@ -98,7 +98,7 @@ const getFacets = async ( req, res, elasticService, logService ) => {
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForVariant( patient, statement, query, req.fhir, schema )
+                response = await elasticService.getFacetsForVariant( patient, statement, query, { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, schema )
 
                 // Filtered Non-Nested
                 if ( response.aggregations.filtered ) {
@@ -231,7 +231,7 @@ const countVariants = async ( req, res, elasticService, logService ) => {
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 await Promise.all(
                     queries.map( async( query ) => {
-                        const response = await elasticService.countVariantsForPatient( patient, statement, query, req.fhir, schema, group )
+                        const response = await elasticService.countVariantsForPatient( patient, statement, query, { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, schema, group )
 
                         totalFromResponse[ query ] = response.count
                         await logService.debug( `Elastic countVariants in ${dialect} dialect resolved query ${patient}/${query} found ${response.count} matches` )
@@ -252,7 +252,7 @@ const countVariants = async ( req, res, elasticService, logService ) => {
 
 const getVariantById = async ( req, res, elasticService, logService ) => {
     try {
-        const response = await elasticService.searchVariants( req.fhir, [], [ { ids: { values: [ req.params.vid ] } } ], 0, 1 )
+        const response = await elasticService.searchVariants( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, [], [ { ids: { values: [ req.params.vid ] } } ], 0, 1 )
 
         if ( response.hits.total < 1 ) {
             return new errors.NotFoundError()

@@ -33,10 +33,11 @@ export default ( server, config ) => {
             keycloak
                 .verifyOffline( ( accessToken && accessToken.indexOf( ' ' ) > -1 ) ? accessToken.split( ' ' )[ 1 ] : '' )
                 .then( ( user ) => {
-                    req.fhir = user.fhirPractitionerId
+                    req.fhirPractitionerId = user.fhirPractitionerId
+                    req.fhirOrganizationId = user.fhirOrganizationId
                     next()
                 } )
-                .catch( () => {
+                .catch( ( ) => {
                     // Token expired or is invalid
                     next( new errors.ForbiddenError() )
                 } )

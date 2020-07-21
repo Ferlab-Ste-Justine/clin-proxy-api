@@ -13,6 +13,7 @@ const makeUser = ({
                     email,
                     name,
                     fhir_practitioner_id,
+                    fhir_organization_id,
                     given_name,
                     family_name
                   }) => ({
@@ -24,7 +25,8 @@ const makeUser = ({
   name,
   firstName: given_name,
   lastName: family_name,
-  fhirPractitionerId: fhir_practitioner_id
+  fhirPractitionerId: fhir_practitioner_id,
+  fhirOrganizationId: fhir_organization_id
 });
 
 const verify = curryN(2)(jwt.verify);

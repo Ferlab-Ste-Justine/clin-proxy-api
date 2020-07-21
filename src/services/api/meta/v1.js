@@ -9,7 +9,7 @@ const getStatements = async ( req, res, elasticService, logService ) => {
         const params = req.query || req.params || req.body
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const response = await elasticService.searchMeta( req.fhir, META_TYPE_STATEMENT, [], [], [], index, limit )
+        const response = await elasticService.searchMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_STATEMENT, [], [], [], index, limit )
 
         await logService.debug( `Elastic getStatements [${index},${limit}] returns ${response.hits.total} matches` )
         return {
@@ -36,7 +36,7 @@ const createStatement = async ( req, res, elasticService, logService ) => {
             isDefault,
             lastUpdatedOn: new Date().getTime()
         }
-        const response = await elasticService.createMeta( req.fhir, META_TYPE_STATEMENT, struct )
+        const response = await elasticService.createMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_STATEMENT, struct )
 
         if ( response.result !== 'created' ) {
             return new errors.InvalidContentError()
@@ -65,7 +65,7 @@ const updateStatement = async ( req, res, elasticService, logService ) => {
             queries: JSON.stringify( queries ),
             lastUpdatedOn: new Date().getTime()
         }
-        const response = await elasticService.updateMeta( req.fhir, META_TYPE_STATEMENT, uid, struct )
+        const response = await elasticService.updateMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_STATEMENT, uid, struct )
 
         if ( !response.updated ) {
             return new errors.ResourceNotFoundError()
@@ -83,7 +83,7 @@ const deleteStatement = async ( req, res, elasticService, logService ) => {
     try {
         const params = req.body
         const uid = params.uid
-        const response = await elasticService.deleteMeta( req.fhir, META_TYPE_STATEMENT, uid )
+        const response = await elasticService.deleteMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_STATEMENT, uid )
 
         if ( !response.deleted ) {
             return new errors.ResourceNotFoundError()
@@ -99,7 +99,7 @@ const deleteStatement = async ( req, res, elasticService, logService ) => {
 
 const getProfile = async ( req, res, elasticService, logService ) => {
     try {
-        const response = await elasticService.searchMeta( req.fhir, META_TYPE_PROFILE, [], [], [], 0, 1 )
+        const response = await elasticService.searchMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_PROFILE, [], [], [], 0, 1 )
 
         await logService.debug( `Elastic getProfile returns ${response.hits.total} matches` )
         return {
@@ -124,7 +124,7 @@ const createProfile = async ( req, res, elasticService, logService ) => {
             variantTableConfig: JSON.stringify( variantTableConfig ),
             lastUpdatedOn: new Date().getTime()
         }
-        const response = await elasticService.createMeta( req.fhir, META_TYPE_PROFILE, struct )
+        const response = await elasticService.createMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_PROFILE, struct )
 
         if ( response.result !== 'created' ) {
             return new errors.InvalidContentError()
@@ -153,7 +153,7 @@ const updateProfile = async ( req, res, elasticService, logService ) => {
             variantTableConfig: JSON.stringify( variantTableConfig ),
             lastUpdatedOn: new Date().getTime()
         }
-        const response = await elasticService.updateMeta( req.fhir, META_TYPE_PROFILE, uid, struct )
+        const response = await elasticService.updateMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_PROFILE, uid, struct )
 
         if ( !response.updated ) {
             return new errors.ResourceNotFoundError()
@@ -171,7 +171,7 @@ const deleteProfile = async ( req, res, elasticService, logService ) => {
     try {
         const params = req.body
         const uid = params.uid
-        const response = await elasticService.deleteMeta( req.fhir, META_TYPE_PROFILE, uid )
+        const response = await elasticService.deleteMeta( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, META_TYPE_PROFILE, uid )
 
         if ( !response.deleted ) {
             return new errors.ResourceNotFoundError()

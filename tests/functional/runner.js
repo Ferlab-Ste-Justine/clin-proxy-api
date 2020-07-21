@@ -31,12 +31,7 @@ enabledServices.forEach( ( service ) => {
         newman.run( {
             collection,
             environment,
-
-            // @NOTE insecure or set both sslClientCert and sslClientKey
             insecure: true,
-            // sslClientCert: process.env.SSL_CERTIFICATE_PATH,
-            // sslClientKey: process.env.SSL_CERTIFICATE_KEY_PATH,
-
             reporters: 'cli'
         }, ( ee ) => {
             if ( ee ) {
