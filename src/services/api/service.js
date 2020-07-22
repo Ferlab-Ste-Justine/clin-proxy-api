@@ -3,9 +3,9 @@ import restify from 'restify'
 import addAcceptMiddleware from './middleware/accept'
 import addBodyParserMiddleware from './middleware/bodyParser'
 import addCorsMiddleware from './middleware/cors'
+import addJwtMiddleware from './middleware/jwt'
 import addGzipMiddleware from './middleware/gzip'
 import addJoiValidatorMiddleware from './middleware/joi'
-import addJwtMiddleware from './middleware/jwt'
 import addQueryParserMiddleware from './middleware/queryParser'
 import addVersionMiddleware from './middleware/version'
 import restifyAsyncWrap from './helpers/async'
@@ -53,12 +53,12 @@ export default class ApiService {
         this.startTimestamp = startDate
         addVersionMiddleware( this.instance, apiVersions, defaultApiVersion )
         addCorsMiddleware( this.instance, this.config )
+        addJwtMiddleware( this.instance, this.config )
         addQueryParserMiddleware( this.instance )
         addBodyParserMiddleware( this.instance )
         addGzipMiddleware( this.instance )
         addJoiValidatorMiddleware( this.instance )
         addAcceptMiddleware( this.instance )
-        addJwtMiddleware( this.instance, this.config )
 
         // Register Health Check Route
         this.instance.get( `${this.config.endpoint}/health`, restifyAsyncWrap( async( req, res, next ) => {

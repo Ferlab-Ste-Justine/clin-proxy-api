@@ -1,17 +1,14 @@
+import corsMiddleware from 'restify-cors-middleware'
+
+
 export default ( server, config ) => {
 
-    server.pre( ( req, res, next ) => {
-        const origin = req.header( 'origin' )
-        
-        if ( origin && config.cors && config.cors.origins ){
-            if ( config.cors.origins.includes( origin ) ){
-                res.header( 'Access-Control-Allow-Credentials', true )
-                res.header( 'Access-Control-Allow-Origin', origin )
+    const cors = corsMiddleware({
+        origins: ['http://localhost:2000'],
+        allowHeaders: ['Origin', 'X-Requested-With', 'Authorization', 'Content-Type', 'Accept']
+    })
 
-                return next()
-            }
-        }
+    server.pre(cors.preflight)
+    server.pre(cors.actual)
 
-        return next()
-    } )
 }

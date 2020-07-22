@@ -58,7 +58,7 @@ const getUserFromJWK = token => jwk =>
     decode({ complete: true })
   )(token);
 
-const fetchPublicKeys = ({ realm, authServerUrl, useCache = true }) => {
+const fetchPublicKeys = ({ realm, authServerUrl, useCache = false }) => {
   const url = `${authServerUrl}/auth/realms/${realm}/protocol/openid-connect/certs`;
   const key = url;
   if (useCache) {
@@ -78,6 +78,7 @@ const fetchPublicKeys = ({ realm, authServerUrl, useCache = true }) => {
 
 const verifyOffline = config => async (accessToken, options = {}) => {
   const { publicKey } = config;
+  console.log(publicKey)
   return publicKey
     ? getUserFromPublicKey(accessToken)(publicKey)
     : fetchPublicKeys({ ...config, ...options }).then(
