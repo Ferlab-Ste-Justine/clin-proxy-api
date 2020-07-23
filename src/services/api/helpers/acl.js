@@ -5,3 +5,10 @@ export const SERVICE_TYPE_META = 'meta'
 export const ROLE_TYPE_USER = 'practitioner'
 export const ROLE_TYPE_GROUP = 'genetician'
 export const ROLE_TYPE_ADMIN = 'administrator'
+
+export const getACL = ( req ) => {
+    return {
+        practitioner_id: req.fhirPractitionerId,
+        organization_id: req.fhirOrganizationId
+    }
+}
