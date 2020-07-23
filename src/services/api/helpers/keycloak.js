@@ -78,7 +78,6 @@ const fetchPublicKeys = ({ realm, authServerUrl, useCache = false }) => {
 
 const verifyOffline = config => async (accessToken, options = {}) => {
   const { publicKey } = config;
-  console.log(publicKey)
   return publicKey
     ? getUserFromPublicKey(accessToken)(publicKey)
     : fetchPublicKeys({ ...config, ...options }).then(

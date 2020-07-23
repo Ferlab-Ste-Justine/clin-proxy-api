@@ -51,9 +51,10 @@ export default class ApiService {
         const apiVersions = this.config.availableApiVersions
 
         this.startTimestamp = startDate
-        addVersionMiddleware( this.instance, apiVersions, defaultApiVersion )
+
         addCorsMiddleware( this.instance, this.config )
         addJwtMiddleware( this.instance, this.config )
+        addVersionMiddleware( this.instance, apiVersions, defaultApiVersion )
         addQueryParserMiddleware( this.instance )
         addBodyParserMiddleware( this.instance )
         addGzipMiddleware( this.instance )
