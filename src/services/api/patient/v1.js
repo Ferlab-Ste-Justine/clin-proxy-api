@@ -74,7 +74,7 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
             }
         ]
 
-        const response = await elasticService.searchPatients( sessionData.acl.fhir, fields, [], matches, index, limit )
+        const response = await elasticService.searchPatients( { practitioner_id: req.fhirPractitionerId, organization_id: req.fhirOrganizationId }, fields, [], matches, index, limit )
 
         await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total} matches` )
         return {
