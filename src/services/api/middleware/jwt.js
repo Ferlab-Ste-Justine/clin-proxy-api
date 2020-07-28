@@ -19,8 +19,6 @@ export default ( server, config ) => {
         const route = req.getRoute()
         let excluded = false
 
-        console.log( 'ROUTE : ', route )
-
         if ( route ) {
             exclusions.forEach( ( exclusion ) => {
                 excluded = exclusion.methods.includes( route.method ) && exclusion.path === route.path
