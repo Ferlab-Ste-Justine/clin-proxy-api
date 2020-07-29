@@ -1,10 +1,8 @@
 import Keycloak from '../helpers/keycloak'
 import { findIndex } from 'lodash'
 
-// TODO: Find an alternative for local management of self-signed certificates
 // The following is required when using a local instance of KeyCloak which uses self-signed certificates
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 export default ( server, config ) => {
     // eslint-disable-next-line new-cap
