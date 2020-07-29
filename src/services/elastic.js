@@ -19,7 +19,10 @@ const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
 
 const generateAclFilters = ( acl, service, schema = null ) => {
     const filters = []
+
     const practitionerId = acl.practitioner_id
+    // PLA: In Keycloak a user can be associated with multiple groups and each group could have a different organization id
+    // Shouldn't acl.organization_id be a list?  If so, in the Keycloak fhir organization mapper, activate the multi-value switch.
     const organizationId = acl.organization_id
 
     switch ( acl.role ) {
@@ -306,8 +309,6 @@ export default class ElasticClient {
             body.query.bool.minimum_should_match = 1
         }
 
-        console.debug( `searchPatient: ${JSON.stringify( body )}` )
-
         return rp( {
             method: 'GET',
             uri,
@@ -341,8 +342,6 @@ export default class ElasticClient {
             body.highlight = highlight
         }
 
-        console.debug( `searchGenes: ${JSON.stringify( body )}` )
-
         return rp( {
             method: 'GET',
             uri,
@@ -354,8 +353,6 @@ export default class ElasticClient {
     async searchVariantsForPatient( patient, statement, query, acl, schema, group, index, limit ) {
         const uri = `${this.host}${schema.path}/_search`
         const body = generateVariantQuery( patient, statement, query, acl, schema, group, index, limit )
-
-        console.debug( `searchVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',
@@ -369,8 +366,6 @@ export default class ElasticClient {
         const uri = `${this.host}${schema.path}/_search`
         const body = generateFacetQuery( patient, statement, query, acl, schema )
 
-        console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
-
         return rp( {
             method: 'POST',
             uri,
@@ -382,8 +377,6 @@ export default class ElasticClient {
     async countVariantsForPatient( patient, statement, query, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
         const body = generateCountQuery( patient, statement, query, acl, schema, group )
-
-        console.debug( `countVariantsForPatient: ${JSON.stringify( body )}` )
 
         return rp( {
             method: 'POST',

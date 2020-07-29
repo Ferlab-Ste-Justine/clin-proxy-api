@@ -3,13 +3,12 @@ import restify from 'restify'
 import addAcceptMiddleware from './middleware/accept'
 import addBodyParserMiddleware from './middleware/bodyParser'
 import addCorsMiddleware from './middleware/cors'
+import addJwtMiddleware from './middleware/jwt'
 import addGzipMiddleware from './middleware/gzip'
 import addJoiValidatorMiddleware from './middleware/joi'
 import addQueryParserMiddleware from './middleware/queryParser'
 import addVersionMiddleware from './middleware/version'
-import addRefreshAccessTokenMiddleware from './middleware/refreshAccessToken'
 import restifyAsyncWrap from './helpers/async'
-import { sendDataAsExcel } from './helpers/excel'
 
 export default class ApiService {
     constructor( config ) {
@@ -52,14 +51,15 @@ export default class ApiService {
         const apiVersions = this.config.availableApiVersions
 
         this.startTimestamp = startDate
-        addVersionMiddleware( this.instance, apiVersions, defaultApiVersion )
+
         addCorsMiddleware( this.instance, this.config )
+        addJwtMiddleware( this.instance, this.config )
+        addVersionMiddleware( this.instance, apiVersions, defaultApiVersion )
         addQueryParserMiddleware( this.instance )
         addBodyParserMiddleware( this.instance )
         addGzipMiddleware( this.instance )
         addJoiValidatorMiddleware( this.instance )
         addAcceptMiddleware( this.instance )
-        addRefreshAccessTokenMiddleware( this.instance, this.config.jwt.requestProperty )
 
         // Register Health Check Route
         this.instance.get( `${this.config.endpoint}/health`, restifyAsyncWrap( async( req, res, next ) => {

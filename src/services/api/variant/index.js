@@ -1,14 +1,10 @@
-import rjwt from 'restify-jwt-community'
-
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
-import CacheClient from '../../cache'
 import ElasticClient from '../../elastic'
 
 import Apiv1 from './v1'
 import validators from '../helpers/validators'
 import restifyAsyncWrap from '../helpers/async'
-import { sendDataAsExcel } from '../helpers/excel'
 
 
 const getFunctionForApiVersion = generateGetFunctionForApiVersion( {
@@ -23,13 +19,6 @@ export default class VariantService extends ApiService {
         this.config.elastic = config.elasticConfig
         this.runServicesHealthCheck = async () => {
             try {
-                try {
-                    await this.cacheService.ping()
-                } catch ( cacheException ) {
-                    throw new Error( `Cache Service Client health check failed with ${ cacheException.message}` )
-                }
-                await this.logService.debug( 'Cache Service is healthy.' )
-
                 try {
                     const elasticPingResult = await this.elasticService.ping()
 
@@ -52,22 +41,12 @@ export default class VariantService extends ApiService {
 
         await this.logService.debug( 'Initializing service dependencies...' )
 
-        this.cacheService = new CacheClient( this.config.cache )
         this.elasticService = new ElasticClient( this.config.elastic )
 
         await this.runServicesHealthCheck()
     }
 
     async start() {
-        // JWT Endpoint Exceptions
-        this.instance.use( rjwt( this.config.jwt ).unless( {
-            path: [
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/schema` }
-            ]
-        } ) )
-
         // Register Schema Route
         this.instance.get( {
             path: `${this.config.endpoint}/schema`
@@ -94,7 +73,6 @@ export default class VariantService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'getVariants' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -118,7 +96,6 @@ export default class VariantService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'getFacets' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -142,7 +119,6 @@ export default class VariantService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'countVariants' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -166,7 +142,6 @@ export default class VariantService extends ApiService {
                 const response = await getFunctionForApiVersion( req.version, 'getVariantById' )(
                     req,
                     res,
-                    this.cacheService,
                     this.elasticService,
                     this.logService
                 )
@@ -183,26 +158,26 @@ export default class VariantService extends ApiService {
 
         // Generate excel file for list of variants
         this.instance.post( {
-          path: `${this.config.endpoint}/xl`,
-        }, async (req, res, next) => {
-          try {
-            const response = await getFunctionForApiVersion( req.version, 'sendDataAsExcel' )(
-              req,
-              res,
-              this.cacheService,
-              this.elasticService,
-              this.logService
-            );
-            if (response) {
-              res.status( 400 )
-              res.end()
+            path: `${this.config.endpoint}/xl`
+            // eslint-disable-next-line no-unused-vars
+        }, async ( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'sendDataAsExcel' )(
+                    req,
+                    res,
+                    this.elasticService,
+                    this.logService
+                )
+
+                if ( response ) {
+                    res.status( 400 )
+                    res.end()
+                }
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                ext( e )
             }
-          }
-          catch ( e ) {
-            await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-            ext( e )
-          }
-        });
+        } )
 
         super.start()
     }

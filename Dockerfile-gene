@@ -2,8 +2,10 @@ FROM node:10.14.1-alpine
 RUN apk add curl
 ADD . /code
 WORKDIR /code
+RUN npm config set unsafe-perm true
 RUN npm install
-RUN npm run build
+RUN npm install nodemon -g --save
+RUN npm run build --ignore-scripts
 CMD ["npm", "run", "service-gene"]
 
 HEALTHCHECK --interval=20s CMD curl -kf https://localhost:5002/gene/health

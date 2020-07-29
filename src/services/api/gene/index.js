@@ -1,5 +1,3 @@
-import rjwt from 'restify-jwt-community'
-
 import ApiService from '../service'
 import { generateGetFunctionForApiVersion } from '../service'
 import restifyAsyncWrap from '../helpers/async'
@@ -47,14 +45,6 @@ export default class GeneService extends ApiService {
     }
 
     async start() {
-        // JWT Endpoint Exceptions
-        this.instance.use( rjwt( this.config.jwt ).unless( {
-            path: [
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/docs` },
-                { methods: [ 'GET' ], url: `${this.config.endpoint}/health` }
-            ]
-        } ) )
-
         // Register searchGenesByAutoComplete Route
         // @NOTE Accessible to all authenticated user
         this.instance.get( {

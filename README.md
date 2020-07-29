@@ -21,7 +21,6 @@
 * `pnpm run functional-tests` start functional tests using  [newman](https://github.com/postmanlabs/newman) through Postman collections
 * `pnpm run unit-tests` start unit tests using  [mocha](https://www.npmjs.com/package/mocha)
 * `pnpm run build` builds all of the Services for production mode.<br>
-* `pnpm run service-auth` starts the Auth API Service in production (built) mode.<br>
 * `pnpm run service-patient` starts the Patient API Service in production (built) mode.<br>
 * `pnpm run service-variant` starts the Variant API Service in production (built) mode.<br>
 * `pnpm run service-gene` starts the Gene API Service in production (built) mode.<br>
