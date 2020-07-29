@@ -8,6 +8,6 @@ RUN npm install nodemon -g --save
 RUN npm run build
 CMD ["npm", "run", "service-meta"]
 
-HEALTHCHECK --interval=20s CMD curl -kf https://localhost:7000/meta/health
+HEALTHCHECK --interval=20s CMD curl -kf http://localhost:7000/meta/health
 
 ENV MEMORY_LIMIT 256
