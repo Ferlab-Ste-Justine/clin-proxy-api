@@ -5,7 +5,7 @@ WORKDIR /code
 RUN npm config set unsafe-perm true
 RUN npm install
 RUN npm install nodemon -g --save
-RUN npm run build --ignore-scripts
+RUN npm run build
 CMD ["npm", "run", "service-variant"]
 
 HEALTHCHECK --interval=20s CMD curl -kf https://localhost:5001/variant/health
