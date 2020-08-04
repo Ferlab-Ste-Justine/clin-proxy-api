@@ -5,7 +5,7 @@ const getPatientById = async ( req, res, elasticService, logService ) => {
     try {
         const response = await elasticService.searchPatients( getACL( req ), [], [ { match: { id: req.params.uid } } ], [] )
 
-        if ( response.hits.total < 1 ) {
+        if ( response.hits.total.value < 1 ) {
             return new errors.NotFoundError()
         }
 
@@ -25,9 +25,9 @@ const searchPatients = async ( req, res, elasticService, logService ) => {
 
         const response = await elasticService.searchPatients( getACL( req ), [], [], [], index, limit )
 
-        await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total.value} matches` )
         return {
-            total: response.hits.total,
+            total: response.hits.total.value,
             hits: response.hits.hits
         }
     } catch ( e ) {
@@ -77,9 +77,9 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
 
         const response = await elasticService.searchPatients( getACL( req ), fields, [], matches, index, limit )
 
-        await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total.value} matches` )
         return {
-            total: response.hits.total,
+            total: response.hits.total.value,
             hits: response.hits.hits
         }
     } catch ( e ) {

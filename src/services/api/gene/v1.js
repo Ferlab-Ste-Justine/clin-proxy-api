@@ -51,9 +51,9 @@ const searchGenesByAutoComplete = async ( req, res, elasticService, logService )
 
         const response = await elasticService.searchGenes( fields, [], matches, index, limit, highlight )
 
-        await logService.debug( `Elastic searchGenesByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic searchGenesByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total.value} matches` )
         return {
-            total: response.hits.total,
+            total: response.hits.total.value,
             hits: response.hits.hits
         }
     } catch ( e ) {

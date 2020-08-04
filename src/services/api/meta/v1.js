@@ -11,9 +11,9 @@ const getStatements = async ( req, res, elasticService, logService ) => {
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const response = await elasticService.searchMeta( getACL( req ), META_TYPE_STATEMENT, [], [], [], index, limit )
 
-        await logService.debug( `Elastic getStatements [${index},${limit}] returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic getStatements [${index},${limit}] returns ${response.hits.total.value} matches` )
         return {
-            total: response.hits.total,
+            total: response.hits.total.value,
             hits: response.hits.hits
         }
     } catch ( e ) {
@@ -101,9 +101,9 @@ const getProfile = async ( req, res, elasticService, logService ) => {
     try {
         const response = await elasticService.searchMeta( getACL( req ), META_TYPE_PROFILE, [], [], [], 0, 1 )
 
-        await logService.debug( `Elastic getProfile returns ${response.hits.total} matches` )
+        await logService.debug( `Elastic getProfile returns ${response.hits.total.value} matches` )
         return {
-            total: response.hits.total,
+            total: response.hits.total.value,
             hits: response.hits.hits
         }
     } catch ( e ) {
