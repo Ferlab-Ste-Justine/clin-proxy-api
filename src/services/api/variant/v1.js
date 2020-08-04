@@ -57,7 +57,7 @@ const getVariants = async ( req, res, elasticService, logService ) => {
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 response = await elasticService.searchVariantsForPatient( patient, statement, query, getACL( req ), schema, group, index, limit )
-                totalFromResponse = response.hits.total
+                totalFromResponse = response.hits.total.value
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {
                     const result = hit._source
 
@@ -68,7 +68,7 @@ const getVariants = async ( req, res, elasticService, logService ) => {
                 break
         }
 
-        await logService.debug( `Elastic getVariants using ${patient}/${query} [${index},${limit}] found ${response.hits.total} matches` )
+        await logService.debug( `Elastic getVariants using ${patient}/${query} [${index},${limit}] found ${response.hits.total.value} matches` )
 
         return {
             query,
@@ -255,7 +255,7 @@ const getVariantById = async ( req, res, elasticService, logService ) => {
     try {
         const response = await elasticService.searchVariants( getACL( req ), [], [ { ids: { values: [ req.params.vid ] } } ], 0, 1 )
 
-        if ( response.hits.total < 1 ) {
+        if ( response.hits.total.value < 1 ) {
             return new errors.NotFoundError()
         }
 
