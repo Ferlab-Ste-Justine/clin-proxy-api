@@ -1,5 +1,6 @@
-![](https://github.com/cr-ste-justine/clin-proxy-api/workflows/Build%20Images/badge.svg)
-![](https://github.com/cr-ste-justine/clin-proxy-api/workflows/Publish%20Images/badge.svg)
+![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Build%20Images/badge.svg)
+![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Publish%20Images%20Using%20Commit%20Hash/badge.svg)
+![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Publish%20Images%20Using%20Tag/badge.svg)
 
 # CLIN Proxy API
 
