@@ -3,7 +3,7 @@ name: Build Images
 on:
   push:
     paths:
-      - 'images/**'
+      - 'app/**'
       - .github/workflows/build_images.yml
 
 jobs:
@@ -13,10 +13,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Ensure we can build the patient service
-      run: docker build -t test:test -f images/Dockerfile-patient images
+      run: docker build -t test:test -f app/Dockerfile-patient app
     - name: Ensure we can build the meta service
-      run: docker build -t test:test -f images/Dockerfile-meta images
+      run: docker build -t test:test -f app/Dockerfile-meta app
     - name: Ensure we can build the variant service
-      run: docker build -t test:test -f images/Dockerfile-variant images
+      run: docker build -t test:test -f app/Dockerfile-variant app
     - name: Ensure we can build the gene service
-      run: docker build -t test:test -f images/Dockerfile-gene images
+      run: docker build -t test:test -f app/Dockerfile-gene app
