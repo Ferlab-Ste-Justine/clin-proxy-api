@@ -1,0 +1,353 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.x",
+    "title": "HPO API Service",
+    "description": "HPO Service; This service is available to everyone that have a valid JWT token from the Auth Service.\n",
+    "license": {
+      "name": "GNU Affero General Public License v3.0",
+      "url": "https://github.com/cr-ste-justine/clin-proxy-api/blob/master/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://localhost:8000",
+      "description": "Localhost"
+    },
+    {
+      "url": "https://clin.cr-ste-justine.xyz/api",
+      "description": "QA"
+    }
+  ],
+  "paths": {
+    "/hpo/health": {
+      "get": {
+        "tags": [
+          "Service Health Check"
+        ],
+        "summary": "Returns the health status of the service.",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/descendants": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "HPO Query"
+        ],
+        "summary": "Return a list of HPOs",
+        "description": "Matches all descendants HPOs of the requested parent's id",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultSuccess"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "parentHpoId",
+            "in": "query",
+            "required": true,
+            "description": "Pref",
+            "schema": {
+              "type": "string",
+              "minimum": 9
+            }
+          }
+        ]
+      }
+    },
+    "/autocomplete": {
+      "get": {
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "tags": [
+          "HPO Query"
+        ],
+        "summary": "Returns a list of HPO matched by the prefix to complete",
+        "description": "Matches all HPOs which id starts with the specified prefix.",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultSuccess"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error500"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": true,
+            "description": "Pref",
+            "schema": {
+              "type": "string",
+              "minimum": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token"
+      }
+    },
+    "schemas": {
+      "Health": {
+        "title": "Health Check",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {}
+        }
+      },
+      "ResultSuccess": {
+        "title": "HPO result",
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              }
+            }
+          },
+          "hits": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_index": {
+                  "type": "string"
+                },
+                "_type": {
+                  "type": "string"
+                },
+                "_id": {
+                  "type": "string"
+                },
+                "_score": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "_source": {
+                  "type": "object",
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "parents": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "ancestors": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "highlight": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "timestamp": 1553284037677,
+          "message": "Ok",
+          "data": {
+            "total": 1,
+            "hits": [
+              {
+                "_index": "sparktest",
+                "_type": "_doc",
+                "_id": "UNIQUE_ID",
+                "_score": 1,
+                "_source": {
+                  "id": "HPO_ID",
+                  "name": "Name of the HPO",
+                  "parents": [
+                    {
+                      "id": "PARENT_HPO_ID",
+                      "name": "Parent"
+                    }
+                  ],
+                  "ancestors": [
+                    {
+                      "id": "ANCESTOR_HPO_ID",
+                      "name": "Ancestor"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "Error500": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "InternalError",
+          "data": {
+            "messages": [
+              "Halp! I has error."
+            ]
+          }
+        }
+      },
+      "Error401": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "timestamp": 1587403307565,
+          "error": "Unauthorized",
+          "data": {
+            "messages": [
+              "Halp! I has the forgottenz."
+            ]
+          }
+        }
+      }
+    }
+  }
+}

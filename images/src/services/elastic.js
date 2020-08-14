@@ -525,5 +525,42 @@ export default class ElasticClient {
             } )
         }
     }
+    
+    async searchHPODescendants( hpoId ) {
+        const uri = `${this.host}/hpo/_search`
+        const body = {
+            query: {
+                term: {
+                    'parents.id': hpoId
+                }
+            }
+        }
+
+        return rp( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
+
+    async searchHPOAutocomplete( prefix ) {
+        const uri = `${this.host}/hpo/_search`
+        const body = {
+            query: {
+                match_phrase_prefix: {
+                    id: prefix
+                }
+            }
+        }
+
+        return rp( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
 
 }

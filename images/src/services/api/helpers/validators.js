@@ -78,5 +78,12 @@ export default {
                 vid: Joi.string().alphanum().min( 1 ).max( 256 ).required()
             } ).required()
         }
+    },
+    requieredParentHpoId: {
+        schema: {
+            body: Joi.object( {
+                parentHpoId: Joi.string().min( 10 ).max( 10 ).required()
+            } )
+        }
     }
 }
