@@ -36,24 +36,20 @@ From the **images** directory:
 
 Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/master/README.md) and run
 ```
-cd images
-cp -p local_configs/development.env images/.env
-npm install -g pnpm
-pnpm install
-pnpm start
+./launch-local.sh
 ```
 
 ### Dockerized Version
 
-If you haven't done so already, generate self-signed certificates for the **dev.chusj-clin-dev.org** domain: https://github.com/cr-ste-justine/devops/tree/dev/certificates
-
-Run the following to launch:
-
+- Make sure that a network named **proxy** exists on your machine
+- Make sure the following services are running on the **proxy** network with the corresponding names and ports (alternatively, you can edit the **docker.local.env** file to change the values):
+  - keycloak which should be named **keycloak** on port **8080** (http)
+  - elasticsearch which should be named **elastic** on port **9200**
+- Run the following to launch:
 ```
 ./launch-docker-local.sh
 ```
-
-Run the following to tear down:
+- Run the following to tear down:
 
 ```
 ./teardown-docker-local.sh
