@@ -2,98 +2,58 @@ version: '3.3'
 
 services:
   patient:
-    image: localhost:5000/clin-proxy-api-patient-service
+    build:
+      context: ./images
+      dockerfile: Dockerfile-patient
     volumes:
-      - ./src:/code/src
+      - ./images/src:/code/src
     ports:
       - "4000:4000"
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
     networks:
-      - clinnet
       - proxy
     env_file:
-      - patient.env
-    secrets:
-      - certificate_certificate
-      - certificate_key
+      - images/.env
     command: ["npm", "run", "dev-service-patient"]
   variant:
-    image: localhost:5000/clin-proxy-api-variant-service
+    build:
+      context: ./images
+      dockerfile: Dockerfile-variant
     volumes:
-      - ./src:/code/src
+      - ./images/src:/code/src
     ports:
       - "5001:5001"
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '1.00'
-          memory: 512M
     networks:
-      - clinnet
       - proxy
     env_file:
-      - variant.env
-    secrets:
-      - certificate_certificate
-      - certificate_key
+      - images/.env
     command: ["npm", "run", "dev-service-variant"]
   meta:
-    image: localhost:5000/clin-proxy-api-meta-service
+    build:
+      context: ./images
+      dockerfile: Dockerfile-meta
     volumes:
-      - ./src:/code/src
+      - ./images/src:/code/src
     ports:
       - "7000:7000"
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
     networks:
-      - clinnet
       - proxy
     env_file:
-      - meta.env
-    secrets:
-      - certificate_certificate
-      - certificate_key
+      - images/.env
     command: ["npm", "run", "dev-service-meta"]
   gene:
-    image: localhost:5000/clin-proxy-api-gene-service
+    build:
+      context: ./images
+      dockerfile: Dockerfile-gene
     volumes:
-      - ./src:/code/src
+      - ./images/src:/code/src
     ports:
       - "5002:5002"
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
     networks:
-      - clinnet
       - proxy
     env_file:
-      - gene.env
-    secrets:
-      - certificate_certificate
-      - certificate_key
+      - images/.env
     command: ["npm", "run", "dev-service-gene"]
 
-secrets:
-  certificate_certificate:
-    external: true
-  certificate_key:
-    external: true
-
 networks:
-  clinnet:
-    external: true
   proxy:
     external: true

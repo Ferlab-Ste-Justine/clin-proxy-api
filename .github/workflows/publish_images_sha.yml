@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'images/**'
+      - .github/workflows/publish_images_sha.yml
 
 jobs:
   build:
@@ -21,5 +24,5 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
         image: chusj/clin-proxy-api-${{ matrix.service }}-service
         tag_source: sha
-        location: .
-        dockerfile: Dockerfile-${{ matrix.service }}
+        location: images
+        dockerfile: images/Dockerfile-${{ matrix.service }}

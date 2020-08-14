@@ -8,7 +8,7 @@
 
 ### Boilerplate
 
-`src/services/api/boilerplate`
+`images/src/services/api/boilerplate`
 
 ###  Default Endpoints
 
@@ -16,6 +16,8 @@
 * `GET` on `/{endpoint}/docs` returns the documentation for the service endpoint ( https://editor.swagger.io )
 
 ## Available Scripts
+
+From the **images** directory:
 
 * `pnpm start` launches of the Services in local development mode.<br>
 * `pnpm test` launches all test runners using .env file.<br>
@@ -34,23 +36,20 @@
 
 Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/master/README.md) and run
 ```
-cp -p development.env .env
-npm install -g pnpm
-pnpm install
-pnpm start
+./launch-local.sh
 ```
 
 ### Dockerized Version
 
-If you haven't done so already, generate self-signed certificates for the **dev.chusj-clin-dev.org** domain: https://github.com/cr-ste-justine/devops/tree/dev/certificates
-
-Run the following to launch:
-
+- Make sure that a network named **proxy** exists on your machine
+- Make sure the following services are running on the **proxy** network with the corresponding names and ports (alternatively, you can edit the **docker.local.env** file to change the values):
+  - keycloak which should be named **keycloak** on port **8080** (http)
+  - elasticsearch which should be named **elastic** on port **9200**
+- Run the following to launch:
 ```
 ./launch-docker-local.sh
 ```
-
-Run the following to tear down:
+- Run the following to tear down:
 
 ```
 ./teardown-docker-local.sh
@@ -69,7 +68,7 @@ curl -XPUT "http://localhost:9200/profile" -H 'Content-Type: application/json' -
 
 ### Pushing images
 
-Images are pushed by merging on dev. The version tag is taken from the version in the package.json file so make sure you increment it before merging to dev.
+Images are pushed by merging on master. The version tag is taken from the version in the package.json file so make sure you increment it before merging to dev.
 
 If you add a new service, make sure to add it to the **build_images.yml** pipeline and to the **push_images.sh** script.
 
