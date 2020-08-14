@@ -8,7 +8,7 @@
 
 ### Boilerplate
 
-`src/services/api/boilerplate`
+`images/src/services/api/boilerplate`
 
 ###  Default Endpoints
 
@@ -16,6 +16,8 @@
 * `GET` on `/{endpoint}/docs` returns the documentation for the service endpoint ( https://editor.swagger.io )
 
 ## Available Scripts
+
+From the **images** directory:
 
 * `pnpm start` launches of the Services in local development mode.<br>
 * `pnpm test` launches all test runners using .env file.<br>
@@ -34,7 +36,8 @@
 
 Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/master/README.md) and run
 ```
-cp -p development.env .env
+cd images
+cp -p local_configs/development.env images/.env
 npm install -g pnpm
 pnpm install
 pnpm start
@@ -69,7 +72,7 @@ curl -XPUT "http://localhost:9200/profile" -H 'Content-Type: application/json' -
 
 ### Pushing images
 
-Images are pushed by merging on dev. The version tag is taken from the version in the package.json file so make sure you increment it before merging to dev.
+Images are pushed by merging on master. The version tag is taken from the version in the package.json file so make sure you increment it before merging to dev.
 
 If you add a new service, make sure to add it to the **build_images.yml** pipeline and to the **push_images.sh** script.
 

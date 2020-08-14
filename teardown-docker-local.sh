@@ -1,2 +1,1 @@
-docker stack rm clin-proxy;
-docker network rm clinnet;
+docker-compose down -v;

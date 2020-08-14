@@ -1,10 +1,2 @@
-cp docker.local.env patient.env;
-cp docker.local.env variant.env;
-cp docker.local.env meta.env;
-cp docker.local.env gene.env;
-docker network create -d overlay --attachable clinnet;
-docker build -f Dockerfile-patient -t localhost:5000/clin-proxy-api-patient-service .;
-docker build -f Dockerfile-variant -t localhost:5000/clin-proxy-api-variant-service .;
-docker build -f Dockerfile-meta -t localhost:5000/clin-proxy-api-meta-service .;
-docker build -f Dockerfile-gene -t localhost:5000/clin-proxy-api-gene-service .;
-docker stack deploy -c docker-compose.yml clin-proxy;
+cp docker.local.env images/.env;
+docker-compose up -d;
