@@ -3,55 +3,55 @@ version: '3.3'
 services:
   patient:
     build:
-      context: ./images
+      context: ./app
       dockerfile: Dockerfile-patient
     volumes:
-      - ./images/src:/code/src
+      - ./app/src:/code/src
     ports:
       - "4000:4000"
     networks:
       - proxy
     env_file:
-      - images/.env
+      - app/.env
     command: ["npm", "run", "dev-service-patient"]
   variant:
     build:
-      context: ./images
+      context: ./app
       dockerfile: Dockerfile-variant
     volumes:
-      - ./images/src:/code/src
+      - ./app/src:/code/src
     ports:
       - "5001:5001"
     networks:
       - proxy
     env_file:
-      - images/.env
+      - app/.env
     command: ["npm", "run", "dev-service-variant"]
   meta:
     build:
-      context: ./images
+      context: ./app
       dockerfile: Dockerfile-meta
     volumes:
-      - ./images/src:/code/src
+      - ./app/src:/code/src
     ports:
       - "7000:7000"
     networks:
       - proxy
     env_file:
-      - images/.env
+      - app/.env
     command: ["npm", "run", "dev-service-meta"]
   gene:
     build:
-      context: ./images
+      context: ./app
       dockerfile: Dockerfile-gene
     volumes:
-      - ./images/src:/code/src
+      - ./app/src:/code/src
     ports:
       - "5002:5002"
     networks:
       - proxy
     env_file:
-      - images/.env
+      - app/.env
     command: ["npm", "run", "dev-service-gene"]
 
 networks:

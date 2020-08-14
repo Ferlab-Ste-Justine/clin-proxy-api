@@ -1,5 +1,5 @@
 #Copy environment file
-cp development.env images/.env;
+cp development.env app/.env;
 
 NPM=$(which npm)
 if [ -z "$NPM" ]; then
@@ -15,7 +15,7 @@ if [ -z "$PNPM" ]; then
 fi
 
 (
-  cd images;
+  cd app;
   pnpm install;
   pnpm start
 )

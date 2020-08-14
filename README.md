@@ -8,7 +8,7 @@
 
 ### Boilerplate
 
-`images/src/services/api/boilerplate`
+`app/src/services/api/boilerplate`
 
 ###  Default Endpoints
 
@@ -17,7 +17,7 @@
 
 ## Available Scripts
 
-From the **images** directory:
+From the **app** directory:
 
 * `pnpm start` launches of the Services in local development mode.<br>
 * `pnpm test` launches all test runners using .env file.<br>
@@ -50,7 +50,6 @@ Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/m
 ./launch-docker-local.sh
 ```
 - Run the following to tear down:
-
 ```
 ./teardown-docker-local.sh
 ```
@@ -68,9 +67,9 @@ curl -XPUT "http://localhost:9200/profile" -H 'Content-Type: application/json' -
 
 ### Pushing images
 
-Images are pushed by merging on master. The version tag is taken from the version in the package.json file so make sure you increment it before merging to dev.
+See the documentation for our convention on gitflow and docker images: https://www.notion.so/ferlab/Developer-Handbook-ca9d689d8aca4412a78eafa2dfa0f8a8
 
-If you add a new service, make sure to add it to the **build_images.yml** pipeline and to the **push_images.sh** script.
+This repo follows it.
 
 ### Deploying
 
