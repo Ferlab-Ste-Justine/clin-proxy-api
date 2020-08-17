@@ -95,10 +95,10 @@ export const generateVariantQuery = ( patient, statement, query, acl, schema, gr
 
 
 const apiCall = ( options ) => {
-    const headers = {
+    const headers = process.env.AUTHORIZATION != null ? {
         ...options.headers,
         Authorization: process.env.AUTHORIZATION
-    }
+    } : options.headers
 
     return rp(
         {
