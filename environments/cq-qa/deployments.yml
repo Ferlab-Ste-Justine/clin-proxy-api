@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clin-proxy-api-meta
+spec:
+  template:
+    spec:
+      containers:
+        - image: chusj/clin-proxy-api-meta-service:9c37a2e04ad72be07fd14f8e439278f107d4bbbd
+          name: clin-proxy-api-meta
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clin-proxy-api-gene
+spec:
+  template:
+    spec:
+      containers:
+        - image: chusj/clin-proxy-api-gene-service:9c37a2e04ad72be07fd14f8e439278f107d4bbbd
+          name: clin-proxy-api-gene
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clin-proxy-api-variant
+spec:
+  template:
+    spec:
+      containers:
+        - image: chusj/clin-proxy-api-variant-service:9c37a2e04ad72be07fd14f8e439278f107d4bbbd
+          name: clin-proxy-api-variant
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clin-proxy-api-patient
+spec:
+  template:
+    spec:
+      containers:
+        - image: chusj/clin-proxy-api-patient-service:9c37a2e04ad72be07fd14f8e439278f107d4bbbd
+          name: clin-proxy-api-patient
