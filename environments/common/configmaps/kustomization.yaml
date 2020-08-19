@@ -1,0 +1,27 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+configMapGenerator:
+- name: clin-proxy-config
+  literals:
+  - NODE_ENV=production
+  - LOGGER=console
+  - LOG_LEVEL=info
+  - |
+    CORS_ORIGINS=["*"]
+  - |
+    API_SERVICES=["boilerplate", "query", "variant", "meta", "gene"]
+  - |
+    BOILERPLATE_API_SERVICE={"name": "Boilerplate", "endpoint": "/boilerplate", "port": 2999, "defaultVersion": 1, "availableVersions": [1]}
+  - |
+    PATIENT_API_SERVICE={"name": "Patient", "endpoint": "/patient", "port": 4000, "defaultVersion": 1, "availableVersions": [1]}
+  - |
+    VARIANT_API_SERVICE={"name": "Variant", "endpoint": "/variant", "port": 5001, "defaultVersion": 1, "availableVersions": [1], "schemaVariables": { "GENE_API_SEARCH_ENDPOINT": "https://__UNDEFINED__/autocomplete"}}
+  - |
+    GENE_API_SERVICE={"name": "Gene", "endpoint": "/gene", "port": 5002, "defaultVersion": 1, "availableVersions": [1]}
+  - |
+    META_API_SERVICE={"name": "Meta", "endpoint": "/meta", "port": 7000, "defaultVersion": 1, "availableVersions": [1]}
+  - |
+    ELASTIC_SERVICE={"host": "__UNDEFINED__"}
+  - |
+    KEYCLOAK_CONFIG={ "realm": "clin", "authServerUrl": "__UNDEFINED__" }

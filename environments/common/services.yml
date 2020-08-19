@@ -1,0 +1,56 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: clin-proxy-api-meta
+  name: clin-proxy-api-meta
+spec:
+  ports:
+  - port: 7000
+    protocol: TCP
+    targetPort: 7000
+  selector:
+    app: clin-proxy-api-meta
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: clin-proxy-api-gene
+  name: clin-proxy-api-gene
+spec:
+  ports:
+  - port: 5002
+    protocol: TCP
+    targetPort: 5002
+  selector:
+    app: clin-proxy-api-gene
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: clin-proxy-api-variant
+  name: clin-proxy-api-variant
+spec:
+  ports:
+  - port: 5001
+    protocol: TCP
+    targetPort: 5001
+  selector:
+    app: clin-proxy-api-variant
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: clin-proxy-api-patient
+  name: clin-proxy-api-patient
+spec:
+  ports:
+  - port: 4000
+    protocol: TCP
+    targetPort: 4000
+  selector:
+    app: clin-proxy-api-patient
