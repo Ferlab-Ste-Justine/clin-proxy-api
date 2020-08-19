@@ -14,6 +14,8 @@
     "dev-service-variant": "nodemon --exec babel-node src/index.js --service variant",
     "service-meta": "node --max-old-space-size=$MEMORY_LIMIT dist/index.js --service meta",
     "dev-service-meta": "nodemon --exec babel-node src/index.js --service meta",
+    "service-hpo": "node --max-old-space-size=$MEMORY_LIMIT dist/index.js --service hpo",
+    "dev-service-hpo": "nodemon --exec babel-node src/index.js --service hpo",
     "functional-tests": "babel-node tests/functional/runner.js",
     "unit-tests": "mocha --require @babel/register 'tests/unit/**.js'"
   },

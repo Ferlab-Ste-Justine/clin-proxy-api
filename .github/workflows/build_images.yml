@@ -10,13 +10,10 @@ jobs:
   build:
     name: Build Images
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        service: [patient, meta, variant, gene, hpo]
     steps:
     - uses: actions/checkout@v2
-    - name: Ensure we can build the patient service
-      run: docker build -t test:test -f app/Dockerfile-patient app
-    - name: Ensure we can build the meta service
-      run: docker build -t test:test -f app/Dockerfile-meta app
-    - name: Ensure we can build the variant service
-      run: docker build -t test:test -f app/Dockerfile-variant app
-    - name: Ensure we can build the gene service
-      run: docker build -t test:test -f app/Dockerfile-gene app
+    - name: Ensure we can build the ${{ matrix.service }} service
+      run: docker build -t test:test -f app/Dockerfile-${{ matrix.service }} app
