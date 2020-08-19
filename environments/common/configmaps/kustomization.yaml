@@ -10,7 +10,7 @@ configMapGenerator:
   - |
     CORS_ORIGINS=["*"]
   - |
-    API_SERVICES=["boilerplate", "query", "variant", "meta", "gene", "patient"]
+    API_SERVICES=["boilerplate", "query", "variant", "meta", "gene", "patient", "hpo"]
   - |
     BOILERPLATE_API_SERVICE={"name": "Boilerplate", "endpoint": "/boilerplate", "port": 2999, "defaultVersion": 1, "availableVersions": [1]}
   - |
@@ -21,6 +21,8 @@ configMapGenerator:
     GENE_API_SERVICE={"name": "Gene", "endpoint": "/gene", "port": 5002, "defaultVersion": 1, "availableVersions": [1]}
   - |
     META_API_SERVICE={"name": "Meta", "endpoint": "/meta", "port": 7000, "defaultVersion": 1, "availableVersions": [1]}
+  - |
+    HPO_API_SERVICE={"name": "HPO", "endpoint": "/hpo", "port": 8400, "defaultVersion": 1, "availableVersions": [1]}
   - |
     ELASTIC_SERVICE={"host": "__UNDEFINED__"}
   - |

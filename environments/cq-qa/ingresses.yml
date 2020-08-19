@@ -71,3 +71,21 @@ spec:
           backend:
             serviceName: clin-proxy-api-patient
             servicePort: 4000
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: clin-proxy-api-hpo
+spec:
+  tls:
+    - hosts:
+      - hpo.qa.clin.cqdg.ferlab.bio
+      secretName: letsencrypt-certificate
+  rules:
+    - host: hpo.qa.clin.cqdg.ferlab.bio
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: clin-proxy-api-hpo
+            servicePort: 8400
