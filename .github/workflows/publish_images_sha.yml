@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        service: [patient, meta, variant, gene]
+        service: [patient, meta, variant, gene, hpo]
     steps:
     - uses: actions/checkout@v2
     - name: Push the image on the ${{ matrix.service }} image on the registry
