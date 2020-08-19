@@ -118,3 +118,33 @@ spec:
           envFrom:
             - configMapRef:
                 name: clin-proxy-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: clin-proxy-api-hpo
+  name: clin-proxy-api-hpo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: clin-proxy-api-hpo
+  template:
+    metadata:
+      labels:
+        app: clin-proxy-api-hpo
+    spec:
+      containers:
+        - image: chusj/clin-proxy-api-hpo-service:__UNDEFINED__
+          name: clin-proxy-api-hpo
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: '0.25'
+            limits:
+              memory: "256Mi"
+              cpu: '0.50'
+          envFrom:
+            - configMapRef:
+                name: clin-proxy-config

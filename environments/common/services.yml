@@ -54,3 +54,18 @@ spec:
     targetPort: 4000
   selector:
     app: clin-proxy-api-patient
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: clin-proxy-api-hpo
+  name: clin-proxy-api-hpo
+spec:
+  ports:
+  - port: 8400
+    protocol: TCP
+    targetPort: 8400
+  selector:
+    app: clin-proxy-api-hpo
+
