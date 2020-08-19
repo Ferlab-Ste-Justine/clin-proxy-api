@@ -10,7 +10,7 @@ configMapGenerator:
   - |
     CORS_ORIGINS=["*"]
   - |
-    API_SERVICES=["boilerplate", "query", "variant", "meta", "gene"]
+    API_SERVICES=["boilerplate", "query", "variant", "meta", "gene", "patient"]
   - |
     BOILERPLATE_API_SERVICE={"name": "Boilerplate", "endpoint": "/boilerplate", "port": 2999, "defaultVersion": 1, "availableVersions": [1]}
   - |
