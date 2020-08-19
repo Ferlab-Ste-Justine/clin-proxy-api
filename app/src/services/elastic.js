@@ -93,6 +93,21 @@ export const generateVariantQuery = ( patient, statement, query, acl, schema, gr
     }
 }
 
+
+const apiCall = ( options ) => {
+    const headers = process.env.AUTHORIZATION != null ? {
+        ...options.headers,
+        Authorization: process.env.AUTHORIZATION
+    } : options.headers
+
+    return rp(
+        {
+            ...options,
+            headers
+        }
+    )
+}
+
 export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) => {
     const denormalizedStatement = denormalize( statement )
     const denormalizedRequest = getQueryByKey( denormalizedStatement, queryId )
@@ -280,7 +295,7 @@ export default class ElasticClient {
     }
 
     async ping() {
-        return rp( {
+        return apiCall( {
             method: 'GET',
             uri: `${this.host}`,
             json: true
@@ -309,7 +324,7 @@ export default class ElasticClient {
             body.query.bool.minimum_should_match = 1
         }
 
-        return rp( {
+        return apiCall( {
             method: 'GET',
             uri,
             json: true,
@@ -342,7 +357,7 @@ export default class ElasticClient {
             body.highlight = highlight
         }
 
-        return rp( {
+        return apiCall( {
             method: 'GET',
             uri,
             json: true,
@@ -354,7 +369,7 @@ export default class ElasticClient {
         const uri = `${this.host}${schema.path}/_search`
         const body = generateVariantQuery( patient, statement, query, acl, schema, group, index, limit )
 
-        return rp( {
+        return apiCall( {
             method: 'POST',
             uri,
             json: true,
@@ -366,7 +381,7 @@ export default class ElasticClient {
         const uri = `${this.host}${schema.path}/_search`
         const body = generateFacetQuery( patient, statement, query, acl, schema )
 
-        return rp( {
+        return apiCall( {
             method: 'POST',
             uri,
             json: true,
@@ -378,7 +393,7 @@ export default class ElasticClient {
         const uri = `${this.host}${schema.path}/_count`
         const body = generateCountQuery( patient, statement, query, acl, schema, group )
 
-        return rp( {
+        return apiCall( {
             method: 'POST',
             uri,
             json: true,
@@ -403,7 +418,7 @@ export default class ElasticClient {
             body._source = { includes }
         }
 
-        return rp( {
+        return apiCall( {
             method: 'GET',
             uri,
             json: true,
@@ -434,7 +449,7 @@ export default class ElasticClient {
                 body.query.bool.minimum_should_match = 1
             }
 
-            return rp( {
+            return apiCall( {
                 method: 'GET',
                 uri,
                 json: true,
@@ -449,7 +464,7 @@ export default class ElasticClient {
 
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
-            return rp( {
+            return apiCall( {
                 method: 'POST',
                 uri,
                 json: true,
@@ -468,7 +483,7 @@ export default class ElasticClient {
             }
             data.practitionerId = acl.practitioner_id
             data.organizationId = acl.organization_id
-            return rp( {
+            return apiCall( {
                 method: 'POST',
                 uri,
                 json: true,
@@ -498,7 +513,7 @@ export default class ElasticClient {
 
             aclFilters.push( { match: { _id: uid } } )
 
-            return rp( {
+            return apiCall( {
                 method: 'POST',
                 uri,
                 json: true,
@@ -517,7 +532,7 @@ export default class ElasticClient {
         if ( index !== null ) {
             const uri = `${this.host}/${index}/_cache/clear?query=true`
 
-            return rp( {
+            return apiCall( {
                 method: 'POST',
                 uri,
                 json: true
@@ -536,7 +551,7 @@ export default class ElasticClient {
             }
         }
 
-        return rp( {
+        return apiCall( {
             method: 'GET',
             uri,
             json: true,
@@ -555,7 +570,7 @@ export default class ElasticClient {
             }
         }
 
-        return rp( {
+        return apiCall( {
             method: 'GET',
             uri,
             json: true,
