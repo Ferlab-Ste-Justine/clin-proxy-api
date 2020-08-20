@@ -8,6 +8,5 @@ data:
     { "realm": "clin", "authServerUrl": "https://auth.qa.cqdg.ferlab.bio" }
   ELASTIC_SERVICE: |
     {"host": "http://elasticsearch-workers:9200"}
-  #Once the migration is done, change GENE_API_SEARCH_ENDPOINT to: https://gene.qa.clin.ferlab.bio/autocomplete
   VARIANT_API_SERVICE: |
-    {"name": "Variant", "endpoint": "/variant", "port": 5001, "defaultVersion": 1, "availableVersions": [1], "schemaVariables": { "GENE_API_SEARCH_ENDPOINT": "https://gene.qa.clin.cqdg.ferlab.bio/autocomplete"}}
+    {"name": "Variant", "endpoint": "/variant", "port": 5001, "defaultVersion": 1, "availableVersions": [1], "schemaVariables": { "GENE_API_SEARCH_ENDPOINT": "https://gene.qa.clin.ferlab.bio/autocomplete"}}
