@@ -1,4 +1,3 @@
-#Once migration is complete, clin.cqdg -> clin + switch to clin certificate
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
@@ -7,10 +6,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - meta.qa.clin.cqdg.ferlab.bio
+      - meta.qa.clin.ferlab.bio
       secretName: letsencrypt-certificate
   rules:
-    - host: meta.qa.clin.cqdg.ferlab.bio
+    - host: meta.qa.clin.ferlab.bio
       http:
         paths:
         - path: /
@@ -25,10 +24,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - gene.qa.clin.cqdg.ferlab.bio
+      - gene.qa.clin.ferlab.bio
       secretName: letsencrypt-certificate
   rules:
-    - host: gene.qa.clin.cqdg.ferlab.bio
+    - host: gene.qa.clin.ferlab.bio
       http:
         paths:
         - path: /
@@ -43,10 +42,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - variant.qa.clin.cqdg.ferlab.bio
+      - variant.qa.clin.ferlab.bio
       secretName: letsencrypt-certificate
   rules:
-    - host: variant.qa.clin.cqdg.ferlab.bio
+    - host: variant.qa.clin.ferlab.bio
       http:
         paths:
         - path: /
@@ -61,10 +60,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - patient.qa.clin.cqdg.ferlab.bio
+      - patient.qa.clin.ferlab.bio
       secretName: letsencrypt-certificate
   rules:
-    - host: patient.qa.clin.cqdg.ferlab.bio
+    - host: patient.qa.clin.ferlab.bio
       http:
         paths:
         - path: /
@@ -79,10 +78,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - hpo.qa.clin.cqdg.ferlab.bio
+      - hpo.qa.clin.ferlab.bio
       secretName: letsencrypt-certificate
   rules:
-    - host: hpo.qa.clin.cqdg.ferlab.bio
+    - host: hpo.qa.clin.ferlab.bio
       http:
         paths:
         - path: /
