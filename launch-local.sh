@@ -1,5 +1,8 @@
 #Copy environment file
-cp development.env app/.env;
+if [ ! -f app/.env ]; then
+  echo "Please, copy the development.env file to app/.env and don't forget to replace the __UNDEFINED__ value by the elasticsearch basic auth token";
+  exit 1;
+fi
 
 NPM=$(which npm)
 if [ -z "$NPM" ]; then
