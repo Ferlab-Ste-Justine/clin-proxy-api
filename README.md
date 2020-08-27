@@ -71,8 +71,8 @@ See the documentation for our convention on gitflow and docker images: https://w
 
 This repo follows it.
 
-### Deploying
+### Deployments
 
-Assuming you have access to deployments, you can go to this repo: https://github.com/cr-ste-justine/clin-environments
+Updates to the QA environment are automatically done once a new image is pushed. No action is required.
 
-Then, go to the directory of the environment you want to deploy on, go to the **clin-proxy-api** directory, change the orchestration, get it merged to master and let the pipeline do the deployment for you.
+Procedures to deploy to prod will be fleshed out once we have such an environment.
