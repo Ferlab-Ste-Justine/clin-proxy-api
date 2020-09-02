@@ -1,15 +1,28 @@
 import rp from 'request-promise-native'
-import { flatten, map, isArray, isString, cloneDeep } from 'lodash'
+import {cloneDeep, flatten, isArray, isString, map} from 'lodash'
 
-import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
+import {
+    ROLE_TYPE_ADMIN,
+    ROLE_TYPE_GROUP,
+    ROLE_TYPE_USER,
+    SERVICE_TYPE_META,
+    SERVICE_TYPE_PATIENT,
+    SERVICE_TYPE_VARIANT
+} from './api/helpers/acl'
 import translate, {
-    traverseArrayAndApplyFunc,
-    instructionIsFilter,
-    getFieldSearchNameFromFieldIdMappingFunction,
+    denormalize,
     getFieldFacetNameFromFieldIdMappingFunction,
-    getFieldSubtypeFromFieldIdMappingFunction, denormalize, getQueryByKey
+    getFieldSearchNameFromFieldIdMappingFunction,
+    getFieldSubtypeFromFieldIdMappingFunction,
+    getQueryByKey,
+    instructionIsFilter,
+    traverseArrayAndApplyFunc
 } from './api/variant/sqon'
-import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
+import {
+    DIALECT_LANGUAGE_ELASTIC_SEARCH,
+    elasticSearchTranslator,
+    FILTER_SUBTYPE_NESTED
+} from './api/variant/sqon/dialect/es'
 
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
     return JSON.parse(
@@ -267,8 +280,8 @@ export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) =
 
     return {
         size: 0,
-        query: replacePlaceholderInJSON( query, '%patientId.keyword%', patient ),
-        aggs: replacePlaceholderInJSON( aggs, '%patientId.keyword%', patient )
+        query: replacePlaceholderInJSON(query, '%patientId.keyword%', patient),
+        aggs: replacePlaceholderInJSON(aggs, '%patientId.keyword%', patient)
     }
 }
 
@@ -392,7 +405,6 @@ export default class ElasticClient {
     async countVariantsForPatient( patient, statement, query, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
         const body = generateCountQuery( patient, statement, query, acl, schema, group )
-
         return apiCall( {
             method: 'POST',
             uri,
@@ -402,7 +414,7 @@ export default class ElasticClient {
     }
 
     async searchVariants( acl, includes = [], filters = [], index, limit ) {
-        const uri = `${this.host}/mutations/_search`
+        const uri = `${this.host}/variants_re_bat1/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
         const body = {
             from: index,
@@ -527,20 +539,6 @@ export default class ElasticClient {
             } )
         }
     }
-
-    async clearCacheMeta( index = null ) {
-        if ( index !== null ) {
-            const uri = `${this.host}/${index}/_cache/clear?query=true`
-
-            return apiCall( {
-                method: 'POST',
-                uri,
-                json: true
-
-            } )
-        }
-    }
-    
     async searchHPODescendants( hpoId ) {
         const uri = `${this.host}/hpo/_search`
         const body = {
