@@ -1,0 +1,23 @@
+name: Lint Check
+
+on: [push]
+
+jobs:
+  build:
+    name: Lint Check
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Install dependencies
+      run: npm install
+      working-directory: app
+    - name: Lint Check Code
+      run: ./node_modules/.bin/eslint src/**
+      working-directory: app
+    - name: Lint Check Tests
+      run: ./node_modules/.bin/eslint tests/**
+      working-directory: app
