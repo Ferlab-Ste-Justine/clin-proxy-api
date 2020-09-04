@@ -16,8 +16,8 @@ jobs:
       run: npm install
       working-directory: app
     - name: Lint Check Code
-      run: ./node_modules/.bin/eslint src/**
+      run: ./node_modules/.bin/eslint src/
       working-directory: app
     - name: Lint Check Tests
-      run: ./node_modules/.bin/eslint tests/**
+      run: ./node_modules/.bin/eslint tests/
       working-directory: app
