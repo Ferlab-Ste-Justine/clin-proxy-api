@@ -1,4 +1,4 @@
-const example = ( req, res ) => {
+const example = () => {
 
     return {
         version: 1

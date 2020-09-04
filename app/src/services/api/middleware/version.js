@@ -16,7 +16,7 @@ export default ( server, versions, defaultVersion ) => {
             req.version = version
             next()
         } else {
-            next( new errors.InvalidVersionError( 'The API version you requested does not exist.' ))
+            next( new errors.InvalidVersionError( 'The API version you requested does not exist.' ) )
         }
     } )
 }
