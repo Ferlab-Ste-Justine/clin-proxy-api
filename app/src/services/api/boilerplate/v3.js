@@ -1,7 +1,7 @@
 import errors from 'restify-errors'
 
 
-const example = ( req, res ) => {
+const example = () => {
 
     return new errors.NotImplementedError( 'v3' )
 

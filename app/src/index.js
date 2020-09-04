@@ -1,5 +1,3 @@
-import fs from 'fs'
-
 try { require( 'babel-polyfill' ) } catch ( e ) {} /* eslint-disable-line */
 require( 'dotenv' ).config()
 

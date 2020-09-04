@@ -175,7 +175,7 @@ export default class VariantService extends ApiService {
                 }
             } catch ( e ) {
                 await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
-                ext( e )
+                next( e )
             }
         } )
 

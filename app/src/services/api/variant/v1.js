@@ -277,5 +277,5 @@ export default {
     getFacets,
     countVariants,
     getVariantById,
-    sendDataAsExcel,
+    sendDataAsExcel
 }

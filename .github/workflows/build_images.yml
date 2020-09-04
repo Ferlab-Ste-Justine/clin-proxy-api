@@ -1,10 +1,6 @@
 name: Build Images
 
-on:
-  push:
-    paths:
-      - 'app/**'
-      - .github/workflows/build_images.yml
+on: [push]
 
 jobs:
   build:

@@ -1,10 +1,10 @@
-import { Readable, Duplex } from 'stream'
+import { Duplex } from 'stream'
 import { Base64Encode } from 'base64-stream'
 import errors from 'restify-errors'
 
 import xl from 'excel4node'
 
-function bufferToStream( buffer ) {
+const bufferToStream = ( buffer ) => {
     let stream = new Duplex()
 
     stream.push( buffer )
@@ -14,7 +14,7 @@ function bufferToStream( buffer ) {
 
 const HEADER_HEIGHT = 30
 
-export const sendDataAsExcel = ( req, res, next ) => {
+export const sendDataAsExcel = ( req, res ) => {
     const {
         sheet, style
     } = req.body
@@ -44,23 +44,23 @@ export const sendDataAsExcel = ( req, res, next ) => {
    
     wb.createStyle( style )
 
-    const writeCell = ( ws, cell, rowIndex, colIndex ) => {
+    const writeCell = ( innerWs, cell, rowIndex, colIndex ) => {
         const row = rowIndex + 1
         const col = colIndex + 1
 
         switch ( typeof cell.value ) {
             case 'string':
-                ws.cell( row, col )
+                innerWs.cell( row, col )
                     .string( cell.value )
                     .style( style )
                 break
             case 'number':
-                ws.cell( row, col )
+                innerWs.cell( row, col )
                     .number( cell.value )
                     .style( style )
                 break
             default:
-                ws.cell( row, col )
+                innerWs.cell( row, col )
                     .string( cell.value )
                     .style( style )
         }

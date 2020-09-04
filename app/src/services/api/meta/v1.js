@@ -193,5 +193,5 @@ export default {
     getProfile,
     createProfile,
     updateProfile,
-    deleteProfile,
+    deleteProfile
 }
