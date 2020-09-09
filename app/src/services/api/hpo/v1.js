@@ -1,7 +1,7 @@
 const searchHPODescendants = async( req, res, elasticService, logService ) => {
     try {
-        
-        const { parentHpoId } = req.params
+        const params = req.query || req.params || req.body
+        const { parentHpoId } = params
         const response = await elasticService.searchHPODescendants( parentHpoId )
 
         return {
@@ -15,8 +15,8 @@ const searchHPODescendants = async( req, res, elasticService, logService ) => {
 
 const searchHPOAutocomplete = async( req, res, elasticService, logService ) => {
     try {
-        console.log( 'Here' )
-        const { prefix } = req.params
+        const params = req.query || req.params || req.body
+        const { prefix } = params
         const response = await elasticService.searchHPOAutocomplete( prefix )
 
         return {
