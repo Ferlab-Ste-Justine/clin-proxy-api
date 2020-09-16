@@ -1,3 +1,5 @@
+import errors from 'restify-errors'
+
 const searchHPODescendants = async( req, res, elasticService, logService ) => {
     try {
         const params = req.query || req.params || req.body
@@ -10,6 +12,7 @@ const searchHPODescendants = async( req, res, elasticService, logService ) => {
         }
     } catch ( error ) {
         await logService.warning( `Elastic searchHPODescendants ${error.toString()}` )
+        return new errors.InternalServerError()
     }
 }
 
@@ -25,9 +28,9 @@ const searchHPOAutocomplete = async( req, res, elasticService, logService ) => {
         }
     } catch ( error ) {
         await logService.warning( `Elastic searchHPOAutocomplete ${error.toString()}` )
+        return new errors.InternalServerError()
     }
 }
-
 
 export default {
     searchHPODescendants,

@@ -564,11 +564,23 @@ export default class ElasticClient {
         const uri = `${this.host}/hpo/_search`
         const body = {
             query: {
-                match_phrase_prefix: {
-                    id: prefix
+                bool: {
+                    should: [
+                        {
+                            prefix: {
+                                name: prefix
+                            }
+                        },
+                        {
+                            match_phrase_prefix: {
+                                id: prefix
+                            }
+                        }
+                    ]
                 }
             }
         }
+        
 
         return apiCall( {
             method: 'GET',
