@@ -2,7 +2,7 @@
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Publish%20Images%20Using%20Commit%20Hash/badge.svg)
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Publish%20Images%20Using%20Tag/badge.svg)
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Lint%20Check/badge.svg)
-
+![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Dependencies%20Security%20Audit/badge.svg)
 
 # CLIN Proxy API
 
