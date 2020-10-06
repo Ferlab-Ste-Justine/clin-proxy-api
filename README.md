@@ -4,6 +4,7 @@
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Lint%20Check/badge.svg)
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Dependencies%20Security%20Audit/badge.svg)
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Unit%20Tests/badge.svg)
+![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Functional%20Tests/badge.svg)
 
 # CLIN Proxy API
 
