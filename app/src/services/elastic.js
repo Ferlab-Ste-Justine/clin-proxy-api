@@ -1,5 +1,5 @@
 import rp from 'request-promise-native'
-import {cloneDeep, flatten, isArray, isString, map} from 'lodash'
+import { cloneDeep, flatten, isArray, isString, map } from 'lodash'
 
 import {
     ROLE_TYPE_ADMIN,
@@ -280,8 +280,8 @@ export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) =
 
     return {
         size: 0,
-        query: replacePlaceholderInJSON(query, '%patient_id%', patient),
-        aggs: replacePlaceholderInJSON(aggs, '%patient_id%', patient)
+        query: replacePlaceholderInJSON( query, '%patient_id%', patient ),
+        aggs: replacePlaceholderInJSON( aggs, '%patient_id%', patient )
     }
 }
 
@@ -405,6 +405,7 @@ export default class ElasticClient {
     async countVariantsForPatient( patient, statement, query, acl, schema, group ) {
         const uri = `${this.host}${schema.path}/_count`
         const body = generateCountQuery( patient, statement, query, acl, schema, group )
+
         return apiCall( {
             method: 'POST',
             uri,
@@ -578,7 +579,7 @@ export default class ElasticClient {
                 }
             }
         }
-        
+
 
         return apiCall( {
             method: 'GET',

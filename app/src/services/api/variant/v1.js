@@ -1,10 +1,10 @@
 import errors from 'restify-errors'
-import {readFileSync} from 'fs'
-import {sendDataAsExcel} from '../helpers/excel'
-import {getACL} from '../helpers/acl'
+import { readFileSync } from 'fs'
+import { sendDataAsExcel } from '../helpers/excel'
+import { getACL } from '../helpers/acl'
 
-import {DIALECT_LANGUAGE_ELASTIC_SEARCH} from './sqon/dialect/es'
-import {DIALECT_LANGUAGE_GRAPHQL} from './sqon/dialect/gql'
+import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from './sqon/dialect/es'
+import { DIALECT_LANGUAGE_GRAPHQL } from './sqon/dialect/gql'
 
 const readSchemaAndAttachEnvironmentVariables = ( dialects, variables ) => {
     return dialects.reduce( ( accumulator, dialect ) => {
