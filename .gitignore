@@ -19,4 +19,3 @@ app/pnpm-debug.log
 secrets/jwt_secret
 *.iml
 
-.env
