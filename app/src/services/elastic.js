@@ -1,15 +1,28 @@
 import rp from 'request-promise-native'
-import { flatten, map, isArray, isString, cloneDeep } from 'lodash'
+import { cloneDeep, flatten, isArray, isString, map } from 'lodash'
 
-import { SERVICE_TYPE_PATIENT, SERVICE_TYPE_VARIANT, SERVICE_TYPE_META, ROLE_TYPE_USER, ROLE_TYPE_GROUP, ROLE_TYPE_ADMIN } from './api/helpers/acl'
+import {
+    ROLE_TYPE_ADMIN,
+    ROLE_TYPE_GROUP,
+    ROLE_TYPE_USER,
+    SERVICE_TYPE_META,
+    SERVICE_TYPE_PATIENT,
+    SERVICE_TYPE_VARIANT
+} from './api/helpers/acl'
 import translate, {
-    traverseArrayAndApplyFunc,
-    instructionIsFilter,
-    getFieldSearchNameFromFieldIdMappingFunction,
+    denormalize,
     getFieldFacetNameFromFieldIdMappingFunction,
-    getFieldSubtypeFromFieldIdMappingFunction, denormalize, getQueryByKey
+    getFieldSearchNameFromFieldIdMappingFunction,
+    getFieldSubtypeFromFieldIdMappingFunction,
+    getQueryByKey,
+    instructionIsFilter,
+    traverseArrayAndApplyFunc
 } from './api/variant/sqon'
-import { elasticSearchTranslator, DIALECT_LANGUAGE_ELASTIC_SEARCH, FILTER_SUBTYPE_NESTED } from './api/variant/sqon/dialect/es'
+import {
+    DIALECT_LANGUAGE_ELASTIC_SEARCH,
+    elasticSearchTranslator,
+    FILTER_SUBTYPE_NESTED
+} from './api/variant/sqon/dialect/es'
 
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
     return JSON.parse(
@@ -88,7 +101,7 @@ export const generateVariantQuery = ( patient, statement, query, acl, schema, gr
     return {
         from: index,
         size: limit,
-        query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient ),
+        query: replacePlaceholderInJSON( request.query, '%patient_id%', patient ),
         sort
     }
 }
@@ -267,8 +280,8 @@ export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) =
 
     return {
         size: 0,
-        query: replacePlaceholderInJSON( query, '%patientId.keyword%', patient ),
-        aggs: replacePlaceholderInJSON( aggs, '%patientId.keyword%', patient )
+        query: replacePlaceholderInJSON( query, '%patient_id%', patient ),
+        aggs: replacePlaceholderInJSON( aggs, '%patient_id%', patient )
     }
 }
 
@@ -283,7 +296,7 @@ export const generateCountQuery = ( patient, statement, query, acl, schema ) => 
     request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
     return {
-        query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient )
+        query: replacePlaceholderInJSON( request.query, '%patient_id%', patient )
     }
 }
 
@@ -402,7 +415,7 @@ export default class ElasticClient {
     }
 
     async searchVariants( acl, includes = [], filters = [], index, limit ) {
-        const uri = `${this.host}/mutations/_search`
+        const uri = `${this.host}/variants_re_bat1/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
         const body = {
             from: index,
@@ -527,20 +540,6 @@ export default class ElasticClient {
             } )
         }
     }
-
-    async clearCacheMeta( index = null ) {
-        if ( index !== null ) {
-            const uri = `${this.host}/${index}/_cache/clear?query=true`
-
-            return apiCall( {
-                method: 'POST',
-                uri,
-                json: true
-
-            } )
-        }
-    }
-    
     async searchHPODescendants( hpoId ) {
         const uri = `${this.host}/hpo/_search`
         const body = {
@@ -580,7 +579,7 @@ export default class ElasticClient {
                 }
             }
         }
-        
+
 
         return apiCall( {
             method: 'GET',

@@ -61,7 +61,7 @@ const getVariants = async ( req, res, elasticService, logService ) => {
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {
                     const result = hit._source
 
-                    result.donors = result.donors.filter( ( donor ) => donor.patientId === patient )
+                    result.donors = result.donors.filter( ( donor ) => donor.patient_id === patient )
                     result.id = hit._id
                     return result
                 } )
