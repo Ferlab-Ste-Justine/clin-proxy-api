@@ -677,7 +677,7 @@
               "id": "cohort_gnomad_genomes_min",
               "query": {
                 "min": {
-                  "field": "frequencies.gnomad_genomes_3_0.AF"
+                  "field": "frequencies.gnomad_genomes_3_0.af"
                 }
               }
             },
@@ -800,7 +800,7 @@
             "type": "nested",
             "config": {
               "path": "donors",
-              "field": "patientId.keyword"
+              "field": "patient_id"
             }
           },
           "config": {
@@ -911,7 +911,7 @@
             "type": "nested",
             "config": {
               "path": "donors",
-              "field": "patientId.keyword"
+              "field": "patient_id"
             }
           },
           "config": {

@@ -101,7 +101,7 @@ export const generateVariantQuery = ( patient, statement, query, acl, schema, gr
     return {
         from: index,
         size: limit,
-        query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient ),
+        query: replacePlaceholderInJSON( request.query, '%patient_id%', patient ),
         sort
     }
 }
@@ -280,8 +280,8 @@ export const generateFacetQuery = ( patient, statement, queryId, acl, schema ) =
 
     return {
         size: 0,
-        query: replacePlaceholderInJSON(query, '%patientId.keyword%', patient),
-        aggs: replacePlaceholderInJSON(aggs, '%patientId.keyword%', patient)
+        query: replacePlaceholderInJSON(query, '%patient_id%', patient),
+        aggs: replacePlaceholderInJSON(aggs, '%patient_id%', patient)
     }
 }
 
@@ -296,7 +296,7 @@ export const generateCountQuery = ( patient, statement, query, acl, schema ) => 
     request.query.bool.filter.push( { term: { [ schema.fields.patient ]: patient } } )
 
     return {
-        query: replacePlaceholderInJSON( request.query, '%patientId.keyword%', patient )
+        query: replacePlaceholderInJSON( request.query, '%patient_id%', patient )
     }
 }
 
