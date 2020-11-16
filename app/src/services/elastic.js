@@ -316,7 +316,7 @@ export default class ElasticClient {
     }
 
     async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/patient/_search`
+        const uri = `${this.host}/patient-list/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,
