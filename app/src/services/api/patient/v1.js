@@ -48,9 +48,9 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
         if ( type === 'partial' ) {
             fields.push(
                 'id',
-                'name.family',
-                'name.given',
-                'identifier.JHN',
+                'lastName',
+                'firstName',
+                'mrn',
             )
         }
 
@@ -62,14 +62,10 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
                     fields: [
                         'id',
                         'familyId',
-                        'name.family',
-                        'name.given',
-                        'studies.title',
-                        'specimens.id',
-                        'identifier.MR',
-                        'identifier.JHN',
-                        'studies.title',
-                        'samples.id'
+                        'lastName',
+                        'firstName',
+                        'mrn',
+                        'ramq'
                     ]
                 }
             }
