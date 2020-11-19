@@ -315,7 +315,8 @@ export default class ElasticClient {
         } )
     }
 
-    async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
+
+    async autoCompletePatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
         const uri = `${this.host}/patient-list/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
@@ -344,6 +345,67 @@ export default class ElasticClient {
             body
         } )
     }
+    
+    async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
+        const uri = `${this.host}/patient-list/_search`
+        const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
+        const body = {
+            from: index,
+            size: limit,
+            query: {
+                function_score: {
+                    query: {
+                        bool: {
+                            must: filters.concat( aclFilters )
+                        }
+                        
+                    },
+                    boost: '5',
+                    functions: [
+                        {
+                            filter: {
+                                bool: {
+                                    must_not: {
+                                        match_phrase_prefix: {
+                                            id: 'PA'
+                                        }
+                                    }
+                                }
+                            },
+                            weight: 100
+                        }
+                    ],
+                    score_mode: 'max',
+                    boost_mode: 'replace'
+                }
+            },
+            sort: [
+                {
+                    _score: 'desc'
+                },
+                {
+                    _id: 'desc'
+                }
+            ]
+        }
+
+        if ( includes.length > 0 ) {
+            body._source = { includes }
+        }
+
+        if ( shoulds.length > 0 ) {
+            body.query.bool.should = shoulds
+            body.query.bool.minimum_should_match = 1
+        }
+
+        return apiCall( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
 
     async searchGenes( includes = [], filters = [], shoulds = [], index, limit, highlight = null ) {
         const uri = `${this.host}/genes/_search`
