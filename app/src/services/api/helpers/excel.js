@@ -66,9 +66,18 @@ export const sendDataAsExcel = ( req, res ) => {
         }
     }
 
+    const cleanCell = ( cell ) => {
+        if ( Array.isArray( cell.value ) ){
+            cell.value = cell.value.filter( ( val ) => val != null )
+        }
+    }
+
     ws.row( 1 ).setHeight( HEADER_HEIGHT )
     const writeRow = ( row, rowIndex ) => {
-        row.forEach( ( cell, colIndex ) => writeCell( ws, cell, rowIndex, colIndex ) )
+        row.forEach( ( cell, colIndex ) => {
+            cleanCell( cell )
+            writeCell( ws, cell, rowIndex, colIndex )
+        } )
     }
 
     data.forEach( ( row, rowIndex ) => writeRow( row, rowIndex ) )
@@ -77,5 +86,7 @@ export const sendDataAsExcel = ( req, res ) => {
         const stream = bufferToStream( buffer )
 
         stream.pipe( new Base64Encode() ).pipe( res )
+    } ).catch( ( error ) => {
+        console.log( error )
     } )
 }
