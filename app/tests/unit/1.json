@@ -692,36 +692,6 @@
           ]
         },
         {
-          "id": "cohort_topmed_bravo",
-          "label": "filter_cohort_topmed_bravo",
-          "type": "numcomparison",
-          "config": {
-            "min": "cohort_topmed_bravo_min",
-            "max": "cohort_topmed_bravo_max"
-          },
-          "search": {
-            "cohort_topmed_bravo": "frequencies.topmed_bravo.af"
-          },
-          "facet": [
-            {
-              "id": "topmed_bravo_min",
-              "query": {
-                "min": {
-                  "field": "frequencies.topmed_bravo.af"
-                }
-              }
-            },
-            {
-              "id": "topmed_bravo_max",
-              "query": {
-                "max": {
-                  "field": "frequencies.topmed_bravo.af"
-                }
-              }
-            }
-          ]
-        },
-        {
           "id": "cohort_exac",
           "label": "filter_cohort_exac",
           "type": "numcomparison",
