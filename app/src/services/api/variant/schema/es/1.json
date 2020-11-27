@@ -1,8 +1,8 @@
 {
   "version": "1.0",
   "dialect": "es",
-  "index": "variants_re_bat1",
-  "path": "/variants_re_bat1",
+  "index": "variants",
+  "path": "/variants",
   "fields": {
     "patient": "donors.patient_id",
     "practitioner": "donors.practitioner_id",
@@ -110,7 +110,7 @@
               }
             }
           ]
-        },        
+        },
         {
           "id": "chromosome",
           "label": "filter_chromosome",
