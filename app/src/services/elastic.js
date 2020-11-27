@@ -345,7 +345,7 @@ export default class ElasticClient {
             body
         } )
     }
-    
+
     async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
         const uri = `${this.host}/patient-list/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
@@ -358,7 +358,7 @@ export default class ElasticClient {
                         bool: {
                             must: filters.concat( aclFilters )
                         }
-                        
+
                     },
                     boost: '5',
                     functions: [
@@ -477,7 +477,7 @@ export default class ElasticClient {
     }
 
     async searchVariants( acl, includes = [], filters = [], index, limit ) {
-        const uri = `${this.host}/variants_re_bat1/_search`
+        const uri = `${this.host}/variants/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
         const body = {
             from: index,
