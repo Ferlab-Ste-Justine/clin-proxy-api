@@ -12,7 +12,7 @@ const searchGenesByAutoComplete = async ( req, res, elasticService, logService )
 
         if ( type === 'partial' ) {
             fields.push(
-                'geneSymbol',
+                'symbol',
             )
         }
 
@@ -22,13 +22,13 @@ const searchGenesByAutoComplete = async ( req, res, elasticService, logService )
                     query: query,
                     type: 'phrase_prefix',
                     fields: [
-                        'geneSymbol^7',
+                        'symbol^7',
                         'alias^6',
-                        'ensemblId^5',
+                        'ensembl_gene_id^5',
                         'name^4',
                         'omim^3',
                         'hgnc^2',
-                        'geneId'
+                        'entrez_gene_id'
                     ]
                 }
             }
@@ -39,13 +39,13 @@ const searchGenesByAutoComplete = async ( req, res, elasticService, logService )
             post_tags: [ '}}' ],
             order: 'score',
             fields: [
-                { geneSymbol: {} },
+                { symbol: {} },
                 { alias: {} },
-                { ensemblId: {} },
+                { ensembl_gene_id: {} },
                 { name: {} },
                 { omim: {} },
                 { hgnc: {} },
-                { geneId: {} }
+                { entrez_gene_id: {} }
             ]
         }
 
