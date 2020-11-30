@@ -157,7 +157,7 @@
             "url": "%%GENE_API_SEARCH_ENDPOINT%%"
           },
           "search": {
-            "gene_symbol": "genes.genes_symbol"
+            "gene_symbol": "genes.symbol"
           }
         },
         {
