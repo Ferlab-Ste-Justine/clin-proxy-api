@@ -33,6 +33,7 @@ export default ( server, config ) => {
                 .then( ( user ) => {
                     req.fhirPractitionerId = user.fhirPractitionerId
                     req.fhirOrganizationId = user.fhirOrganizationId
+                    req.roles = user.realm_access.roles
                     return next()
                 } )
                 .catch( () => {

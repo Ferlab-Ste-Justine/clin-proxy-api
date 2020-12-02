@@ -12,9 +12,9 @@ import translate from '../../src/services/api/variant/sqon'
 const ELASTIC_SEARCH_SCHEMA_V1 = JSON.parse(readFileSync(`${__dirname}/1.json`, 'utf8'))
 
 const PATIENT_ID = 'PA00001';
-const ADMINISTRATOR_ACL = {role: 'administrator', organization_id: 'OR00202', practitioner_id: 'PR00601'}
-const GENETICIAN_ACL = {role: 'genetician', organization_id: 'OR00203', practitioner_id: 'PR00602'}
-const PRACTITIONER_ACL = {role: 'practitioner', organization_id: 'OR00204', practitioner_id: 'PR00603'}
+const ADMINISTRATOR_ACL = {roles: ['clin_administrator'], organization_id: 'OR00202', practitioner_id: 'PR00601'}
+const GENETICIAN_ACL = {roles: ['clin_genetician'], organization_id: 'OR00203', practitioner_id: 'PR00602'}
+const PRACTITIONER_ACL = {roles: ['clin_practitioner'], organization_id: 'OR00204', practitioner_id: 'PR00603'}
 const EMPTY_STATEMENT_QUERY = uniqid();
 const EMPTY_STATEMENT = [{"key": EMPTY_STATEMENT_QUERY, "instructions": [], "title": "Query 1"}];
 const DEFAULT_GROUP = ELASTIC_SEARCH_SCHEMA_V1.defaultGroup;

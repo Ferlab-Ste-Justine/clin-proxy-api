@@ -38,38 +38,29 @@ const generateAclFilters = ( acl, service, schema = null ) => {
     // Shouldn't acl.organization_id be a list?  If so, in the Keycloak fhir organization mapper, activate the multi-value switch.
     const organizationId = acl.organization_id
 
-    switch ( acl.role ) {
-
-        case ROLE_TYPE_USER:
-            if ( service === SERVICE_TYPE_PATIENT ) {
-                filters.push( { match: { 'practitioners.id': practitionerId } } )
-            } else if ( service === SERVICE_TYPE_VARIANT ) {
-                filters.push( { term: { [ schema.fields.practitioner ]: practitionerId } } )
-            } else if ( service === SERVICE_TYPE_META ) {
-                filters.push( { match: { practitionerId } } )
-            }
-            break
-
-        case ROLE_TYPE_GROUP:
-            if ( service === SERVICE_TYPE_PATIENT ) {
-                filters.push( { match: { 'organization.id': organizationId } } )
-            } else if ( service === SERVICE_TYPE_VARIANT ) {
-                filters.push( { term: { [ schema.fields.organization ]: organizationId } } )
-            } else if ( service === SERVICE_TYPE_META ) {
-                filters.push( { match: { practitionerId } } )
-            }
-            break
-
-        case ROLE_TYPE_ADMIN:
-            if ( service === SERVICE_TYPE_META ) {
-                filters.push( { match: { practitionerId } } )
-            }
-            break
-
-        default:
-            break
+    if ( acl.roles.includes( ROLE_TYPE_ADMIN ) ) {
+        if ( service === SERVICE_TYPE_META ) {
+            filters.push( { match: { practitionerId } } )
+        }
+    } else if ( acl.roles.includes( ROLE_TYPE_USER ) ) {
+        if ( service === SERVICE_TYPE_PATIENT ) {
+            filters.push( { match: { 'practitioners.id': practitionerId } } )
+        } else if ( service === SERVICE_TYPE_VARIANT ) {
+            filters.push( { term: { [ schema.fields.practitioner ]: practitionerId } } )
+        } else if ( service === SERVICE_TYPE_META ) {
+            filters.push( { match: { practitionerId } } )
+        }
+    } else if ( acl.roles.includes( ROLE_TYPE_GROUP ) ) {
+        if ( service === SERVICE_TYPE_PATIENT ) {
+            filters.push( { match: { 'organization.id': organizationId } } )
+        } else if ( service === SERVICE_TYPE_VARIANT ) {
+            filters.push( { term: { [ schema.fields.organization ]: organizationId } } )
+        } else if ( service === SERVICE_TYPE_META ) {
+            filters.push( { match: { practitionerId } } )
+        }
+    } else {
+        throw new Error( 'Users must have one of roles administrator / user / group' )
     }
-
     return filters
 }
 
@@ -505,6 +496,7 @@ export default class ElasticClient {
         if ( type !== null ) {
             const uri = `${this.host}/${type}/_search`
             const aclFilters = generateAclFilters( acl, SERVICE_TYPE_META )
+
             const body = {
                 from: index,
                 size: limit,
