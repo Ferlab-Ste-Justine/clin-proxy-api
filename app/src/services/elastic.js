@@ -60,14 +60,12 @@ const generateAclFilters = ( acl, service, schema = null ) => {
             }
             break
 
-        case ROLE_TYPE_ADMIN:
+        default :
             if ( service === SERVICE_TYPE_META ) {
                 filters.push( { match: { practitionerId } } )
             }
             break
 
-        default:
-            break
     }
 
     return filters
