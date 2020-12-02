@@ -10,6 +10,7 @@ const makeUser = ( {
     preferred_username,
     email_verified,
     resource_access,
+    realm_access,
     email,
     name,
     fhir_practitioner_id,
@@ -21,6 +22,7 @@ const makeUser = ( {
     userName: preferred_username,
     emailVerified: email_verified,
     resourceAccess: resource_access,
+    realm_access: realm_access,
     email,
     name,
     firstName: given_name,
@@ -61,7 +63,7 @@ const getUserFromJWK = ( token ) => ( jwk ) =>
 const fetchPublicKeys = ( { realm, authServerUrl, useCache = true } ) => {
     const url = `${authServerUrl}/auth/realms/${realm}/protocol/openid-connect/certs`
     const key = url
-    
+
     if ( useCache ) {
         return certificatesCache[ key ] ? Promise.resolve(
             certificatesCache[ key ]
