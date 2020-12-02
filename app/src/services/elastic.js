@@ -39,8 +39,9 @@ const generateAclFilters = ( acl, service, schema = null ) => {
     const organizationId = acl.organization_id
 
     if ( acl.roles.includes( ROLE_TYPE_ADMIN ) ) {
-        filters.push( { match: { practitionerId } } )
-
+        if ( service === SERVICE_TYPE_META ) {
+            filters.push( { match: { practitionerId } } )
+        }
     } else if ( acl.roles.includes( ROLE_TYPE_USER ) ) {
         if ( service === SERVICE_TYPE_PATIENT ) {
             filters.push( { match: { 'practitioners.id': practitionerId } } )
