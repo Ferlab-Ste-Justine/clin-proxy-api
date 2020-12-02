@@ -327,8 +327,6 @@
             }
           ]
         },
-
-
         {
           "id": "prediction_fathmm",
           "label": "filter_prediction_fathmm",
@@ -704,7 +702,7 @@
           },
           "facet": [
             {
-              "id": "topmed_bravo_min",
+              "id": "cohort_topmed_bravo_min",
               "query": {
                 "min": {
                   "field": "frequencies.topmed_bravo.af"
@@ -712,7 +710,7 @@
               }
             },
             {
-              "id": "topmed_bravo_max",
+              "id": "cohort_topmed_bravo_max",
               "query": {
                 "max": {
                   "field": "frequencies.topmed_bravo.af"
@@ -1011,9 +1009,3 @@
     }
   ]
 }
-
-
-
-
-
-
