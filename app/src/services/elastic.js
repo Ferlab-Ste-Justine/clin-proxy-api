@@ -351,6 +351,9 @@ export default class ElasticClient {
             sort: [
                 {
                     timestamp: 'desc'
+                },
+                {
+                    _id: 'desc'
                 }
             ]
         }
