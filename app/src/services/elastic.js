@@ -344,38 +344,13 @@ export default class ElasticClient {
             from: index,
             size: limit,
             query: {
-                function_score: {
-                    query: {
-                        bool: {
-                            must: filters.concat( aclFilters )
-                        }
-
-                    },
-                    boost: '5',
-                    functions: [
-                        {
-                            filter: {
-                                bool: {
-                                    must_not: {
-                                        match_phrase_prefix: {
-                                            id: 'PA'
-                                        }
-                                    }
-                                }
-                            },
-                            weight: 100
-                        }
-                    ],
-                    score_mode: 'max',
-                    boost_mode: 'replace'
+                bool: {
+                    must: filters.concat( aclFilters )
                 }
             },
             sort: [
                 {
-                    _score: 'desc'
-                },
-                {
-                    _id: 'desc'
+                    timestamp: 'desc'
                 }
             ]
         }
