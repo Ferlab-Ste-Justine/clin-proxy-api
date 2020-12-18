@@ -15,6 +15,9 @@
           "impact_score": {
             "order": "desc"
           }
+        },
+        {
+          "_id": "desc"
         }
       ]
     }
