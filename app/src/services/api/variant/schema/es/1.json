@@ -340,7 +340,7 @@
           },
           "search": {
             "prediction_fathmm": {
-              "score": "consequences.predictions.fathmm_converted_rank_score",
+              "score": "consequences.predictions.FATHMM_converted_rankscore",
               "quality": "consequences.predictions.fathmm_pred"
             }
           },
@@ -361,7 +361,7 @@
               "id": "prediction_fathmm_min",
               "query": {
                 "min": {
-                  "field": "consequences.predictions.fathmm_converted_rank_score"
+                  "field": "consequences.predictions.FATHMM_converted_rankscore"
                 }
               }
             },
@@ -369,7 +369,7 @@
               "id": "prediction_fathmm_max",
               "query": {
                 "max": {
-                  "field": "consequences.predictions.fathmm_converted_rank_score"
+                  "field": "consequences.predictions.FATHMM_converted_rankscore"
                 }
               }
             }
