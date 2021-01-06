@@ -87,6 +87,7 @@ const getFacets = async ( req, res, elasticService, logService ) => {
         const params = req.body
         const patient = params.patient
         const statement = params.statement
+        const facetsStatement = statement.map( ( stm ) => ( { ...stm, instructions: [] } ) )
         const query = params.query
         const dialect = params.dialect || DIALECT_LANGUAGE_ELASTIC_SEARCH
         const schema = schemas[ dialect ]
@@ -99,7 +100,7 @@ const getFacets = async ( req, res, elasticService, logService ) => {
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForVariant( patient, statement, query, getACL( req ), schema )
+                response = await elasticService.getFacetsForVariant( patient, facetsStatement, query, getACL( req ), schema )
 
                 // Filtered Non-Nested
                 if ( response.aggregations.filtered ) {
