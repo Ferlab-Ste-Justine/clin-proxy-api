@@ -20,9 +20,9 @@ jobs:
     - name: Push the image on the ${{ matrix.service }} image on the registry
       uses: Ferlab-Ste-Justine/action-push-image@master
       with:
-        username: chusj
-        password: ${{ secrets.DOCKER_HUB_TOKEN }}
-        image: chusj/clin-proxy-api-${{ matrix.service }}-service
+        username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
+        password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
+        image: ferlabcrsj/clin-proxy-api-${{ matrix.service }}-service
         tag_source: ref
         location: app
         dockerfile: app/Dockerfile-${{ matrix.service }}
