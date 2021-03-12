@@ -337,6 +337,33 @@ export default class ElasticClient {
         } )
     }
 
+    async searchGenderAndPosition( ids ) {
+        const uri = `${this.host}/patient-list/_search`
+        const should = ids.map( ( id ) => ( { match: { _id: id } } ) )
+        
+        const body = {
+            size: ids.length,
+            query: {
+                bool: {
+                    should,
+                    minimum_should_match: 1
+                }
+            },
+            _source: [
+                'id',
+                'position',
+                'gender'
+            ]
+        }
+
+        return apiCall( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
     async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
         const uri = `${this.host}/patient-list/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )

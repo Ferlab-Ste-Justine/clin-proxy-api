@@ -1,5 +1,27 @@
 import errors from 'restify-errors'
 import { getACL } from '../helpers/acl'
+import get from 'lodash/get'
+
+const getGenderAndPosition = async ( req, res, elasticService, logService ) => {
+    try {
+        const params = req.body
+        const ids = get( params, 'ids', [] )
+
+        if ( ids.length === 0 ){
+            throw new Error( 'Invalid ids.' )
+        }
+
+        const response = await elasticService.searchGenderAndPosition( ids )
+
+        return {
+            total: response.hits.total.value,
+            hits: response.hits.hits
+        }
+    } catch ( e ) {
+        await logService.error( `getGenderAndPosition ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
 
 const getPatientById = async ( req, res, elasticService, logService ) => {
     try {
@@ -85,6 +107,7 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
 }
 
 export default {
+    getGenderAndPosition,
     getPatientById,
     searchPatients,
     searchPatientsByAutoComplete
