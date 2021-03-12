@@ -46,6 +46,27 @@ export default class PatientService extends ApiService {
     }
 
     async start() {
+        this.instance.post( {
+            path: `${this.config.endpoint}/gender-and-position`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'getGenderAndPosition' )(
+                    req,
+                    res,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
         // Register SOME searchPatients Route
         // @TODO - need filters specifications
         this.instance.get( {
