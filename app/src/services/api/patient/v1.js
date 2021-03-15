@@ -2,6 +2,33 @@ import errors from 'restify-errors'
 import { getACL } from '../helpers/acl'
 import get from 'lodash/get'
 
+const canEdit = async( req, res, elasticService, logService ) => {
+    try {
+        const params = req.body
+        const ids = get( params, 'ids', [] )
+
+        if ( ids.length === 0 ){
+            throw new Error( 'Invalid ids' )
+        }
+
+        const response = await elasticService.getPatientsByIds( ids )
+        const hits = response.hits.hits
+        
+        const hasSubmittedPrescriptions = ( patient ) =>
+            patient.requests.some( ( request ) => request.isSubmitted || request.status === 'on-hold' )
+
+        const result = hits.map( ( hit ) => hit._source ).some( hasSubmittedPrescriptions )
+
+        return {
+            result: !result
+        }
+
+    } catch ( e ) {
+        await logService.error( `canEdit ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
 const getGenderAndPosition = async ( req, res, elasticService, logService ) => {
     try {
         const params = req.body
@@ -107,6 +134,7 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
 }
 
 export default {
+    canEdit,
     getGenderAndPosition,
     getPatientById,
     searchPatients,

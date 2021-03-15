@@ -47,6 +47,27 @@ export default class PatientService extends ApiService {
 
     async start() {
         this.instance.post( {
+            path: `${this.config.endpoint}/can-edit`
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'canEdit' )(
+                    req,
+                    res,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
+        this.instance.post( {
             path: `${this.config.endpoint}/gender-and-position`
         }, restifyAsyncWrap( async( req, res, next ) => {
             try {
