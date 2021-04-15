@@ -308,7 +308,7 @@ export default class ElasticClient {
 
 
     async autoCompletePatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/patient-list/_search`
+        const uri = `${this.host}/prescriptions/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,
@@ -338,7 +338,7 @@ export default class ElasticClient {
     }
 
     async getPatientsByIds( ids ){
-        const uri = `${this.host}/patient-list/_search`
+        const uri = `${this.host}/prescriptions/_search`
         const should = ids.map( ( id ) => ( { match: { _id: id } } ) )
         
         const body = {
@@ -360,7 +360,7 @@ export default class ElasticClient {
     }
 
     async searchGenderAndPosition( ids ) {
-        const uri = `${this.host}/patient-list/_search`
+        const uri = `${this.host}/prescriptions/_search`
         const should = ids.map( ( id ) => ( { match: { _id: id } } ) )
         
         const body = {
@@ -387,7 +387,7 @@ export default class ElasticClient {
     }
 
     async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/patient-list/_search`
+        const uri = `${this.host}/prescriptions/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,
