@@ -15,7 +15,7 @@ const canEdit = async( req, res, elasticService, logService ) => {
         const hits = response.hits.hits
         
         const hasSubmittedPrescriptions = ( patient ) =>
-            patient.requests.some( ( request ) => request.isSubmitted || request.status === 'on-hold' )
+            patient.requests.some( ( request ) => request.status === 'active' || request.status === 'completed' )
 
         const result = hits.map( ( hit ) => hit._source ).some( hasSubmittedPrescriptions )
 
