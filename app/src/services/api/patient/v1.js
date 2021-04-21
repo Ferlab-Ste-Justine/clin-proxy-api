@@ -2,6 +2,9 @@ import errors from 'restify-errors'
 import { getACL } from '../helpers/acl'
 import get from 'lodash/get'
 
+const SEARCH_TYPE_PRESCRIPTIONS = 'prescriptions'
+const SEARCH_TYPE_PATIENTS = 'patients'
+
 const canEdit = async( req, res, elasticService, logService ) => {
     try {
         const params = req.body
@@ -71,14 +74,29 @@ const searchPatients = async ( req, res, elasticService, logService ) => {
         const params = req.query || req.params || req.body
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
+        const type = params.type || 'patient'
 
-        const response = await elasticService.searchPatients( getACL( req ), [], [], [], index, limit )
+        if ( type === SEARCH_TYPE_PRESCRIPTIONS ){
+            const response = await elasticService.searchPrescriptions( getACL( req ), [], [], [], index, limit )
 
-        await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total.value} matches` )
-        return {
-            total: response.hits.total.value,
-            hits: response.hits.hits
+            await logService.debug( `Elastic searchPrescriptions [${index},${limit}] returns ${response.hits.total.value} matches` )
+            return {
+                total: response.hits.total.value,
+                hits: response.hits.hits
+            }
+        } else if ( type === SEARCH_TYPE_PATIENTS ){
+
+            const response = await elasticService.searchPatients( getACL( req ), [], [], [], index, limit )
+
+            await logService.debug( `Elastic searchPatients [${index},${limit}] returns ${response.hits.total.value} matches` )
+            return {
+                total: response.hits.total.value,
+                hits: response.hits.hits
+            }
+            
         }
+
+        throw new Error( `Invalid search type [${type}]` )
     } catch ( e ) {
         await logService.warning( `Elastic searchPatients ${e.toString()}` )
         return new errors.InternalServerError()

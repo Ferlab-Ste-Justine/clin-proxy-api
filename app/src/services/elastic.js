@@ -387,6 +387,45 @@ export default class ElasticClient {
     }
 
     async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
+        const uri = `${this.host}/patients/_search`
+        const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
+        const body = {
+            from: index,
+            size: limit,
+            query: {
+                bool: {
+                    must: filters.concat( aclFilters )
+                }
+            },
+            sort: [
+                {
+                    timestamp: 'desc'
+                },
+                {
+                    _id: 'desc'
+                }
+            ]
+        }
+
+        if ( includes.length > 0 ) {
+            body._source = { includes }
+        }
+
+        if ( shoulds.length > 0 ) {
+            body.query.bool.should = shoulds
+            body.query.bool.minimum_should_match = 1
+        }
+
+        return apiCall( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
+
+    async searchPrescriptions( acl, includes = [], filters = [], shoulds = [], index, limit ) {
         const uri = `${this.host}/prescriptions/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
