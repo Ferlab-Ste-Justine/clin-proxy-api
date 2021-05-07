@@ -8,6 +8,7 @@ import addGzipMiddleware from './middleware/gzip'
 import addJoiValidatorMiddleware from './middleware/joi'
 import addQueryParserMiddleware from './middleware/queryParser'
 import addVersionMiddleware from './middleware/version'
+import addAuthorizationsMiddleware from './middleware/authorizations'
 import restifyAsyncWrap from './helpers/async'
 
 export default class ApiService {
@@ -60,6 +61,7 @@ export default class ApiService {
         addGzipMiddleware( this.instance )
         addJoiValidatorMiddleware( this.instance )
         addAcceptMiddleware( this.instance )
+        addAuthorizationsMiddleware( this.instance )
 
         // Register Health Check Route
         this.instance.get( `${this.config.endpoint}/health`, restifyAsyncWrap( async( req, res, next ) => {
