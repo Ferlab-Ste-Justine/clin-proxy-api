@@ -4,7 +4,8 @@ import { AUTH_RESOURCES,
     AUTH_RESOURCE_PATIENT_VARIANTS,
     AUTH_RESOURCE_PATIENT_LIST,
     KEYCLOAK_AUTH_GRANT_TYPE,
-    KEYCLOAK_AUTH_RESPONSE_MODE
+    KEYCLOAK_AUTH_RESPONSE_MODE,
+    AUTH_RESOURCE_PATIENT_PRESCRIPTIONS
 } from '../helpers/acl'
 
 const checkPatientSearchAuth = ( url, resources ) => {
@@ -17,6 +18,10 @@ const checkPatientVariantsAuth = ( url, resources ) => {
 
 const checkProfileAuth = ( url ) => {
     return url.startsWith( '/meta' )
+}
+
+const checkHpos = ( url, resources ) => {
+    return url.startsWith( '/hpo' ) && resources.includes( AUTH_RESOURCE_PATIENT_PRESCRIPTIONS )
 }
   
 
@@ -45,7 +50,7 @@ const fetchAllowedResources = async ( token ) => {
     }
 }
   
-const authorizers = [ checkPatientSearchAuth, checkPatientVariantsAuth, checkProfileAuth ]
+const authorizers = [ checkPatientSearchAuth, checkPatientVariantsAuth, checkProfileAuth, checkHpos ]
 
 export default ( server ) => {
     server.use( async ( req, res, next ) => {
