@@ -5,6 +5,7 @@ import { getACL } from '../helpers/acl'
 
 import { DIALECT_LANGUAGE_ELASTIC_SEARCH } from './sqon/dialect/es'
 import { DIALECT_LANGUAGE_GRAPHQL } from './sqon/dialect/gql'
+import { esIndices } from '../../../utils/constants'
 
 const readSchemaAndAttachEnvironmentVariables = ( dialects, variables ) => {
     return dialects.reduce( ( accumulator, dialect ) => {
@@ -21,6 +22,8 @@ const readSchemaAndAttachEnvironmentVariables = ( dialects, variables ) => {
 
 const schemaVariables = JSON.parse( process.env.VARIANT_API_SERVICE ).schemaVariables || {}
 const schemas = readSchemaAndAttachEnvironmentVariables( [ DIALECT_LANGUAGE_ELASTIC_SEARCH, DIALECT_LANGUAGE_GRAPHQL ], schemaVariables )
+
+const VARIANTS_INDEX = esIndices.variants
 
 const getSchema = async ( logService, dialect = DIALECT_LANGUAGE_ELASTIC_SEARCH ) => {
     try {
@@ -56,7 +59,7 @@ const getVariants = async ( req, res, elasticService, logService ) => {
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.searchVariantsForPatient( patient, statement, query, getACL( req ), schema, group, index, limit )
+                response = await elasticService.searchVariantsForPatient( patient, statement, query, getACL( req ), schema, group, index, limit, VARIANTS_INDEX )
                 totalFromResponse = response.hits.total.value
                 hitsFromResponse = response.hits.hits.map( ( hit ) => {
                     const result = hit._source
@@ -100,7 +103,7 @@ const getFacets = async ( req, res, elasticService, logService ) => {
                 return new errors.NotImplementedError()
 
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
-                response = await elasticService.getFacetsForVariant( patient, facetsStatement, query, getACL( req ), schema )
+                response = await elasticService.getFacetsForVariant( patient, facetsStatement, query, getACL( req ), schema, VARIANTS_INDEX )
 
                 // Filtered Non-Nested
                 if ( response.aggregations.filtered ) {
@@ -233,7 +236,7 @@ const countVariants = async ( req, res, elasticService, logService ) => {
             case DIALECT_LANGUAGE_ELASTIC_SEARCH:
                 await Promise.all(
                     queries.map( async( query ) => {
-                        const response = await elasticService.countVariantsForPatient( patient, statement, query, getACL( req ), schema, group )
+                        const response = await elasticService.countVariantsForPatient( patient, statement, query, getACL( req ), schema, group, VARIANTS_INDEX )
 
                         totalFromResponse[ query ] = response.count
                         await logService.debug( `Elastic countVariants in ${dialect} dialect resolved query ${patient}/${query} found ${response.count} matches` )

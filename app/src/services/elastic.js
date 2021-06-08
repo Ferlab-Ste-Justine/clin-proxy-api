@@ -23,6 +23,7 @@ import {
     elasticSearchTranslator,
     FILTER_SUBTYPE_NESTED
 } from './api/variant/sqon/dialect/es'
+import { esIndices } from '../utils/constants'
 
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
     return JSON.parse(
@@ -308,7 +309,7 @@ export default class ElasticClient {
 
 
     async autoCompletePatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/patients/_search`
+        const uri = `${this.host}/${esIndices.patients}/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,
@@ -338,7 +339,7 @@ export default class ElasticClient {
     }
 
     async getPatientsByIds( ids ){
-        const uri = `${this.host}/patients/_search`
+        const uri = `${this.host}/${esIndices.patients}/_search`
         const should = ids.map( ( id ) => ( { match: { _id: id } } ) )
         
         const body = {
@@ -360,7 +361,7 @@ export default class ElasticClient {
     }
 
     async searchGenderAndPosition( ids ) {
-        const uri = `${this.host}/patients/_search`
+        const uri = `${this.host}/${esIndices.patients}/_search`
         const should = ids.map( ( id ) => ( { match: { _id: id } } ) )
         
         const body = {
@@ -387,7 +388,7 @@ export default class ElasticClient {
     }
 
     async searchPatients( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/patients/_search`
+        const uri = `${this.host}/${esIndices.patients}/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,
@@ -426,7 +427,7 @@ export default class ElasticClient {
 
 
     async searchPrescriptions( acl, includes = [], filters = [], shoulds = [], index, limit ) {
-        const uri = `${this.host}/prescriptions/_search`
+        const uri = `${this.host}/${esIndices.prescriptions}/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
         const body = {
             from: index,
@@ -465,7 +466,7 @@ export default class ElasticClient {
 
 
     async searchGenes( includes = [], filters = [], shoulds = [], index, limit, highlight = null ) {
-        const uri = `${this.host}/genes/_search`
+        const uri = `${this.host}/${esIndices.genes}/_search`
         const body = {
             from: index,
             size: limit,
@@ -497,8 +498,8 @@ export default class ElasticClient {
         } )
     }
 
-    async searchVariantsForPatient( patient, statement, query, acl, schema, group, index, limit ) {
-        const uri = `${this.host}${schema.path}/_search`
+    async searchVariantsForPatient( patient, statement, query, acl, schema, group, index, limit, esIndex ) {
+        const uri = `${this.host}/${esIndex}/_search`
         const body = generateVariantQuery( patient, statement, query, acl, schema, group, index, limit )
 
         return apiCall( {
@@ -509,8 +510,8 @@ export default class ElasticClient {
         } )
     }
 
-    async getFacetsForVariant( patient, statement, query, acl, schema ) {
-        const uri = `${this.host}${schema.path}/_search`
+    async getFacetsForVariant( patient, statement, query, acl, schema, esIndex ) {
+        const uri = `${this.host}/${esIndex}/_search`
         const body = generateFacetQuery( patient, statement, query, acl, schema )
 
         return apiCall( {
@@ -521,8 +522,8 @@ export default class ElasticClient {
         } )
     }
 
-    async countVariantsForPatient( patient, statement, query, acl, schema, group ) {
-        const uri = `${this.host}${schema.path}/_count`
+    async countVariantsForPatient( patient, statement, query, acl, schema, group, esIndex ) {
+        const uri = `${this.host}/${esIndex}/_count`
         const body = generateCountQuery( patient, statement, query, acl, schema, group )
 
         return apiCall( {
@@ -534,7 +535,7 @@ export default class ElasticClient {
     }
 
     async searchVariants( acl, includes = [], filters = [], index, limit ) {
-        const uri = `${this.host}/variants/_search`
+        const uri = `${this.host}/${esIndices.variants}/_search`
         const aclFilters = generateAclFilters( acl, SERVICE_TYPE_VARIANT )
         const body = {
             from: index,
@@ -661,7 +662,7 @@ export default class ElasticClient {
         }
     }
     async searchHPODescendants( hpoId ) {
-        const uri = `${this.host}/hpo/_search`
+        const uri = `${this.host}/${esIndices.hpo}/_search`
         const body = {
             query: {
                 term: {
@@ -680,7 +681,7 @@ export default class ElasticClient {
 
 
     async searchHPOAutocomplete( prefix ) {
-        const uri = `${this.host}/hpo/_search`
+        const uri = `${this.host}/${esIndices.hpo}/_search`
         const body = {
             query: {
                 bool: {

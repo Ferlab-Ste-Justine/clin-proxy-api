@@ -1,9 +1,10 @@
 import errors from 'restify-errors'
 import { getACL } from '../helpers/acl'
 import get from 'lodash/get'
+import { esIndices } from '../../../utils/constants'
 
-const SEARCH_TYPE_PRESCRIPTIONS = 'prescriptions'
-const SEARCH_TYPE_PATIENTS = 'patients'
+const SEARCH_TYPE_PRESCRIPTIONS = esIndices.prescriptions
+const SEARCH_TYPE_PATIENTS = esIndices.patients
 
 const canEdit = async( req, res, elasticService, logService ) => {
     try {
