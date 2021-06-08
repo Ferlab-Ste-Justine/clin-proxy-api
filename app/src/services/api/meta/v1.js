@@ -1,8 +1,9 @@
 import errors from 'restify-errors'
+import { esIndices } from '../../../utils/constants'
 import { getACL } from '../helpers/acl'
 
-const META_TYPE_STATEMENT = 'statement'
-const META_TYPE_PROFILE = 'profile'
+const META_TYPE_STATEMENT = esIndices.statement
+const META_TYPE_PROFILE = esIndices.profile
 
 const getStatements = async ( req, res, elasticService, logService ) => {
     try {
