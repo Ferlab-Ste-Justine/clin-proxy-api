@@ -7,8 +7,8 @@ jobs:
     name: Commit Lint Check
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Lint Commits
-      uses: Ferlab-Ste-Justine/action-commit-lint@master
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Lint Commits
+        uses: Ferlab-Ste-Justine/action-commit-lint@v2
