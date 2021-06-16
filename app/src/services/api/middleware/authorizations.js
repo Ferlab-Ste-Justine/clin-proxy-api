@@ -1,12 +1,9 @@
-import axios from 'axios'
-import queryString from 'querystring'
-import { AUTH_RESOURCES,
+import {
     AUTH_RESOURCE_PATIENT_VARIANTS,
     AUTH_RESOURCE_PATIENT_LIST,
-    KEYCLOAK_AUTH_GRANT_TYPE,
-    KEYCLOAK_AUTH_RESPONSE_MODE,
     AUTH_RESOURCE_PATIENT_PRESCRIPTIONS
 } from '../helpers/acl'
+import configureKeycloak from '../helpers/keycloak'
 
 const checkPatientSearchAuth = ( url, resources ) => {
     return url.startsWith( '/patient' ) && resources.includes( AUTH_RESOURCE_PATIENT_LIST )
@@ -23,42 +20,22 @@ const checkProfileAuth = ( url ) => {
 const checkHpos = ( url, resources ) => {
     return url.startsWith( '/hpo' ) && resources.includes( AUTH_RESOURCE_PATIENT_PRESCRIPTIONS )
 }
-  
 
-const fetchAllowedResources = async ( token ) => {
-    const data = queryString.encode( {
-        grant_type: KEYCLOAK_AUTH_GRANT_TYPE,
-        audience: process.env.KEYCLOAK_AUTH_CLIENT_ID,
-        response_mode: KEYCLOAK_AUTH_RESPONSE_MODE,
-        permission: AUTH_RESOURCES
-    } )
-  
-    try {
-        const response = await axios.post(
-            `${process.env.KEYCLOAK_URL}realms/clin/protocol/openid-connect/token`,
-            data,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        )
-  
-        return response.data.map( ( resource ) => resource.rsname )
-    } catch ( e ) {
-        return []
-    }
-}
   
 const authorizers = [ checkPatientSearchAuth, checkPatientVariantsAuth, checkProfileAuth, checkHpos ]
 
-export default ( server ) => {
+export default ( server, config ) => {
+    const keycloak = configureKeycloak( config.jwt )
+
     server.use( async ( req, res, next ) => {
         try {
             const url = req.url
-            const accessToken = req.headers.Authorization || req.headers.authorization || null
-            const token = accessToken.split( ' ' )[ 1 ]
-            const resources = await fetchAllowedResources( token )
+
+            const bearer = req.headers.Authorization || req.headers.authorization || null
+            const authorization = bearer.split( ' ' )[ 1 ]
+            
+            const parsed = await keycloak.verifyOffline( authorization )
+            const resources = parsed.authorization.permissions.map( ( permission ) => permission.rsname )
 
             const result = authorizers.some( ( authorizer ) => authorizer( url, resources ) )
             

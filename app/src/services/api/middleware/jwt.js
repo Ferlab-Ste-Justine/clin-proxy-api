@@ -30,10 +30,10 @@ export default ( server, config ) => {
         if ( route && !excluded ) {
             keycloak
                 .verifyOffline( ( accessToken && accessToken.indexOf( ' ' ) > -1 ) ? accessToken.split( ' ' )[ 1 ] : '' )
-                .then( ( user ) => {
-                    req.fhirPractitionerId = user.fhirPractitionerId
-                    req.fhirOrganizationId = user.fhirOrganizationId
-                    req.roles = user.realm_access.roles
+                .then( ( ) => {
+                    req.fhirPractitionerId = req.query.fhirPractitionerId
+                    req.fhirOrganizationId = req.query.fhirOrganizationId
+                    req.roles = JSON.parse( req.query.realm_access ).roles
                     return next()
                 } )
                 .catch( () => {
