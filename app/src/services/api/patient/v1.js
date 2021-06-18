@@ -129,6 +129,7 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
                 'firstName',
                 'mrn',
                 'gender',
+                'ramq'
             )
         }
 
