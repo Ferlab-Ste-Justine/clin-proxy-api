@@ -108,9 +108,19 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
         const params = req.query || req.params
         const query = params.query
         const type = params.type || 'partial'
+        const gender = params.gender
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const fields = []
+        const filters = []
+
+        if ( gender != null ){
+            filters.push( {
+                match: {
+                    gender
+                }
+            } )
+        }
 
         if ( type === 'partial' ) {
             fields.push(
@@ -118,6 +128,7 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
                 'lastName',
                 'firstName',
                 'mrn',
+                'gender',
             )
         }
 
@@ -138,7 +149,7 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
             }
         ]
 
-        const response = await elasticService.autoCompletePatients( getACL( req ), fields, [], matches, index, limit )
+        const response = await elasticService.autoCompletePatients( getACL( req ), fields, filters, matches, index, limit )
 
         await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total.value} matches` )
         return {
