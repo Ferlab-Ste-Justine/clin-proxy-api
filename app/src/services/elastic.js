@@ -28,7 +28,7 @@ const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
     )
 }
 
-const generateAclFilters = ( acl, service, schema = null ) => {
+const generateAclFilters = ( acl, service ) => {
     const filters = []
 
     const practitionerId = acl.practitioner_id
@@ -36,11 +36,7 @@ const generateAclFilters = ( acl, service, schema = null ) => {
     // Shouldn't acl.organization_id be a list?  If so, in the Keycloak fhir organization mapper, activate the multi-value switch.
     // const organizationId = acl.organization_id
 
-    if ( service === SERVICE_TYPE_PATIENT ) {
-        filters.push( { match: { 'practitioners.id': practitionerId } } )
-    } else if ( service === SERVICE_TYPE_VARIANT ) {
-        filters.push( { term: { [ schema.fields.practitioner ]: practitionerId } } )
-    } else if ( service === SERVICE_TYPE_META ) {
+    if ( service === SERVICE_TYPE_META ) {
         filters.push( { match: { practitionerId } } )
     }
     return filters
