@@ -5,30 +5,19 @@ import jwkToPem from 'jwk-to-pem'
 
 const certificatesCache = {}
 
-const makeUser = ( {
-    sub,
-    preferred_username,
-    email_verified,
-    resource_access,
-    realm_access,
-    email,
-    name,
-    fhir_practitioner_id,
-    fhir_organization_id,
-    given_name,
-    family_name
-} ) => ( {
-    id: sub,
-    userName: preferred_username,
-    emailVerified: email_verified,
-    resourceAccess: resource_access,
-    realm_access: realm_access,
-    email,
-    name,
-    firstName: given_name,
-    lastName: family_name,
-    fhirPractitionerId: fhir_practitioner_id,
-    fhirOrganizationId: fhir_organization_id
+const makeUser = ( data ) => ( {
+    id: data.sub,
+    userName: data.preferred_username,
+    emailVerified: data.email_verified,
+    resourceAccess: data.resource_access,
+    email: data.email,
+    name: data.name,
+    firstName: data.given_name,
+    lastName: data.family_name,
+    authorization: data.authorization,
+    fhirPractitionerId: data.fhir_practitioner_id,
+    fhirOrganizationId: data.fhir_organization_id
+    
 } )
 
 const verify = curryN( 2 )( jwt.verify )

@@ -55,13 +55,13 @@ export default class ApiService {
 
         addCorsMiddleware( this.instance, this.config )
         addJwtMiddleware( this.instance, this.config )
+        addAuthorizationsMiddleware( this.instance, this.config )
         addVersionMiddleware( this.instance, apiVersions, defaultApiVersion )
         addQueryParserMiddleware( this.instance )
         addBodyParserMiddleware( this.instance )
         addGzipMiddleware( this.instance )
         addJoiValidatorMiddleware( this.instance )
         addAcceptMiddleware( this.instance )
-        addAuthorizationsMiddleware( this.instance )
 
         // Register Health Check Route
         this.instance.get( `${this.config.endpoint}/health`, restifyAsyncWrap( async( req, res, next ) => {
