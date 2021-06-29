@@ -134,6 +134,29 @@ export default class PatientService extends ApiService {
 
         } ) )
 
+        // Register searchPrescriptionsByAutoComplete Route
+        this.instance.get( {
+            path: `${this.config.endpoint}/prescriptions`,
+            validation: validators.searchPatientByAutoComplete
+        }, restifyAsyncWrap( async( req, res, next ) => {
+            try {
+                const response = await getFunctionForApiVersion( req.version, 'searchPrescriptionsByAutoComplete' )(
+                    req,
+                    res,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( response )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+
+        } ) )
+
         // Register getPatientById Route
         this.instance.get( {
             path: `${this.config.endpoint}/:uid`,
