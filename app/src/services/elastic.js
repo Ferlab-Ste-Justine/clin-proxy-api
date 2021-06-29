@@ -315,6 +315,33 @@ export default class ElasticClient {
         } )
     }
 
+    async autoCompletePrescriptions( acl, shoulds = [], index, limit ) {
+        const uri = `${this.host}/${esIndices.prescriptions}/_search`
+        const aclFilters = generateAclFilters( acl, SERVICE_TYPE_PATIENT )
+        const body = {
+            from: index,
+            size: limit,
+            query: {
+                bool: {
+                    must: aclFilters
+                }
+            }
+        }
+
+        if ( shoulds.length > 0 ) {
+            body.query.bool.should = shoulds
+            body.query.bool.minimum_should_match = 1
+        }
+
+        return apiCall( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
+
     async getPatientsByIds( ids ){
         const uri = `${this.host}/${esIndices.patients}/_search`
         const should = ids.map( ( id ) => ( { match: { _id: id } } ) )

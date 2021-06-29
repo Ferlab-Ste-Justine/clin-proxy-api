@@ -163,10 +163,50 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
     }
 }
 
+
+const searchPrescriptionsByAutoComplete = async ( req, res, elasticService, logService ) => {
+    try {
+        const params = req.query || req.params
+        const query = params.query
+        const limit = params.size || 25
+        const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
+        
+        const matches = [
+            {
+                multi_match: {
+                    query: query,
+                    type: 'phrase_prefix',
+                    fields: [
+                        'id',
+                        'patientInfo.lastName',
+                        'patientInfo.firstName',
+                        'patientInfo.ramq',
+                        'patientInfo.mrn',
+                        'familyInfo.id'
+                    ]
+                }
+            }
+        ]
+
+        const response = await elasticService.autoCompletePrescriptions( getACL( req ), matches, index, limit )
+
+        await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total.value} matches` )
+        return {
+            total: response.hits.total.value,
+            hits: response.hits.hits
+        }
+    } catch ( e ) {
+        await logService.warning( `Elastic searchPatientsByAutoComplete ${e.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
+
 export default {
     canEdit,
     getGenderAndPosition,
     getPatientById,
     searchPatients,
-    searchPatientsByAutoComplete
+    searchPatientsByAutoComplete,
+    searchPrescriptionsByAutoComplete
 }
