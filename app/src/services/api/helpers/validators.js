@@ -15,7 +15,7 @@ export default {
     searchPatientByPatientId: {
         schema: {
             params: Joi.object( {
-                uid: Joi.string().alphanum().min( 1 ).max( 256 ).required()
+                uid: Joi.string().regex( /^[a-zA-Z0-9-]+$/ ).min( 1 ).max( 256 ).required()
             } ).required()
         }
     },
