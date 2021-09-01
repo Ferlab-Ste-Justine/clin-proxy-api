@@ -665,12 +665,34 @@ export default class ElasticClient {
             } )
         }
     }
-    async searchHPODescendants( hpoId ) {
+    async searchHPODescendants( hpo ) {
         const uri = `${this.host}/${esIndices.hpo}/_search`
         const body = {
             query: {
                 term: {
-                    'parents.id': hpoId
+                    parents: {
+                        value: hpo
+                    }
+                }
+            }
+        }
+
+        return apiCall( {
+            method: 'GET',
+            uri,
+            json: true,
+            body
+        } )
+    }
+
+    async searchHPOByAncestorId( hpoId ) {
+        const uri = `${this.host}/${esIndices.hpo}/_search`
+        const body = {
+            query: {
+                term: {
+                    'compact_ancestors.hpo_id.keyword': {
+                        value: hpoId
+                    }
                 }
             }
         }
@@ -692,12 +714,14 @@ export default class ElasticClient {
                     should: [
                         {
                             prefix: {
-                                name: prefix
+                                name: {
+                                    value: prefix
+                                }
                             }
                         },
                         {
                             match_phrase_prefix: {
-                                id: prefix
+                                hpo_id: prefix
                             }
                         }
                     ]

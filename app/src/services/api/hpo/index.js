@@ -88,6 +88,25 @@ export default class HPOService extends ApiService {
             }
         } ) )
 
+        this.instance.get( {
+            path: `${this.config.endpoint}/ancestors`
+        }, restifyAsyncWrap( async ( req, res, next ) => {
+            try {
+                const result = await getFunctionForApiVersion( req.version, 'searchHPOByAncestorId' )(
+                    req,
+                    res,
+                    this.elasticService,
+                    this.logService
+                )
+
+                res.status( 200 )
+                res.send( result )
+                next()
+            } catch ( e ) {
+                await this.logService.warning( `${this.config.endpoint} ${e.toString()}` )
+                next( e )
+            }
+        } ) )
 
         super.start()
     }
