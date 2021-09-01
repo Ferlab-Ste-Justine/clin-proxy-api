@@ -32,7 +32,24 @@ const searchHPOAutocomplete = async( req, res, elasticService, logService ) => {
     }
 }
 
+const searchHPOByAncestorId = async( req, res, elasticService, logService ) => {
+    try {
+        const params = req.query || req.params || req.body
+        const { prefix } = params
+        const response = await elasticService.searchHPOByAncestorId( prefix )
+
+        return {
+            total: response.hits.total.value,
+            hits: response.hits.hits
+        }
+    } catch ( error ) {
+        await logService.warning( `Elastic searchHPOByAncestorId ${error.toString()}` )
+        return new errors.InternalServerError()
+    }
+}
+
 export default {
     searchHPODescendants,
-    searchHPOAutocomplete
+    searchHPOAutocomplete,
+    searchHPOByAncestorId
 }
