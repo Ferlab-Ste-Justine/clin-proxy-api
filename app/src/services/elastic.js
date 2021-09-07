@@ -22,6 +22,8 @@ import {
 } from './api/variant/sqon/dialect/es'
 import { esIndices } from '../utils/constants'
 
+const SIZE_HPO_CHILDREN = 1000
+
 const replacePlaceholderInJSON = ( query, placeholder, placeholderValue ) => {
     return JSON.parse(
         JSON.stringify( query ).split( placeholder ).join( placeholderValue )
@@ -668,7 +670,7 @@ export default class ElasticClient {
     async searchHPODescendants( hpo ) {
         const uri = `${this.host}/${esIndices.hpo}/_search`
         const body = {
-            size: 1000,
+            size: SIZE_HPO_CHILDREN,
             query: {
                 term: {
                     parents: {
