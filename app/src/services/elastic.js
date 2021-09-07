@@ -668,6 +668,7 @@ export default class ElasticClient {
     async searchHPODescendants( hpo ) {
         const uri = `${this.host}/${esIndices.hpo}/_search`
         const body = {
+            size: 1000,
             query: {
                 term: {
                     parents: {
@@ -685,16 +686,27 @@ export default class ElasticClient {
         } )
     }
 
-    async searchHPOByAncestorId( hpoId ) {
+    async searchHPOByAncestorId( hpoId, size, after ) {
         const uri = `${this.host}/${esIndices.hpo}/_search`
         const body = {
+            size: size,
             query: {
                 term: {
                     'compact_ancestors.hpo_id.keyword': {
                         value: hpoId
                     }
                 }
-            }
+            },
+            sort: [
+                {
+                    'hpo_id.keyword': {
+                        order: 'desc'
+                    }
+                }
+            ],
+            search_after: [
+                after
+            ]
         }
 
         return apiCall( {

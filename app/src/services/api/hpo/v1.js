@@ -35,8 +35,8 @@ const searchHPOAutocomplete = async( req, res, elasticService, logService ) => {
 const searchHPOByAncestorId = async( req, res, elasticService, logService ) => {
     try {
         const params = req.query || req.params || req.body
-        const { prefix } = params
-        const response = await elasticService.searchHPOByAncestorId( prefix )
+        const { hpoId, size, after } = params
+        const response = await elasticService.searchHPOByAncestorId( hpoId, size, after )
 
         return {
             total: response.hits.total.value,
