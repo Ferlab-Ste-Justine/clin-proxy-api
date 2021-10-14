@@ -205,7 +205,7 @@ describe('SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => {
             expect(facetQuery).to.eql(
                 {
                     "size": 0,
-                    "query": {"bool": {"filter": [[{"term": {"donors.organization_id": "OR00203"}}], {"term": {"donors.patient_id": "PA00001"}}]}},
+                    "query": {"bool": {"filter": [{"term": {"donors.patient_id": "PA00001"}}]}},
                     "aggs": {
                         "filtered": {
                             "aggs": {
@@ -366,7 +366,7 @@ describe('SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => {
             expect(facetQuery).to.eql(
                 {
                     "size": 0,
-                    "query": {"bool": {"filter": [[{"term": {"donors.practitioner_id": "PR00603"}}], {"term": {"donors.patient_id": "PA00001"}}]}},
+                    "query": {"bool": {"filter": [{"term": {"donors.patient_id": "PA00001"}}]}},
                     "aggs": {
                         "filtered": {
                             "aggs": {
@@ -529,14 +529,14 @@ describe('SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => {
         it('should contain ACL for Genetician role Query Count translation', () => {
             const countQuery = generateCountQuery(PATIENT_ID, EMPTY_STATEMENT, EMPTY_STATEMENT_QUERY, GENETICIAN_ACL, ELASTIC_SEARCH_SCHEMA_V1)
             expect(countQuery).to.eql(
-                {"query": {"bool": {"filter": [[{"term": {"donors.organization_id": "OR00203"}}], {"term": {"donors.patient_id": "PA00001"}}]}}}
+                {"query": {"bool": {"filter": [{"term": {"donors.patient_id": "PA00001"}}]}}}
             )
         })
 
         it('should contain ACL for Practitioner role in Query Count translation', () => {
             const countQuery = generateCountQuery(PATIENT_ID, EMPTY_STATEMENT, EMPTY_STATEMENT_QUERY, PRACTITIONER_ACL, ELASTIC_SEARCH_SCHEMA_V1)
             expect(countQuery).to.eql(
-                {"query": {"bool": {"filter": [[{"term": {"donors.practitioner_id": "PR00603"}}], {"term": {"donors.patient_id": "PA00001"}}]}}}
+                {"query": {"bool": {"filter": [{"term": {"donors.patient_id": "PA00001"}}]}}}
             )
         })
 
@@ -559,7 +559,7 @@ describe('SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => {
                 {
                     "from": 0,
                     "size": 25,
-                    "query": {"bool": {"filter": [[{"term": {"donors.organization_id": "OR00203"}}], {"term": {"donors.patient_id": "PA00001"}}]}},
+                    "query": {"bool": {"filter": [{"term": {"donors.patient_id": "PA00001"}}]}},
                     "sort": [{"impact_score": {"order": "desc"}}]
 
                 }
@@ -572,7 +572,7 @@ describe('SQON (JSON) to ElasticSearch Query Translation For Schema V1', () => {
                 {
                     "from": 0,
                     "size": 25,
-                    "query": {"bool": {"filter": [[{"term": {"donors.practitioner_id": "PR00603"}}], {"term": {"donors.patient_id": "PA00001"}}]}},
+                    "query": {"bool": {"filter": [{"term": {"donors.patient_id": "PA00001"}}]}},
                     "sort": [{"impact_score": {"order": "desc"}}]
 
                 }
