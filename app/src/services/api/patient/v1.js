@@ -55,7 +55,7 @@ const getGenderAndPosition = async ( req, res, elasticService, logService ) => {
 
 const getPatientById = async ( req, res, elasticService, logService ) => {
     try {
-        const response = await elasticService.searchPatients( getACL( req ), [], [ { match: { id: req.params.uid } } ], [] )
+        const response = await elasticService.searchPatients( getACL( req ), [], [ { match: { _id: req.params.uid } } ], [] )
 
         if ( response.hits.total.value < 1 ) {
             return new errors.NotFoundError()
