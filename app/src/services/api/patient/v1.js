@@ -111,13 +111,27 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
         const gender = params.gender
         const limit = params.size || 25
         const position = params.position
+        const idsToExclude = params.idsToExclude || []
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
 
-        const filters = [ gender, position ].filter( ( rawParam ) => rawParam ).map( ( rawParam ) => ( {
+        const mustMatchGenderFilter = gender ? [ { match: {
+            gender
+        } } ] : []
+
+        const mustMatchPositionFilter = position ? [ { match: {
+            position
+        } } ] : []
+
+        const mustNotMatchIdFilters = idsToExclude.length > 0 ? idsToExclude.map( ( idToExclude ) => ( {
             match: {
-                rawParam
-            }
-        } ) )
+                id: idToExclude
+            } }
+        ) ) : []
+
+        const filters = {
+            must: [ ...mustMatchGenderFilter, ...mustMatchPositionFilter ],
+            mustNot: [ ...mustNotMatchIdFilters ]
+        }
 
         const fields = type === 'partial' ? [ 'id', 'lastName', 'firstName', 'mrn', 'gender', 'ramq' ] : []
 
