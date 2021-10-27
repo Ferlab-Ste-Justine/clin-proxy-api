@@ -26,7 +26,9 @@ export default {
                 query: Joi.string().min( 1 ),
                 page: Joi.number().integer().min( 0 ),
                 size: Joi.number().integer().min( 1 ).max( 1000 ),
-                gender: Joi.string().valid( [ 'Female', 'Male' ] )
+                gender: Joi.string().valid( [ 'Female', 'Male' ] ),
+                position: Joi.string().valid( [ 'Proband', 'Parent' ] ),
+                idsToExclude: Joi.array().items( Joi.string() )
             } ).required()
         }
     },

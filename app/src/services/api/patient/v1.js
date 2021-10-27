@@ -5,18 +5,18 @@ import get from 'lodash/get'
 const SEARCH_TYPE_PRESCRIPTIONS = 'prescriptions'
 const SEARCH_TYPE_PATIENTS = 'patients'
 
-const canEdit = async( req, res, elasticService, logService ) => {
+const canEdit = async ( req, res, elasticService, logService ) => {
     try {
         const params = req.body
         const ids = get( params, 'ids', [] )
 
-        if ( ids.length === 0 ){
+        if ( ids.length === 0 ) {
             throw new Error( 'Invalid ids' )
         }
 
         const response = await elasticService.getPatientsByIds( ids )
         const hits = response.hits.hits
-        
+
         const hasSubmittedPrescriptions = ( patient ) =>
             patient.requests.some( ( request ) => request.status === 'active' || request.status === 'completed' )
 
@@ -37,7 +37,7 @@ const getGenderAndPosition = async ( req, res, elasticService, logService ) => {
         const params = req.body
         const ids = get( params, 'ids', [] )
 
-        if ( ids.length === 0 ){
+        if ( ids.length === 0 ) {
             throw new Error( 'Invalid ids.' )
         }
 
@@ -76,7 +76,7 @@ const searchPatients = async ( req, res, elasticService, logService ) => {
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
         const type = params.type || 'patient'
 
-        if ( type === SEARCH_TYPE_PRESCRIPTIONS ){
+        if ( type === SEARCH_TYPE_PRESCRIPTIONS ) {
             const response = await elasticService.searchPrescriptions( getACL( req ), [], [], [], index, limit )
 
             await logService.debug( `Elastic searchPrescriptions [${index},${limit}] returns ${response.hits.total.value} matches` )
@@ -84,7 +84,7 @@ const searchPatients = async ( req, res, elasticService, logService ) => {
                 total: response.hits.total.value,
                 hits: response.hits.hits
             }
-        } else if ( type === SEARCH_TYPE_PATIENTS ){
+        } else if ( type === SEARCH_TYPE_PATIENTS ) {
 
             const response = await elasticService.searchPatients( getACL( req ), [], [], [], index, limit )
 
@@ -93,7 +93,7 @@ const searchPatients = async ( req, res, elasticService, logService ) => {
                 total: response.hits.total.value,
                 hits: response.hits.hits
             }
-            
+
         }
 
         throw new Error( `Invalid search type [${type}]` )
@@ -110,28 +110,30 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
         const type = params.type || 'partial'
         const gender = params.gender
         const limit = params.size || 25
+        const position = params.position
+        const idsToExclude = params.idsToExclude || []
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        const fields = []
-        const filters = []
 
-        if ( gender != null ){
-            filters.push( {
-                match: {
-                    gender
-                }
-            } )
+        const mustMatchGenderFilter = gender ? [ { match: {
+            gender
+        } } ] : []
+
+        const mustMatchPositionFilter = position ? [ { match: {
+            position
+        } } ] : []
+
+        const mustNotMatchIdFilters = idsToExclude.length > 0 ? idsToExclude.map( ( idToExclude ) => ( {
+            match: {
+                id: idToExclude
+            } }
+        ) ) : []
+
+        const filters = {
+            must: [ ...mustMatchGenderFilter, ...mustMatchPositionFilter ],
+            mustNot: [ ...mustNotMatchIdFilters ]
         }
 
-        if ( type === 'partial' ) {
-            fields.push(
-                'id',
-                'lastName',
-                'firstName',
-                'mrn',
-                'gender',
-                'ramq'
-            )
-        }
+        const fields = type === 'partial' ? [ 'id', 'lastName', 'firstName', 'mrn', 'gender', 'ramq' ] : []
 
         const matches = [
             {
@@ -152,7 +154,9 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
 
         const response = await elasticService.autoCompletePatients( getACL( req ), fields, filters, matches, index, limit )
 
-        await logService.debug( `Elastic searchPatientsByAutoComplete using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total.value} matches` )
+        await logService.debug(
+            `Elastic searchPatientsByAutoComplete
+             using ${params.type}/${params.query} [${index},${limit}] returns ${response.hits.total.value} matches` )
         return {
             total: response.hits.total.value,
             hits: response.hits.hits
@@ -170,7 +174,7 @@ const searchPrescriptionsByAutoComplete = async ( req, res, elasticService, logS
         const query = params.query
         const limit = params.size || 25
         const index = ( params.page ? ( params.page - 1 ) : 0 ) * limit
-        
+
         const matches = [
             {
                 multi_match: {

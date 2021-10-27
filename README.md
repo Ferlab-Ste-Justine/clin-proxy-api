@@ -42,7 +42,7 @@ Install Node.js LTS 10.14.1 using [nvm](https://github.com/creationix/nvm/blob/m
 ```
 ./launch-local.sh
 ```
-
+Note: if you need to add a ca-certificate add its path in this env var `NODE_EXTRA_CA_CERTS` in the shell running the project.
 ### Dockerized Version
 
 - Make sure that a network named **proxy** exists on your machine

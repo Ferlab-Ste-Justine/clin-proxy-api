@@ -295,7 +295,8 @@ export default class ElasticClient {
             size: limit,
             query: {
                 bool: {
-                    must: filters.concat( aclFilters )
+                    must: [ ...filters.must, ...aclFilters ],
+                    must_not: [ ...filters.mustNot ]
                 }
             }
         }
