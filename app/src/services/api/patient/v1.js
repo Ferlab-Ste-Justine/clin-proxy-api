@@ -141,12 +141,11 @@ const searchPatientsByAutoComplete = async ( req, res, elasticService, logServic
                     query: query,
                     type: 'phrase_prefix',
                     fields: [
-                        'id',
-                        'familyId',
-                        'lastName',
-                        'firstName',
-                        'mrn',
-                        'ramq'
+                        'cidText',
+                        'lastNameText',
+                        'firstNameText',
+                        'mrnText',
+                        'ramqText'
                     ]
                 }
             }
