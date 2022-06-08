@@ -6,6 +6,10 @@
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Unit%20Tests/badge.svg)
 ![](https://github.com/Ferlab-Ste-Justine/clin-proxy-api/workflows/Commit%20Lint%20Check/badge.svg)
 
+# Deprecation
+
+These services are deprecated and will no longer be maintained.
+
 # CLIN Proxy API
 
 ## Creating Services
